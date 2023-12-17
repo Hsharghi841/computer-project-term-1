@@ -1,6 +1,6 @@
-allegro_monolith-5.2.dll
-Makefile.win
-Project1.dev
-Project1.exe
-Project1.layout
-main.o
+*.dll
+*.win
+*.dev
+*.exe
+*.layout
+*.o
