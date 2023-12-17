@@ -43,44 +43,51 @@ int main()
 
 void initAnimals(){
 
-    animal[1].name = "bulldog";
-    animal[1].energy = 5;
-    animal[1].power = 5;
-    animal[1].dogdefense = 30;
+    animals[1].name = "bulldog";
+    animals[1].energy = 5;
+    animals[1].power = 5;
+    animals[1].dogdefense = 30;
 
-    animal[2].name = "pitbull";
-    animal[2].energy = 2;
-    animal[2].power = 2;
-    animal[2].dogdefense = 15;
+    animals[2].name = "pitbull";
+    animals[2].energy = 2;
+    animals[2].power = 2;
+    animals[2].dogdefense = 15;
 
-    animal[3].name = "Shepherd";
-    animal[3].energy = 3;
-    animal[3].power = 2;
-    animal[3].dogdefense = 20;
+    animals[3].name = "Shepherd";
+    animals[3].energy = 3;
+    animals[3].power = 2;
+    animals[3].dogdefense = 20;
 
-    animal[4].name = "BulldogJr";
-    animal[4].energy = 1;
-    animal[4].power = 1;
-    animal[4].dogdefense = 5;
+    animals[4].name = "BulldogJr";
+    animals[4].energy = 1;
+    animals[4].power = 1;
+    animals[4].dogdefense = 5;
 
     // 4 3-point mice 
     for (size_t i = 5; i < 9; i++)
     {
-        animal[i].energy = 3;
-        animal[i].score = 3;
+        animals[i].energy = 3;
+        animals[i].score = 3;
     }
     // 6 2-point mice
     for (size_t i = 9; i < 15; i++)
     {
-        animal[i].energy = 2;
-        animal[i].score = 2;
+        animals[i].energy = 2;
+        animals[i].score = 2;
     }
     // 8 1-point mice
     for (size_t i = 15; i < 23; i++)
     {
-        animal[i].energy = 1;
-        animal[i].score = 1;
+        animals[i].energy = 1;
+        animals[i].score = 1;
     }
+    // cats (this part of code will change!)
+    for (size_t i = 23; i <= 26; i++)
+    {
+        animals[i].energy = 5;
+        animals[i].power = 2;
+    }
+    
     
     
 }
