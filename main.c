@@ -24,13 +24,28 @@ int main()
     if (!cursor) {
       printf("Error loading cursor.tga\n");
     }
+    int i=1,mode=1;
     while(1){
-    	al_clear_to_color(al_map_rgb(0, 0, 0));
+    	
+    	
     	al_get_mouse_state(&msestate);
     	al_draw_bitmap(cursor,msestate.x,msestate.y,0);
-    	al_draw_text(font, al_map_rgb(255, 255, 255),3, 300, 400, "Hello World");
-    	for(int i=0;i<3;i++)
-    		if()
+    	//al_draw_text(font, al_map_rgb(255, 255, 255),3, 300, 400, "Hello World");
+    	if(al_mouse_button_down(&msestate,i))
+    		mode*=-1;
+        if (mode==1)
+        {
+            al_clear_to_color(al_map_rgb(0, 0, 0));
+            al_draw_bitmap(cursor,msestate.x,msestate.y,0);
+            al_draw_text(font, al_map_rgb(255, 255, 255),3, 300, 400, "Hello World");
+        }
+        else
+        {
+            al_clear_to_color(al_map_rgb(0, 255, 255));
+            al_draw_bitmap(cursor,msestate.x,msestate.y,0);
+            al_draw_text(font, al_map_rgb(255, 50, 150),3, 300, 400, "shargi bebin");            
+        }
+        
     	al_flip_display();
     //al_rest(10.0);
 	}
