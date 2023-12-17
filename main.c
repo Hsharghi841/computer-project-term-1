@@ -6,7 +6,7 @@
 
 void initAnimals();
 
-// stractuers for objects (mouses, cats, dogs)
+// stractuers for objects (mice, cats, dogs)
 
 typedef struct 
 {
@@ -63,5 +63,24 @@ void initAnimals(){
     animal[4].power = 1;
     animal[4].dogdefense = 5;
 
+    // 4 3-point mice 
+    for (size_t i = 5; i < 9; i++)
+    {
+        animal[i].energy = 3;
+        animal[i].score = 3;
+    }
+    // 6 2-point mice
+    for (size_t i = 9; i < 15; i++)
+    {
+        animal[i].energy = 2;
+        animal[i].score = 2;
+    }
+    // 8 1-point mice
+    for (size_t i = 15; i < 23; i++)
+    {
+        animal[i].energy = 1;
+        animal[i].score = 1;
+    }
+    
     
 }
