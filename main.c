@@ -9,6 +9,7 @@
 //functions:
 
 void initAnimals();
+void initscrean();
 
 // stractuers for objects (mice, cats, dogs)
 
@@ -31,7 +32,13 @@ animal animals[26];
 
 int main()
 {
-   // ALLEGRO_DISPLAY *display;
+	
+}
+
+
+void initscrean()
+{
+	   // ALLEGRO_DISPLAY *display;
   //  ALLEGRO_BITMAP *cursor;
     ALLEGRO_MOUSE_STATE msestate;
   //  ALLEGRO_KEYBOARD_STATE kbdstate;
@@ -75,10 +82,7 @@ int main()
         
     	al_flip_display();
     //al_rest(10.0);
-	}
-
-
-
+}
 void initAnimals(){
 
     animals[1].name = "bulldog";
