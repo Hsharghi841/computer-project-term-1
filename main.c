@@ -1,4 +1,4 @@
-#include <allegro5/allegro.h>
+    #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
@@ -9,6 +9,7 @@
 //functions:
 
 void initAnimals();
+int abs(int x);
 
 // stractuers for objects (mice, cats, dogs)
 
@@ -25,7 +26,7 @@ typedef struct
 
 // 1 to 4 for dogs, 5 to 22 for mouses, 23 to 26 for cats
 animal animals[26];
-
+int bord[31][31][30];
 
 
 
@@ -128,4 +129,36 @@ void initAnimals(){
     
     
     
+}
+
+void sortingbord(int size){
+
+
+    // sorting dogs
+    int dogsBord[31][31] = {{0}};
+
+    for (size_t i = 1; i <= 4; i++)
+    {
+        int r = rand() % (size * size); 
+        int x = r % size, y = r / size;
+        if(!dogsBord[y][x]){
+            for (size_t j = 0; j <= size * size; j++)
+            {
+                if(abs(x - (j % size)) * 2 <= (zize / 4) && abs(y - (j / size)) * 2 <= (zize / 4)){
+                    dogsBord[j / size][j % size] = 1;
+                }
+            }
+            
+            putOnBord(i, y, x);
+
+        }
+        else i--;
+    }
+    
+}
+
+
+int abs(int x){
+    if(x < 0)x = -x;
+    return x;
 }
