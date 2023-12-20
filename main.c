@@ -1,15 +1,17 @@
-    #include <allegro5/allegro.h>
+#include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
 #include <stdio.h>
+#include <math.h>
 
 
 //functions:
 
 void initAnimals();
 int abs(int x);
+void sortObject(int id[], int idnum, int bordSize);
 
 // stractuers for objects (mice, cats, dogs)
 
@@ -135,25 +137,7 @@ void sortingbord(int size){
 
 
     // sorting dogs
-    int dogsBord[31][31] = {{0}};
-
-    for (size_t i = 1; i <= 4; i++)
-    {
-        int r = rand() % (size * size); 
-        int x = r % size, y = r / size;
-        if(!dogsBord[y][x]){
-            for (size_t j = 0; j <= size * size; j++)
-            {
-                if(abs(x - (j % size)) * 2 <= (zize / 4) && abs(y - (j / size)) * 2 <= (zize / 4)){
-                    dogsBord[j / size][j % size] = 1;
-                }
-            }
-            
-            putOnBord(i, y, x);
-
-        }
-        else i--;
-    }
+    
     
 }
 
@@ -162,3 +146,27 @@ int abs(int x){
     if(x < 0)x = -x;
     return x;
 }
+
+void sortObject(int id[], int idnum, int bordSize){
+
+    int boolBord[31][31] = {{0}};
+
+    for (size_t i = 0; i < idnum; i++)
+    {
+        int r = rand() % (bordSize * bordSize); 
+        int x = r % bordSize, y = r / bordSize;
+        if(!boolBord[y][x]){
+            for (size_t j = 0; j < bordSize * bordSize; j++)
+            {
+                if(abs(x - (j % bordSize)) * 2 <= (bordSize / sqrt(idnum)) && abs(y - (j / bordSize)) * 2 <= (bordSize / idnum)){
+                    dogsBord[j / bordSize][j % bordSize] = 1;
+                }
+            }
+            
+            putOnBord(id[i], y, x);
+
+        }
+        else i--;
+    }
+}
+
