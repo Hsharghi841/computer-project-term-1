@@ -12,6 +12,8 @@
 void initAnimals();
 int abs(int x);
 void sortObject(int id[], int idnum, int bordSize);
+// putOnBord tries to put an object on bord if can return 1 else 0 :
+int putOnBord(int id, int width, int length);
 
 // stractuers for objects (mice, cats, dogs)
 
@@ -133,13 +135,6 @@ void initAnimals(){
     
 }
 
-void sortingbord(int size){
-
-
-    // sorting dogs
-    
-    
-}
 
 
 int abs(int x){
@@ -163,10 +158,33 @@ void sortObject(int id[], int idnum, int bordSize){
                 }
             }
             
-            putOnBord(id[i], y, x);
+            if(!putOnBord(id[i], y, x)){
+                i--;
+            }
 
         }
         else i--;
     }
 }
 
+int putOnBord(int id, int width, int length){
+    if(0 < id && id < 27){
+        bord[width][length][bord[width][length][0] + 2] = id;
+        bord[width][length][0]++;
+        animals[id].x = length;
+        animals[id].y = width;
+        return 1;
+    }
+    {// must add code of objects in if
+        if(!bord[width][length][1]){
+            bord[width][length][1] = id;
+            return 1;
+        }
+        else return 0;
+    }
+    //a display function must add in here:
+
+    //
+
+
+}
