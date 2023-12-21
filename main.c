@@ -9,7 +9,7 @@
 
 // defines
 
-#define sq(x) (x) * (x)
+#define sq(x) (x) * (x) // for square a number
 
 //functions:
 
@@ -129,17 +129,7 @@ void sortObject(int id[], int idnum, int bordSize){
             boolBord[j / bordSize][j % bordSize] = 1;
         }
     }
-
-    for (size_t k = 0; k < bordSize; k++)
-        {
-            for (size_t j = 0; j < bordSize; j++)
-            {
-                printf("%d", boolBord[k][j]);
-            }
-            printf("\n");
-        }
-        printf("\n\n");
-
+    
     for (size_t i = 0; i < idnum; i++)
     {
         int r = rand() % (bordSize * bordSize); 
@@ -179,7 +169,7 @@ int putOnBord(int id, int width, int length){
     }
     //a display function must add in here:
 
-    //
+    
 
 
 }
