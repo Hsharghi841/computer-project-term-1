@@ -5,7 +5,11 @@
 #include <allegro5/allegro_ttf.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 
+// defines
+
+#define sq(x) (x) * (x)
 
 //functions:
 
@@ -36,51 +40,23 @@ int bord[31][31][30];
 
 int main()
 {
-   // ALLEGRO_DISPLAY *display;
-  //  ALLEGRO_BITMAP *cursor;
-    ALLEGRO_MOUSE_STATE msestate;
-  //  ALLEGRO_KEYBOARD_STATE kbdstate;
-    al_init();
-    al_init_font_addon();
-    al_init_primitives_addon();
-    al_install_mouse();
-    al_install_keyboard();
-    al_init_image_addon();
-    //init_platform_specific();
-    ALLEGRO_DISPLAY * display = al_create_display(800 ,600);
-    ALLEGRO_FONT * font = al_create_builtin_font();
-	al_hide_mouse_cursor(display);
-    ALLEGRO_BITMAP *cursor=al_load_bitmap("cursor.tga");
-    if (!cursor) {
-      printf("Error loading cursor.tga\n");
-    }
-    int i=1,j=0,mode=1;
-    while(1){
-    	
-    	j=(j+1)%400;
-    	al_get_mouse_state(&msestate);
-    	al_draw_bitmap(cursor,msestate.x,msestate.y,0);
-    	//al_draw_text(font, al_map_rgb(255, 255, 255),3, 300, 400, "Hello World");
-    	if(al_mouse_button_down(&msestate,i))
-    		mode*=-1;
-        if (mode==1)
-        {
-            al_clear_to_color(al_map_rgb(0, 0, 0));
-            al_draw_bitmap(cursor,msestate.x,msestate.y,0);
-            al_draw_text(font, al_map_rgb(255, 255, 255),j, 300, 400, "Hello World");
-            al_rest(0.05);
-        }
-        else
-        {
-            al_clear_to_color(al_map_rgb(0, 255, 255));
-            al_draw_bitmap(cursor,msestate.x,msestate.y,0);
-            al_draw_text(font, al_map_rgb(255, 50, 150),j, 300, 400, "shargi bebin");
-			al_rest(0.05);            
-        }
-        
-    	al_flip_display();
-    //al_rest(10.0);
-	}
+	srand(time(0));
+    // int n = 15;
+    // int a[4] = {27, 28, 29, 30};
+	// sortObject(a, 4, n);
+
+    // for (size_t i = 0; i < n; i++)
+    // {
+    //     for (size_t j = 0; j < n; j++)
+    //     {
+    //         printf("%d", !!bord[i][j][1]);
+    //     }
+    //     printf("\n");
+    // }
+    
+	
+	  
+}
 
 
 
@@ -145,16 +121,35 @@ int abs(int x){
 void sortObject(int id[], int idnum, int bordSize){
 
     int boolBord[31][31] = {{0}};
+    int R = sqrt(bordSize * bordSize / idnum);
+
+    for (size_t j = 0; j < bordSize * bordSize; j++)
+    {
+        if(sq(bordSize / 2 - (j % bordSize)) + sq(bordSize / 2 - (j / bordSize)) <= sq(R * 2 / 3)){
+            boolBord[j / bordSize][j % bordSize] = 1;
+        }
+    }
+
+    for (size_t k = 0; k < bordSize; k++)
+        {
+            for (size_t j = 0; j < bordSize; j++)
+            {
+                printf("%d", boolBord[k][j]);
+            }
+            printf("\n");
+        }
+        printf("\n\n");
 
     for (size_t i = 0; i < idnum; i++)
     {
         int r = rand() % (bordSize * bordSize); 
         int x = r % bordSize, y = r / bordSize;
+        
         if(!boolBord[y][x]){
             for (size_t j = 0; j < bordSize * bordSize; j++)
             {
-                if(abs(x - (j % bordSize)) * 2 <= (bordSize / sqrt(idnum)) && abs(y - (j / bordSize)) * 2 <= (bordSize / idnum)){
-                    dogsBord[j / bordSize][j % bordSize] = 1;
+                if(sq(x - (j % bordSize)) + sq(y - (j / bordSize)) <= sq(R)){
+                    boolBord[j / bordSize][j % bordSize] = 1;
                 }
             }
             
