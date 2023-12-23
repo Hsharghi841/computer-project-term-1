@@ -1,16 +1,20 @@
-#include <allegro5/allegro.h>
+/*#include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_ttf.h>*/
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-
+#define taleCode 27;
+#define chocklet 28;
 //functions:
 
 void initAnimals();
-void initscrean();
-
+//void initscrean();
+void initwall(int n);
+void init_chocklet_tale(int n);
 // stractuers for objects (mice, cats, dogs)
 
 typedef struct 
@@ -28,15 +32,32 @@ typedef struct
 animal animals[26];
 
 
+// arrys
+int board[31][31][30];
+int wall[31][31];
 
 
 int main()
 {
-	
+    int c;
+	srand(time(0));
+//   initscrean();
+    scanf("%d",&c);
+    initwall(c);
+    for (int i = 0; i < c; i++)
+    {
+        for (int j = 0; j < c; j++)
+        {
+
+            printf("%d",wall[i][j]);
+            
+        }
+        printf("\n");
+    }
 }
 
 
-void initscrean()
+/*void initscrean()
 {
 	   // ALLEGRO_DISPLAY *display;
   //  ALLEGRO_BITMAP *cursor;
@@ -82,6 +103,67 @@ void initscrean()
         
     	al_flip_display();
     //al_rest(10.0);
+}*/
+void initwall(int n)
+{
+    for (int i = 0; i < (n+1)/2; i++)
+    {
+        for (int j = 0; j < (n+1)/2; j++)
+        {
+            int number;
+            number=rand()%40;
+            if (number>0&&number<4)
+            {
+                wall[i][j]=number;
+            }
+        }
+        for (int j =(n+1)/2+1 ; j < n; j++)
+        {
+            int number;
+            number=rand()%40;
+            if (number>0&&number<4)
+            {
+                wall[i][j]=number;
+            }
+        }
+    }
+    for (int i = (n+1)/2+1; i < n; i++)
+    {
+        for (int j = 0; j < (n+1)/2; j++)
+        {
+            int number;
+            number=rand()%40;
+            if (number>0&&number<4)
+            {
+                wall[i][j]=number;
+            }
+        }
+        for (int j =(n+1)/2+1 ; j < n; j++)
+        {
+            int number;
+            number=rand()%40;
+            if (number>0&&number<4)
+            {
+                wall[i][j]=number;
+            }
+        }
+    }
+}
+void init_chocklet_tale(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            int number;
+            number=rand()%25+3;
+            if (number==1)
+            {
+                board[i][j][1]=number;
+            }
+        }
+        
+    }
 }
 void initAnimals(){
 
