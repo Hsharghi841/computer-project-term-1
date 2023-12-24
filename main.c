@@ -19,9 +19,9 @@
 
 void initAnimals();
 int abs(int x);
-void sortObject(int id[], int idnum, int bordSize);
-    // putOnBord tries to put an object on bord if can return 1 else 0 :
-int putOnBord(int id, int width, int length);
+void sortObject(int id[], int idnum, int boardSize);
+    // putOnboard tries to put an object on board if can return 1 else 0 :
+int putOnboard(int id, int width, int length);
 void initAnimals();
 //void initscrean();
 void initwall(int n);
@@ -43,9 +43,6 @@ typedef struct
 
 // 1 to 4 for dogs, 5 to 22 for mouses, 23 to 26 for cats
 animal animals[26];
-int bord[31][31][30];
-
-// arrys
 int board[31][31][30];
 int wall[31][31];
 
@@ -61,7 +58,7 @@ int main()
     // {
     //     for (size_t j = 0; j < n; j++)
     //     {
-    //         printf("%d", !!bord[i][j][1]);
+    //         printf("%d", !!board[i][j][1]);
     //     }
     //     printf("\n");
     // }
@@ -256,32 +253,32 @@ int abs(int x){
     return x;
 }
 
-void sortObject(int id[], int idnum, int bordSize){
+void sortObject(int id[], int idnum, int boardSize){
 
-    int boolBord[31][31] = {{0}};
-    int R = sqrt(bordSize * bordSize / idnum);
+    int boolboard[31][31] = {{0}};
+    int R = sqrt(boardSize * boardSize / idnum);
 
-    for (size_t j = 0; j < bordSize * bordSize; j++)
+    for (size_t j = 0; j < boardSize * boardSize; j++)
     {
-        if(sq(bordSize / 2 - (j % bordSize)) + sq(bordSize / 2 - (j / bordSize)) <= sq(R * 2 / 3)){
-            boolBord[j / bordSize][j % bordSize] = 1;
+        if(sq(boardSize / 2 - (j % boardSize)) + sq(boardSize / 2 - (j / boardSize)) <= sq(R * 2 / 3)){
+            boolboard[j / boardSize][j % boardSize] = 1;
         }
     }
     
     for (size_t i = 0; i < idnum; i++)
     {
-        int r = rand() % (bordSize * bordSize); 
-        int x = r % bordSize, y = r / bordSize;
+        int r = rand() % (boardSize * boardSize); 
+        int x = r % boardSize, y = r / boardSize;
         
-        if(!boolBord[y][x]){
-            for (size_t j = 0; j < bordSize * bordSize; j++)
+        if(!boolboard[y][x]){
+            for (size_t j = 0; j < boardSize * boardSize; j++)
             {
-                if(sq(x - (j % bordSize)) + sq(y - (j / bordSize)) <= sq(R)){
-                    boolBord[j / bordSize][j % bordSize] = 1;
+                if(sq(x - (j % boardSize)) + sq(y - (j / boardSize)) <= sq(R)){
+                    boolboard[j / boardSize][j % boardSize] = 1;
                 }
             }
             
-            if(!putOnBord(id[i], y, x)){
+            if(!putOnboard(id[i], y, x)){
                 i--;
             }
 
@@ -290,17 +287,17 @@ void sortObject(int id[], int idnum, int bordSize){
     }
 }
 
-int putOnBord(int id, int width, int length){
+int putOnboard(int id, int width, int length){
     if(0 < id && id < 27){
-        bord[width][length][bord[width][length][0] + 2] = id;
-        bord[width][length][0]++;
+        board[width][length][board[width][length][0] + 2] = id;
+        board[width][length][0]++;
         animals[id].x = length;
         animals[id].y = width;
         return 1;
     }
     {// must add code of objects in if
-        if(!bord[width][length][1]){
-            bord[width][length][1] = id;
+        if(!board[width][length][1]){
+            board[width][length][1] = id;
             return 1;
         }
         else return 0;
