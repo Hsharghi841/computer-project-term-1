@@ -1,7 +1,7 @@
-*.dll
-*.win
-*.dev
-*.exe
-*.layout
-*.o
+computer_project_term_1_private*
+
+
+
+dotOfiles/
+output/
 .idea/
