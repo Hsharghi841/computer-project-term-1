@@ -31,9 +31,9 @@ int abs(int x);
 void sortObject(int id[], int idnum, int boardSize);
 int startSettingBoard(int boardSize);
 int putOnboard(int id, int width, int length);// putOnboard tries to put an object on board if can return 1 else 0 :
-void initscrean(int n);
 void initwall(int n);
 void show_board(int n);
+int show_components(int boadSize);
 
 
 // structures for objects (mice, cats, dogs)
@@ -77,6 +77,8 @@ int main(){
     al_register_event_source(queue, al_get_display_event_source(display));
     
     _Bool showMouse = 1;
+    _Bool needUpdateDisplay = 1;
+    ALLEGRO_BITMAP * oldDisplay;
     
     while(1){
     	al_wait_for_event(queue,&event);
@@ -99,10 +101,18 @@ int main(){
             break;
         }
 
+
         if(event.type == ALLEGRO_EVENT_TIMER){
-            al_clear_to_color(al_map_rgb(0, 0, 0));
-            show_board(n);
-            show_walls(n);
+            if(needUpdateDisplay){
+                al_clear_to_color(al_map_rgb(0, 0, 0));
+                show_board(n);
+                show_components(n);
+                show_walls(n);
+                oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                needUpdateDisplay = 0;
+            }else{
+                al_draw_bitmap(oldDisplay, 0, 0, 0);
+            }
             if(showMouse)put_mouse();
             al_flip_display();
         }
@@ -291,7 +301,7 @@ int startSettingBoard(int boardSize){
         for (size_t i = 23; i <= 26; i++)
         {
             if (1) {
-                putOnboard(animals[i].ID, boardSize / 2 , boardSize / 2);
+                putOnboard(i, boardSize / 2 , boardSize / 2);
             }
         }
 
@@ -301,25 +311,22 @@ int startSettingBoard(int boardSize){
         for (size_t i = 23; i <= 26; i++)
         {
             if (1) {
-                putOnboard(animals[i].ID, boardSize / 2 - r / 2 , boardSize / 2 - r % 2);
+                putOnboard(i, boardSize / 2 - r / 2 , boardSize / 2 - r % 2);
             }
         }
         
     }
-    printf("cats done!\n");
     
     // dogs :
     
     int dogs[] = {1, 2, 3, 4};
     sortObject(dogs, 4, boardSize);
     
-    printf("dogs done!\n");
     // mice :
     
     int mice[] = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22};
     sortObject(mice, 18, boardSize);
     
-    printf("mice done!\n");
     // fishes :
     
     int fishes[10];
@@ -328,13 +335,11 @@ int startSettingBoard(int boardSize){
     
     sortObject(fishes, 10, boardSize);
     
-    printf("fishes done!\n");
     // Chocolate :
     
     int chocolate[] = {CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE};
     sortObject(chocolate, 8, boardSize);
     
-    printf("chocolates done!\n");
     // traps :
     
     int trap[] = {TRAP, TRAP, TRAP, TRAP, TRAP, TRAP, TRAP, TRAP};
@@ -342,4 +347,20 @@ int startSettingBoard(int boardSize){
     
     
     
+}
+
+int show_components(int boadSize){
+    for (size_t i = 0; i < boadSize; i++)
+        for (size_t j = 0; j < boadSize; j++)
+        {
+            if(board[i][j][0]){
+                for(int k = 2; k <= board[i][j][0] + 1; k++){
+                    show_object(board[i][j][k], j, i, boadSize);
+                }
+            }
+
+            if(board[i][j][1]){
+                show_object(board[i][j][1], j, i, boadSize);
+            }
+        }
 }
