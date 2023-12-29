@@ -1,8 +1,5 @@
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_ttf.h>
+#include "../graphics/graphic.h"
+
 
 ALLEGRO_DISPLAY * display;
 ALLEGRO_BITMAP * cursor;
@@ -56,13 +53,13 @@ int put_mouse(){
 	return 1;
 }
 
-void show_board(int n){
+void show_board(int boadSize){
     int x,y;
-    x=y=700/n;
-    for (int i = 10; (i-10)/x < n; i+=x)
-        for (int j = 10; (j-10)/y < n; j+=y){
+    x=y=700/boadSize;
+    for (int i = 10; (i-10)/x < boadSize; i+=x)
+        for (int j = 10; (j-10)/y < boadSize; j+=y){
             al_draw_filled_rectangle(i,j,i+x,j+y, al_map_rgb(190,156,84));
-            al_draw_rectangle(i,j,i+x,j+y, al_map_rgb(158,153,101),60 / n);
+            al_draw_rectangle(i,j,i+x,j+y, al_map_rgb(158,153,101),60 / boadSize);
         }
     
 }
@@ -84,11 +81,11 @@ void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2)
     }
 }
 
-void show_walls(int n){
+void show_walls(int boadSize){
 	int x ,y;
-	x = y = 700 / n;
-    for (int i = 10; (i-10)/x < n-1; i+=x)
-        for (int j = 10; (j-10)/y < n-1; j+=y){
+	x = y = 700 / boadSize;
+    for (int i = 10; (i-10)/x < boadSize-1; i+=x)
+        for (int j = 10; (j-10)/y < boadSize-1; j+=y){
            	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y);
         }
 }
