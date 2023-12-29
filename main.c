@@ -79,7 +79,7 @@ void initscrean(int n)
 	al_hide_mouse_cursor(display);
     ALLEGRO_BITMAP *cursor=al_load_bitmap("cursor.tga");
     if (!cursor) {
-      printf("Error loading cursor.tga\n");
+        printf("Error loading cursor.tga\n");
     }
     int i=1,j=0,mode=1;
     while(1){
@@ -99,10 +99,30 @@ void show_board(int n)
     x=y=700/n;
     for (int i = 10; (i-10)/x < n; i+=x)
         for (int j = 10; (j-10)/y < n; j+=y){
-            al_draw_filled_rectangle(i,j,i+x,j+y, al_map_rgb(150,150,50));
-            al_draw_rectangle(i,j,i+x,j+y, al_map_rgb(0,150,50),2);
+            al_draw_filled_rectangle(i,j,i+x,j+y, al_map_rgb(190,156,84));
+            al_draw_rectangle(i,j,i+x,j+y, al_map_rgb(160,152,98),3);
         }
-    
+    for (int i = 10; (i-10)/x < n-1; i+=x)
+        for (int j = 10; (j-10)/y < n-1; j+=y){
+           	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y);
+        }
+}
+
+void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2)
+{
+    if (wall[i][j]==1)
+    {
+        al_draw_filled_rectangle(x1-3,y1,x+3,y,al_map_rgb(146,155,71));
+    }
+    if (wall[i][j]==2)
+    {
+        al_draw_filled_rectangle(x2,y2-3,x,y+3,al_map_rgb(146,155,71));
+    }
+    if (wall[i][j]==3)
+    {
+        al_draw_filled_rectangle(x1-3,y1,x+3,y,al_map_rgb(146,155,71));
+        al_draw_filled_rectangle(x2,y2-3,x,y+3,al_map_rgb(146,155,71));
+    }
 }
 
 void initwall(int n)
