@@ -13,5 +13,7 @@ int allegroINIT();
 int allegroDESTROY();
 int put_mouse();
 void show_board(int n);
+void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2);
+void show_walls(int n);
 
 #endif

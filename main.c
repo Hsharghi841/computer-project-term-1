@@ -102,6 +102,7 @@ int main(){
         if(event.type == ALLEGRO_EVENT_TIMER){
             al_clear_to_color(al_map_rgb(0, 0, 0));
             show_board(n);
+            show_walls(n);
             if(showMouse)put_mouse();
             al_flip_display();
         }
@@ -114,7 +115,8 @@ int main(){
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
     allegroDESTROY();	        
- }
+}
+
 
 void initwall(int n)
 {

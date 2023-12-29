@@ -9,6 +9,7 @@ ALLEGRO_BITMAP * cursor;
 ALLEGRO_FONT * font;
 ALLEGRO_MOUSE_STATE msestate;
 
+extern int wall[31][31];
 
 int allegroINIT(){
 	
@@ -66,6 +67,31 @@ void show_board(int n){
     
 }
 
+void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2)
+{
+    if (wall[i][j]==1)
+    {
+        al_draw_filled_rectangle(x1-3,y1,x+3,y,al_map_rgb(146,255,71));
+    }
+    if (wall[i][j]==2)
+    {
+        al_draw_filled_rectangle(x2,y2-3,x,y+3,al_map_rgb(146,255,71));
+    }
+    if (wall[i][j]==3)
+    {
+        al_draw_filled_rectangle(x1-3,y1,x+3,y,al_map_rgb(146,255,71));
+        al_draw_filled_rectangle(x2,y2-3,x,y+3,al_map_rgb(146,255,71));
+    }
+}
+
+void show_walls(int n){
+	int x ,y;
+	x = y = 700 / n;
+    for (int i = 10; (i-10)/x < n-1; i+=x)
+        for (int j = 10; (j-10)/y < n-1; j+=y){
+           	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y);
+        }
+}
 
 
 
