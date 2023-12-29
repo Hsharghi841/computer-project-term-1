@@ -95,10 +95,10 @@ void initscrean(int n)
 
 void show_board(int n)
 {
-    float x,y;
+    int x,y;
     x=y=700/n;
-    for (int i = 10; i < 710; i+=x)
-        for (int j = 10; j < 710; j+=y){
+    for (int i = 10; (i-10)/x < n; i+=x)
+        for (int j = 10; (j-10)/y < n; j+=y){
             al_draw_filled_rectangle(i,j,i+x,j+y, al_map_rgb(150,150,50));
             al_draw_rectangle(i,j,i+x,j+y, al_map_rgb(0,150,50),2);
         }
