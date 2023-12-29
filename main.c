@@ -33,6 +33,7 @@ int startSettingBoard(int boardSize);
 int putOnboard(int id, int width, int length);// putOnboard tries to put an object on board if can return 1 else 0 :
 void initscrean(int n);
 void initwall(int n);
+void show_board(int n);
 
 
 // structures for objects (mice, cats, dogs)
