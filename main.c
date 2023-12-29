@@ -1,14 +1,18 @@
-/*#include <allegro5/allegro.h>
+#include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_ttf.h>*/
+#include <allegro5/allegro_ttf.h>
 
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
 
+#include "./graphics/graphic.h"
+//
+
+extern ALLEGRO_DISPLAY * display;
 
 // defines
 
@@ -27,7 +31,7 @@ int abs(int x);
 void sortObject(int id[], int idnum, int boardSize);
 int startSettingBoard(int boardSize);
 int putOnboard(int id, int width, int length);// putOnboard tries to put an object on board if can return 1 else 0 :
-//void initscrean();
+void initscrean(int n);
 void initwall(int n);
 
 
@@ -52,92 +56,64 @@ int wall[31][31];
 
 
 int main(){
+    int n;
 	srand(time(0));
+    scanf("%d",&n);
     
+    allegroINIT();
+    		        
+    initwall(n);
+    startSettingBoard(n);
+
+    ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
+    al_start_timer(timer);
+
+
+    ALLEGRO_EVENT event;
+    ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+    al_register_event_source(queue, al_get_mouse_event_source());
+    al_register_event_source(queue, al_get_timer_event_source(timer));
+    al_register_event_source(queue, al_get_display_event_source(display));
     
+    _Bool showMouse = 1;
     
-    
-    // int n = 15;
-    // int a[4] = {27, 28, 29, 30};
-	// sortObject(a, 4, n);
-
-    // for (size_t i = 0; i < n; i++)
-    // {
-    //     for (size_t j = 0; j < n; j++)
-    //     {
-    //         printf("%d", !!board[i][j][1]);
-    //     }
-    //     printf("\n");
-    // }
-    
-
-
-
-//    int c;
-//	srand(time(0));
-////   initscrean();
-//    scanf("%d",&c);
-//    initwall(c);
-//    for (int i = 0; i < c; i++)
-//    {
-//        for (int j = 0; j < c; j++)
-//        {
-//
-//            printf("%d",wall[i][j]);
-//
-//        }
-//        printf("\n");
-//    }
-}
-
-
-/*void initscrean()
-{
-	   // ALLEGRO_DISPLAY *display;
-  //  ALLEGRO_BITMAP *cursor;
-    ALLEGRO_MOUSE_STATE msestate;
-  //  ALLEGRO_KEYBOARD_STATE kbdstate;
-    al_init();
-    al_init_font_addon();
-    al_init_primitives_addon();
-    al_install_mouse();
-    al_install_keyboard();
-    al_init_image_addon();
-    //init_platform_specific();
-    ALLEGRO_DISPLAY * display = al_create_display(800 ,600);
-    ALLEGRO_FONT * font = al_create_builtin_font();
-	al_hide_mouse_cursor(display);
-    ALLEGRO_BITMAP *cursor=al_load_bitmap("cursor.tga");
-    if (!cursor) {
-      printf("Error loading cursor.tga\n");
-    }
-    int i=1,j=0,mode=1;
     while(1){
-    	
-    	j=(j+1)%400;
-    	al_get_mouse_state(&msestate);
-    	al_draw_bitmap(cursor,msestate.x,msestate.y,0);
-    	//al_draw_text(font, al_map_rgb(255, 255, 255),3, 300, 400, "Hello World");
-    	if(al_mouse_button_down(&msestate,i))
-    		mode*=-1;
-        if (mode==1)
-        {
+    	al_wait_for_event(queue,&event);
+
+
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_AXES){
+
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
+            showMouse = 0;
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
+            showMouse = 1;
+        }
+
+        if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+            break;
+        }
+
+        if(event.type == ALLEGRO_EVENT_TIMER){
             al_clear_to_color(al_map_rgb(0, 0, 0));
-            al_draw_bitmap(cursor,msestate.x,msestate.y,0);
-            al_draw_text(font, al_map_rgb(255, 255, 255),j, 300, 400, "Hello World");
-            al_rest(0.05);
+            show_board(n);
+            if(showMouse)put_mouse();
+            al_flip_display();
         }
-        else
-        {
-            al_clear_to_color(al_map_rgb(0, 255, 255));
-            al_draw_bitmap(cursor,msestate.x,msestate.y,0);
-            al_draw_text(font, al_map_rgb(255, 50, 150),j, 300, 400, "shargi bebin");
-			al_rest(0.05);
-        }
-        
-    	al_flip_display();
-    //al_rest(10.0);
-}*/
+
+    
+
+
+    	
+	}
+    al_destroy_timer(timer);
+    al_destroy_event_queue(queue);
+    allegroDESTROY();	        
+ }
 
 void initwall(int n)
 {
@@ -184,8 +160,6 @@ void initwall(int n)
         }
     }
 }
-
-
 
 void initAnimals(){
 
@@ -307,23 +281,27 @@ int putOnboard(int id, int width, int length){
 }
 
 int startSettingBoard(int boardSize){
-    
+    // cats : (conditions must be change)
+
     if(boardSize % 2 == 1) {
-        // cats : (conditions must be change)
-        if (1) {
-            putOnboard(animals[23].ID, boardSize / 2 + 1, boardSize / 2);
+        
+        for (size_t i = 23; i <= 26; i++)
+        {
+            if (1) {
+                putOnboard(animals[i].ID, boardSize / 2 , boardSize / 2);
+            }
         }
-        if (1) {
-            putOnboard(animals[24].ID, boardSize / 2, boardSize / 2 + 1);
-        }
-        if (1) {
-            putOnboard(animals[25].ID, boardSize / 2 - 1, boardSize / 2);
-        }
-        if (1) {
-            putOnboard(animals[26].ID, boardSize / 2, boardSize / 2 - 1);
-        }
+
     }else{
-    
+        int r = rand() % 4;
+
+        for (size_t i = 23; i <= 26; i++)
+        {
+            if (1) {
+                putOnboard(animals[i].ID, boardSize / 2 - r / 2 , boardSize / 2 - r % 2);
+            }
+        }
+        
     }
     printf("cats done!\n");
     
