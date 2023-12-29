@@ -7,6 +7,13 @@ ALLEGRO_FONT * font;
 ALLEGRO_MOUSE_STATE msestate;
 
 extern int wall[31][31];
+// extern animal animals[27];
+
+char *ch[35] = {"", "d1", "d2", "d3", "d4", "m1",
+              "m2", "m3", "m4", "m5", "m6", "m7", "m8", "m9", "m10", "m11", "m12", "m13", "m14", "m15", "m16", "m17", "m18",
+              "c1", "c2", "c3", "c4",
+              "T", "Choco", "", "", "", "F1", "F2", "F3"
+              };
 
 int allegroINIT(){
 	
@@ -38,6 +45,7 @@ int allegroDESTROY(){
 	
 	al_destroy_display(display);
 	al_destroy_font(font);
+    al_shutdown_font_addon();
 	al_shutdown_primitives_addon();
 	al_destroy_mouse_cursor(cursor);
 	al_uninstall_mouse();
@@ -89,6 +97,36 @@ void show_walls(int boadSize){
            	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y);
         }
 }
+
+// int show_animal(int id, int boadSize){
+//     int width, length;
+//     width = length = 700 / boadSize;
+	
+//     int x = animals[id].x * length + 10;
+//     int y = animals[id].y * width + 10;
+
+//     al_draw_textf(font, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%d", id);
+    
+//     return 1;
+// }
+
+int show_object(int id, int x, int y, int boadSize){
+    int width, length;
+    width = length = 700 / boadSize;
+
+    x = x * length + 10;
+    y = y * width + 10;
+
+    al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
+    al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boadSize);
+
+    al_draw_textf(font, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%s", ch[id]);
+
+    return 1;
+}
+
+
+
 
 
 

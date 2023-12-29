@@ -15,5 +15,7 @@ int put_mouse();
 void show_board(int boadSize);
 void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2);
 void show_walls(int boadSize);
+// int show_animal(int id, int boadSize);
+int show_object(int id, int x, int y, int boadSize);
 
 #endif
