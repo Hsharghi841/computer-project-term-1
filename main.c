@@ -38,8 +38,7 @@ int show_components(int boadSize);
 
 // structures for objects (mice, cats, dogs)
 
-typedef struct
-{
+struct animal{
     int ID;
     char * name;
     unsigned short energy;
@@ -48,7 +47,13 @@ typedef struct
     unsigned short dogdefense;
     unsigned short x;
     unsigned short y;
-} animal;
+};
+
+typedef struct animal animal;
+
+enum direction {None , Up, Right, Down, Left};
+typedef enum direction direction;
+
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
@@ -57,6 +62,9 @@ int wall[31][31];
 
 
 int main(){
+    if(!None){
+        printf("none is false");
+    }
     int n;
 	srand(time(0));
     scanf("%d",&n);
@@ -349,18 +357,18 @@ int startSettingBoard(int boardSize){
     
 }
 
-int show_components(int boadSize){
-    for (size_t i = 0; i < boadSize; i++)
-        for (size_t j = 0; j < boadSize; j++)
+int show_components(int boardSize){
+    for (size_t i = 0; i < boardSize; i++)
+        for (size_t j = 0; j < boardSize; j++)
         {
             if(board[i][j][0]){
                 for(int k = 2; k <= board[i][j][0] + 1; k++){
-                    show_object(board[i][j][k], j, i, boadSize);
+                    show_object(board[i][j][k], boardSize);
                 }
             }
 
             if(board[i][j][1]){
-                show_object(board[i][j][1], j, i, boadSize);
+                show_object(board[i][j][1], boardSize);
             }
         }
 }

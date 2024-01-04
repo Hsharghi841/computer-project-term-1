@@ -7,6 +7,24 @@ ALLEGRO_FONT * font;
 ALLEGRO_MOUSE_STATE msestate;
 
 extern int wall[31][31];
+extern struct animal{
+    int ID;
+    char * name;
+    unsigned short energy;
+    unsigned short power;
+    unsigned short score;
+    unsigned short dogdefense;
+    unsigned short x;
+    unsigned short y;
+};
+
+typedef struct animal animal;
+
+extern enum direction {None , Up, Right, Down, Left};
+typedef enum direction direction;
+
+extern animal animals[27];
+
 // extern animal animals[27];
 
 char *ch[35] = {"", "d1", "d2", "d3", "d4", "m1",
@@ -36,9 +54,6 @@ int allegroINIT(){
       return -1;
     }
     return 1;
-    
-
-	
 }
 
 int allegroDESTROY(){
@@ -110,12 +125,12 @@ void show_walls(int boadSize){
 //     return 1;
 // }
 
-int show_object(int id, int x, int y, int boadSize){
+int show_object(int id, int boadSize){
     int width, length;
     width = length = 700 / boadSize;
 
-    x = x * length + 10;
-    y = y * width + 10;
+    int x = animals[id].x * length + 10;
+    int y = animals[id].y * width + 10;
 
     al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
     al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boadSize);
