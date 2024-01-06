@@ -28,12 +28,12 @@ int FISH[3] = {FISH_2, FISH_3, FISH_4};
 
 void initAnimals();
 int abs(int x);
-void sortObject(int id[], int idnum, int boardSize);
-int startSettingBoard(int boardSize);
+void sortObject(int id[], int idnum);
+int startSettingBoard();
 int putOnboard(int id, int width, int length);// putOnboard tries to put an object on board if can return 1 else 0 :
-void initwall(int n);
-void show_board(int n);
-int show_components(int boadSize);
+void initwall();
+void show_board();
+int show_components();
 
 
 // structures for objects (mice, cats, dogs)
@@ -58,19 +58,20 @@ typedef enum direction direction;
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
 int board[31][31][30];
+int boardSize;
 int wall[31][31];
 
 
 int main(){
     
-    int n;
 	srand(time(0));
-    scanf("%d",&n);
+    scanf("%d",&boardSize);
     
     allegroINIT();
     		        
-    initwall(n);
-    startSettingBoard(n);
+    initwall();
+    startSettingBoard();
+
 
     ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
     al_start_timer(timer);
@@ -83,17 +84,14 @@ int main(){
     al_register_event_source(queue, al_get_display_event_source(display));
     
     _Bool showMouse = 1;
-    _Bool needUpdateDisplay = 1;
-    ALLEGRO_BITMAP * oldDisplay;
-    
+    _Bool needUpdateBoardDisplay = 1;
+    _Bool needShowSelectionHavel = 0;
+    ALLEGRO_BITMAP * oldBoardDisplay;
+    // mx : x of mouse , my : y of mouse
+    int mx, my;
     while(1){
     	al_wait_for_event(queue,&event);
 
-
-
-        if(event.type == ALLEGRO_EVENT_MOUSE_AXES){
-
-        }
 
         if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
             showMouse = 0;
@@ -103,25 +101,40 @@ int main(){
             showMouse = 1;
         }
 
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_AXES){
+            if(needShowSelectionHavel = is_mouse_on_Board(event.mouse.x, event.mouse.y)){
+                mx = event.mouse.x;
+                my = event.mouse.y;
+            }
+
+        }
+
+
         if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
             break;
         }
 
-
         if(event.type == ALLEGRO_EVENT_TIMER){
-            if(needUpdateDisplay){
-                al_clear_to_color(al_map_rgb(0, 0, 0));
-                show_board(n);
-                show_components(n);
-                show_walls(n);
-                oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
-                needUpdateDisplay = 0;
+            if(needUpdateBoardDisplay){
+                al_clear_to_color(al_map_rgb(255, 255, 255));
+                show_board();
+                show_components();
+                show_walls();
+                
+
+                oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                needUpdateBoardDisplay = 0;
             }else{
-                al_draw_bitmap(oldDisplay, 0, 0, 0);
+                al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+            }
+            if(needShowSelectionHavel){
+                needShowSelectionHavel = show_slection_havel(mx, my);
             }
             if(showMouse)put_mouse();
             al_flip_display();
         }
+
 
     
 
@@ -134,11 +147,11 @@ int main(){
 }
 
 
-void initwall(int n)
+void initwall()
 {
-    for (int i = 0; i < (n+1)/2; i++)
+    for (int i = 0; i < (boardSize+1)/2; i++)
     {
-        for (int j = 0; j < (n+1)/2; j++)
+        for (int j = 0; j < (boardSize+1)/2; j++)
         {
             int number;
             number=rand()%40;
@@ -147,7 +160,7 @@ void initwall(int n)
                 wall[i][j]=number;
             }
         }
-        for (int j =(n+1)/2+1 ; j < n; j++)
+        for (int j =(boardSize+1)/2+1 ; j < boardSize; j++)
         {
             int number;
             number=rand()%40;
@@ -157,9 +170,9 @@ void initwall(int n)
             }
         }
     }
-    for (int i = (n+1)/2+1; i < n; i++)
+    for (int i = (boardSize+1)/2+1; i < boardSize; i++)
     {
-        for (int j = 0; j < (n+1)/2; j++)
+        for (int j = 0; j < (boardSize+1)/2; j++)
         {
             int number;
             number=rand()%40;
@@ -168,7 +181,7 @@ void initwall(int n)
                 wall[i][j]=number;
             }
         }
-        for (int j =(n+1)/2+1 ; j < n; j++)
+        for (int j =(boardSize+1)/2+1 ; j < boardSize; j++)
         {
             int number;
             number=rand()%40;
@@ -244,7 +257,7 @@ int abs(int x){
     return x;
 }
 
-void sortObject(int id[], int idnum, int boardSize){
+void sortObject(int id[], int idnum){
 
     int boolboard[31][31] = {{0}};
     float R = sqrt(boardSize * boardSize / idnum ) / 1.8;
@@ -299,7 +312,7 @@ int putOnboard(int id, int width, int length){
     
 }
 
-int startSettingBoard(int boardSize){
+int startSettingBoard(){
     // cats : (conditions must be change)
 
     if(boardSize % 2 == 1) {
@@ -326,12 +339,12 @@ int startSettingBoard(int boardSize){
     // dogs :
     
     int dogs[] = {1, 2, 3, 4};
-    sortObject(dogs, 4, boardSize);
+    sortObject(dogs, 4);
     
     // mice :
     
     int mice[] = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22};
-    sortObject(mice, 18, boardSize);
+    sortObject(mice, 18);
     
     // fishes :
     
@@ -339,34 +352,34 @@ int startSettingBoard(int boardSize){
     for (int i = 0; i < 10; ++i)
         fishes[i] = FISH[rand() % 3];
     
-    sortObject(fishes, 10, boardSize);
+    sortObject(fishes, 10);
     
     // Chocolate :
     
     int chocolate[] = {CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE, CHOCOLATE};
-    sortObject(chocolate, 8, boardSize);
+    sortObject(chocolate, 8);
     
     // traps :
     
     int trap[] = {TRAP, TRAP, TRAP, TRAP, TRAP, TRAP, TRAP, TRAP};
-    sortObject(trap, 8, boardSize);
+    sortObject(trap, 8);
     
     
     
 }
 
-int show_components(int boardSize){
+int show_components(){
     for (size_t i = 0; i < boardSize; i++)
         for (size_t j = 0; j < boardSize; j++)
         {
             if(board[i][j][0]){
                 for(int k = 2; k <= board[i][j][0] + 1; k++){
-                    show_object(board[i][j][k], boardSize);
+                    show_object(board[i][j][k]);
                 }
             }
 
             if(board[i][j][1]){
-                show_object(board[i][j][1], boardSize);
+                show_object(board[i][j][1]);
             }
         }
 }

@@ -1,12 +1,12 @@
 #include "../graphics/graphic.h"
+#include <stdio.h>
 
 
 ALLEGRO_DISPLAY * display;
-ALLEGRO_BITMAP * cursor;
+ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel;
 ALLEGRO_FONT * font;
 ALLEGRO_MOUSE_STATE msestate;
 
-extern int wall[31][31];
 extern struct animal{
     int ID;
     char * name;
@@ -24,6 +24,8 @@ extern enum direction {None , Up, Right, Down, Left};
 typedef enum direction direction;
 
 extern animal animals[27];
+extern int boardSize;
+extern int wall[31][31];
 
 // extern animal animals[27];
 
@@ -48,8 +50,20 @@ int allegroINIT(){
     
     al_init_image_addon();
 	cursor = al_load_bitmap("cursor.tga");
+    selsction = al_load_bitmap("selection.png");
+    selsctionHavel = al_load_bitmap("selection_havel.png");
 	
 	if (!cursor) {
+      printf("Error loading cursor.tga\n");
+      return -1;
+    }
+	
+	if (!selsction) {
+      printf("Error loading cursor.tga\n");
+      return -1;
+    }
+	
+	if (!selsctionHavel) {
       printf("Error loading cursor.tga\n");
       return -1;
     }
@@ -76,13 +90,13 @@ int put_mouse(){
 	return 1;
 }
 
-void show_board(int boadSize){
+void show_board(){
     int x,y;
-    x=y=700 /boadSize;
-    for (int i = 10; (i-10)/x < boadSize; i+=x)
-        for (int j = 10; (j-10)/y < boadSize; j+=y){
+    x=y=700 /boardSize;
+    for (int i = 10; (i-10)/x < boardSize; i+=x)
+        for (int j = 10; (j-10)/y < boardSize; j+=y){
             al_draw_filled_rectangle(i,j,i+x,j+y, al_map_rgb(190,156,84));
-            al_draw_rectangle(i,j,i+x,j+y, al_map_rgb(158,153,101),60 / boadSize);
+            al_draw_rectangle(i,j,i+x,j+y, al_map_rgb(158,153,101),60 / boardSize);
         }
     
 }
@@ -104,42 +118,47 @@ void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2, float thickn
     }
 }
 
-void show_walls(int boadSize){
+void show_walls(){
 	int x ,y;
-	x = y = 700 / boadSize;
-    for (int i = 10; (i-10)/x < boadSize-1; i+=x)
-        for (int j = 10; (j-10)/y < boadSize-1; j+=y){
-           	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y, 60 / boadSize);
+	x = y = 700 / boardSize;
+    for (int i = 10; (i-10)/x < boardSize-1; i+=x)
+        for (int j = 10; (j-10)/y < boardSize-1; j+=y){
+           	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y, 60 / boardSize);
         }
 }
 
-// int show_animal(int id, int boadSize){
-//     int width, length;
-//     width = length = 700 / boadSize;
-	
-//     int x = animals[id].x * length + 10;
-//     int y = animals[id].y * width + 10;
-
-//     al_draw_textf(font, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%d", id);
-    
-//     return 1;
-// }
-
-int show_object(int id, int boadSize){
+int show_object(int id){
     int width, length;
-    width = length = 700 / boadSize;
+    width = length = 700 / boardSize;
 
     int x = animals[id].x * length + 10;
     int y = animals[id].y * width + 10;
 
     al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
-    al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boadSize);
+    al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boardSize);
 
     al_draw_textf(font, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%s", ch[id]);
 
     return 1;
 }
 
+int show_slection_havel(int x, int y){
+    int length, width;
+    length = width = 700 /boardSize;
+    {
+        x = ((x - 10) / length) * length + 10;
+        y = ((y - 10) / width) * width + 10;
+        al_draw_scaled_bitmap(selsctionHavel, 0, 0, 250, 243, x, y, length, width, ALLEGRO_FLIP_HORIZONTAL);
+        return 1;
+    }
+    return 0;
+}
+
+int is_mouse_on_Board(int x, int y){
+    int length, width;
+    length = width = 700 /boardSize;
+    return x > 10 && x < length * boardSize + 10 && y > 10 && y < width * boardSize + 10 ;
+}
 
 
 
