@@ -62,9 +62,7 @@ int wall[31][31];
 
 
 int main(){
-    if(!None){
-        printf("none is false");
-    }
+    
     int n;
 	srand(time(0));
     scanf("%d",&n);

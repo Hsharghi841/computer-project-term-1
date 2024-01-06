@@ -78,7 +78,7 @@ int put_mouse(){
 
 void show_board(int boadSize){
     int x,y;
-    x=y=700/boadSize;
+    x=y=700 /boadSize;
     for (int i = 10; (i-10)/x < boadSize; i+=x)
         for (int j = 10; (j-10)/y < boadSize; j+=y){
             al_draw_filled_rectangle(i,j,i+x,j+y, al_map_rgb(190,156,84));
@@ -87,20 +87,20 @@ void show_board(int boadSize){
     
 }
 
-void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2)
+void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2, float thickness)
 {
     if (wall[i][j]==1)
     {
-        al_draw_filled_rectangle(x1-3,y1,x+3,y,al_map_rgb(146,255,71));
+        al_draw_filled_rectangle(x1-thickness / 2,y1,x+thickness / 2,y,al_map_rgb(146,255,71));
     }
     if (wall[i][j]==2)
     {
-        al_draw_filled_rectangle(x2,y2-3,x,y+3,al_map_rgb(146,255,71));
+        al_draw_filled_rectangle(x2,y2-thickness / 2,x,y+thickness / 2,al_map_rgb(146,255,71));
     }
     if (wall[i][j]==3)
     {
-        al_draw_filled_rectangle(x1-3,y1,x+3,y,al_map_rgb(146,255,71));
-        al_draw_filled_rectangle(x2,y2-3,x,y+3,al_map_rgb(146,255,71));
+        al_draw_filled_rectangle(x1-thickness / 2,y1,x+thickness / 2,y,al_map_rgb(146,255,71));
+        al_draw_filled_rectangle(x2,y2-thickness / 2,x,y+thickness / 2,al_map_rgb(146,255,71));
     }
 }
 
@@ -109,7 +109,7 @@ void show_walls(int boadSize){
 	x = y = 700 / boadSize;
     for (int i = 10; (i-10)/x < boadSize-1; i+=x)
         for (int j = 10; (j-10)/y < boadSize-1; j+=y){
-           	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y);
+           	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y, 60 / boadSize);
         }
 }
 
