@@ -1,40 +1,17 @@
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_ttf.h>
 
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include <stdlib.h>
+// *in the name of god*
 
-#include "./graphics/graphic.h"
-//
-
-extern ALLEGRO_DISPLAY * display;
-
-// defines
-
+// defines :
 #define sq(x) (x) * (x) // for square a number
+#define get_cat_id(x) (x) + 22
 #define TRAP 27
 #define CHOCOLATE 28
 #define FISH_2 32
 #define FISH_3 33
 #define FISH_4 34
 int FISH[3] = {FISH_2, FISH_3, FISH_4};
-
-//functions:
-
-void initAnimals();
-int abs(int x);
-void sortObject(int id[], int idnum);
-int startSettingBoard();
-int putOnboard(int id, int width, int length);// putOnboard tries to put an object on board if can return 1 else 0 :
-void initwall();
-void show_board();
-int show_components();
-
+#define ________________________________________$_START_GAME_$________________________________________ main
+#define _________________________________________$_END_GAME_$_________________________________________ }
 
 // structures for objects (mice, cats, dogs)
 
@@ -48,29 +25,79 @@ struct animal{
     unsigned short x;
     unsigned short y;
 };
-
 typedef struct animal animal;
+
+struct coordinates {
+    int x;
+    int y;
+};
+typedef struct coordinates coordinates;
 
 enum direction {None , Up, Right, Down, Left};
 typedef enum direction direction;
 
+enum turns {none, cat1, cat2, cat3, cat4};
+typedef enum turns turns;
+
+
+#include <stdio.h>
+#include <math.h>
+#include <time.h>
+#include <stdlib.h>
+#include "./graphics/graphic.h"
+
+
+extern ALLEGRO_DISPLAY * display;
+extern ALLEGRO_SAMPLE * selection_fail_audio;
+extern ALLEGRO_SAMPLE_ID isPlayingSampleId;
+
+//functions:
+
+void initAnimals();
+int abs(int x);
+void sortObject(int id[], int idnum);
+int startSettingBoard();
+int putOnboard(int id, int width, int length);// putOnboard tries to put an object on board if can return 1 else 0 :
+void initwall();
+void show_board();
+int show_components();
+turns next_turn();
+direction find_direction(int x, int y, int xboard, int yboard);
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
 int board[31][31][30];
 int boardSize;
 int wall[31][31];
+turns catslist[4];
+int catsNumber = 0;
+turns turn;
 
+int ________________________________________$_START_GAME_$________________________________________(){
 
-int main(){
-    
 	srand(time(0));
     scanf("%d",&boardSize);
+
+    for (size_t i = 0; i < 4; i++)
+    {
+        printf("cat %d : ", i + 1);
+        int a;
+        scanf("%d", &a);
+        if(a){
+            catslist[catsNumber] = i + 1;
+            catsNumber++;
+        }
+    }
+    
+    
     
     allegroINIT();
     		        
     initwall();
     startSettingBoard();
+    
+    next_turn();
+    next_turn();
 
 
     ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
@@ -83,12 +110,20 @@ int main(){
     al_register_event_source(queue, al_get_timer_event_source(timer));
     al_register_event_source(queue, al_get_display_event_source(display));
     
-    _Bool showMouse = 1;
-    _Bool needUpdateBoardDisplay = 1;
-    _Bool needShowSelectionHavel = 0;
+    bool showMouse = 1;
+    bool mouseButtonDown = 0;
+    bool selecting = 0;
+    coordinates selectionlist[5];
+    int nselection = 0;
+
+    bool needUpdateBoardDisplay = 1;
+    bool needShowSelectionHover = 0;
     ALLEGRO_BITMAP * oldBoardDisplay;
     // mx : x of mouse , my : y of mouse
     int mx, my;
+
+    direction moves[4];
+    int nmoves = 0;
     while(1){
     	al_wait_for_event(queue,&event);
 
@@ -103,11 +138,55 @@ int main(){
 
 
         if(event.type == ALLEGRO_EVENT_MOUSE_AXES){
-            if(needShowSelectionHavel = is_mouse_on_Board(event.mouse.x, event.mouse.y)){
-                mx = event.mouse.x;
-                my = event.mouse.y;
+            if(is_mouse_on_Board(event.mouse.x, event.mouse.y)){
+                coordinates onBoard;
+                find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
+                if(needShowSelectionHover = is_mouse_nextto(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y) && !selecting){
+                    
+                    mx = event.mouse.x;
+                    my = event.mouse.y;
+                    if(mouseButtonDown){
+                        selecting = 1;
+                        if(moves[nmoves] = find_direction(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y)){
+                            nmoves++;
+                            selectionlist[nselection] = onBoard;
+                            nselection++;
+                        }
+                    }
+                }
+                if(selecting && !(selectionlist[nselection - 1].x == onBoard.x && selectionlist[nselection - 1].y == onBoard.y)){
+                    // if(moves[nmoves] = find_direction(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y)){
+                        nmoves++;
+                        selectionlist[nselection] = onBoard;
+                        nselection++;
+                    // }
+                    if(nmoves > 3){
+                        selecting = 0;
+                        nmoves = 0;
+                        nselection = 0;
+                    }
+                }
             }
+        }
 
+        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+            mouseButtonDown = 1;
+            if(event.mouse.button == 1 && needShowSelectionHover){
+                
+            }
+            else{
+                al_play_sample(selection_fail_audio, 1, 0, 1.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+            }
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
+            mouseButtonDown = 0;
+            if(selecting){
+                selecting = 0;
+                // move function
+                nmoves = 0;
+                nselection = 0;
+            }
         }
 
 
@@ -128,8 +207,12 @@ int main(){
             }else{
                 al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
             }
-            if(needShowSelectionHavel){
-                needShowSelectionHavel = show_slection_havel(mx, my);
+            if(needShowSelectionHover){
+                needShowSelectionHover = show_slection_hover(mx, my);
+            }
+            if(selecting && nselection){
+                
+                show_slections(selectionlist, nselection);
             }
             if(showMouse)put_mouse();
             al_flip_display();
@@ -143,8 +226,9 @@ int main(){
 	}
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
-    allegroDESTROY();	        
-}
+    allegroDESTROY();
+
+_________________________________________$_END_GAME_$_________________________________________
 
 
 void initwall()
@@ -313,25 +397,21 @@ int putOnboard(int id, int width, int length){
 }
 
 int startSettingBoard(){
-    // cats : (conditions must be change)
+    // cats : 
 
     if(boardSize % 2 == 1) {
         
-        for (size_t i = 23; i <= 26; i++)
+        for (size_t i = 0; i < catsNumber; i++)
         {
-            if (1) {
-                putOnboard(i, boardSize / 2 , boardSize / 2);
-            }
+            putOnboard(get_cat_id(catslist[i]), boardSize / 2 , boardSize / 2);
         }
 
     }else{
         int r = rand() % 4;
 
-        for (size_t i = 23; i <= 26; i++)
+        for (size_t i = 0; i < catsNumber; i++)
         {
-            if (1) {
-                putOnboard(i, boardSize / 2 - r / 2 , boardSize / 2 - r % 2);
-            }
+            putOnboard(get_cat_id(catslist[i]), boardSize / 2 - r / 2 , boardSize / 2 - r % 2);
         }
         
     }
@@ -374,12 +454,45 @@ int show_components(){
         {
             if(board[i][j][0]){
                 for(int k = 2; k <= board[i][j][0] + 1; k++){
-                    show_object(board[i][j][k]);
+                    show_animal(board[i][j][k]);
                 }
             }
 
             if(board[i][j][1]){
-                show_object(board[i][j][1]);
+                show_object(board[i][j][1], j, i);
             }
         }
 }
+
+turns next_turn(){
+    static int tn = 4;
+    static turns tlist[4];
+
+    tn++;
+    if(tn > catsNumber){
+        for (size_t i = 0; i < catsNumber; i++)
+            tlist[i] = catslist[i];
+        
+        tn = 0;
+        turn = none;
+        return none;
+    }
+    int r = rand() % (catsNumber - tn + 1);
+    turn = tlist[r];
+    tlist[r] = tlist[catsNumber - tn];
+    return turn;
+
+}
+
+direction find_direction(int x, int y, int xboard, int yboard){
+    int length, width;
+    length = width = 700 /boardSize;
+    x = ((x - 10) / length);
+    y = ((y - 10) / width);
+    if(x == xboard + 1)return Right;
+    if(x == xboard - 1)return Left;
+    if(y == yboard + 1)return Down;
+    if(y == yboard - 1)return Up;
+    return None;
+}
+
