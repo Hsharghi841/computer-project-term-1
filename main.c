@@ -13,8 +13,13 @@ int FISH[3] = {FISH_2, FISH_3, FISH_4};
 #define ________________________________________$_START_GAME_$________________________________________ main
 #define _________________________________________$_END_GAME_$_________________________________________ }
 
-// structures for objects (mice, cats, dogs)
+struct coordinates {
+    int x;
+    int y;
+};
+typedef struct coordinates coordinates;
 
+// structures for objects (mice, cats, dogs)
 struct animal{
     int ID;
     char * name;
@@ -27,11 +32,6 @@ struct animal{
 };
 typedef struct animal animal;
 
-struct coordinates {
-    int x;
-    int y;
-};
-typedef struct coordinates coordinates;
 
 enum direction {None , Up, Right, Down, Left};
 typedef enum direction direction;
@@ -63,6 +63,9 @@ void show_board();
 int show_components();
 turns next_turn();
 direction find_direction(int x, int y, int xboard, int yboard);
+int isEqualCoordinates(coordinates a, coordinates b);
+int check_wall(coordinates a, coordinates b);
+int check_wall2(int x, int y, coordinates b);
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
@@ -124,6 +127,7 @@ int ________________________________________$_START_GAME_$______________________
 
     direction moves[4];
     int nmoves = 0;
+
     while(1){
     	al_wait_for_event(queue,&event);
 
@@ -141,41 +145,72 @@ int ________________________________________$_START_GAME_$______________________
             if(is_mouse_on_Board(event.mouse.x, event.mouse.y)){
                 coordinates onBoard;
                 find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
-                if(needShowSelectionHover = is_mouse_nextto(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y) && !selecting){
+                if(needShowSelectionHover = (is_mouse_nextto(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y) && check_wall2(animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y, onBoard)) && !selecting){
                     
                     mx = event.mouse.x;
                     my = event.mouse.y;
                     if(mouseButtonDown){
                         selecting = 1;
-                        if(moves[nmoves] = find_direction(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y)){
+                        if(moves[nmoves] = find_direction(onBoard.x, onBoard.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y)){
                             nmoves++;
                             selectionlist[nselection] = onBoard;
                             nselection++;
                         }
                     }
                 }
-                if(selecting && !(selectionlist[nselection - 1].x == onBoard.x && selectionlist[nselection - 1].y == onBoard.y)){
-                    // if(moves[nmoves] = find_direction(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y)){
-                        nmoves++;
-                        selectionlist[nselection] = onBoard;
-                        nselection++;
-                    // }
-                    if(nmoves > 3){
+                if(selecting && !isEqualCoordinates(selectionlist[nselection - 1], onBoard)){
+                    if(nselection > 1 && selectionlist[nselection - 2].x == onBoard.x && selectionlist[nselection - 2].y == onBoard.y){
+                        nselection--;
+                        nmoves--;
+                    }
+                    else if(nselection == 1 && onBoard.x == animals[get_cat_id(turn)].x && onBoard.y == animals[get_cat_id(turn)].y){
                         selecting = 0;
                         nmoves = 0;
                         nselection = 0;
+                        
+                    }
+                    else {
+                        if(check_wall(selectionlist[nselection - 1], onBoard)){
+                            if(moves[nmoves] = find_direction(onBoard.x, onBoard.y, selectionlist[nselection - 1].x, selectionlist[nselection - 1].y)){
+                                nmoves++;
+                                selectionlist[nselection] = onBoard;
+                                nselection++;
+                            }
+                            if(nmoves > 3){
+                                selecting = 0;
+                                nmoves = 0;
+                                nselection = 0;
+                                mouseButtonDown = 0;
+                            }
+                        } else { // if wall exist
+                            selecting = 0;
+                            nmoves = 0;
+                            nselection = 0;
+                            mouseButtonDown = 0;
+                        }
                     }
                 }
+                // printf("%d\n", wall[onBoard.x][onBoard.y]);
             }
+            else {// if mosue is not on board
+                selecting = 0;
+                nmoves = 0;
+                nselection = 0;
+                mouseButtonDown = 0;
+            }
+            // printf("%d\n", nmoves);
         }
 
         if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
             mouseButtonDown = 1;
-            if(event.mouse.button == 1 && needShowSelectionHover){
+            coordinates onBoard;
+            find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
+            if(event.mouse.button == 1 && (needShowSelectionHover || (onBoard.x == animals[get_cat_id(turn)].x && onBoard.y == animals[get_cat_id(turn)].y))){
                 
             }
             else{
                 al_play_sample(selection_fail_audio, 1, 0, 1.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+                mouseButtonDown = 0;
             }
         }
 
@@ -484,15 +519,57 @@ turns next_turn(){
 
 }
 
-direction find_direction(int x, int y, int xboard, int yboard){
-    int length, width;
-    length = width = 700 /boardSize;
-    x = ((x - 10) / length);
-    y = ((y - 10) / width);
-    if(x == xboard + 1)return Right;
-    if(x == xboard - 1)return Left;
-    if(y == yboard + 1)return Down;
-    if(y == yboard - 1)return Up;
+direction find_direction(int x2, int y2, int x1, int y1){
+    
+    if(x2 == x1 + 1)return Right;
+    if(x2 == x1 - 1)return Left;
+    if(y2 == y1 + 1)return Down;
+    if(y2 == y1 - 1)return Up;
     return None;
 }
 
+int isEqualCoordinates(coordinates a, coordinates b){
+    return a.x == b.x && a.y == b.y;
+}
+
+int check_wall(coordinates a, coordinates b){
+    switch (find_direction(b.x, b.y, a.x, a.y))
+    {
+    case Down:
+        if(wall[a.x][a.y] / 2 == 1)return 0;
+        break;
+    case Right:
+        if(wall[a.x][a.y] % 2 == 1)return 0;
+        break;
+    case Left:
+        if(wall[b.x][b.y] % 2 == 1)return 0;
+        break;
+    case Up:
+        if(wall[b.x][b.y] / 2 == 1)return 0;
+        break;
+    default:
+        return 0;
+    }
+    return 1;
+}
+
+int check_wall2(int x, int y, coordinates b){
+    switch (find_direction(b.x, b.y, x, y))
+    {
+    case Down:
+        if(wall[x][y] / 2 == 1)return 0;
+        break;
+    case Right:
+        if(wall[x][y] % 2 == 1)return 0;
+        break;
+    case Left:
+        if(wall[b.x][b.y] % 2 == 1)return 0;
+        break;
+    case Up:
+        if(wall[b.x][b.y] / 2 == 1)return 0;
+        break;
+    default:
+        return 0;
+    }
+    return 1;
+}

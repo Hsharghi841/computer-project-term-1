@@ -124,16 +124,16 @@ void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2, float thickn
 {
     if (wall[i][j]==1)
     {
-        al_draw_filled_rectangle(x1-thickness / 2,y1,x+thickness / 2,y,al_map_rgb(146,255,71));
+        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(146, 255, 71));
     }
     if (wall[i][j]==2)
     {
-        al_draw_filled_rectangle(x2,y2-thickness / 2,x,y+thickness / 2,al_map_rgb(146,255,71));
+        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(146, 255, 71));
     }
     if (wall[i][j]==3)
     {
-        al_draw_filled_rectangle(x1-thickness / 2,y1,x+thickness / 2,y,al_map_rgb(146,255,71));
-        al_draw_filled_rectangle(x2,y2-thickness / 2,x,y+thickness / 2,al_map_rgb(146,255,71));
+        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(146, 255, 71));
+        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(146, 255, 71));
     }
 }
 
