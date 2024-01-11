@@ -376,14 +376,14 @@ int show_components(int boardSize){
         }
 }
 
-/*void move(int id,direction masir[5],int tedadgam){
+void move(int id,direction masir[5],int tedadgam){
     int i,j,a,b,min,swich,bmin;
     for (size_t k = 0; k < tedadgam; k++)
     {
         if (masir[k]==Right&&animals[id].power>0)
         {
-            animals[id].x=j;
-            animals[id].y=i;
+            j=animals[id].x;
+            i=animals[id].y;
             delete_id(id,i,j);
             j++;
             putOnboard(id,i,j);
@@ -481,8 +481,8 @@ int show_components(int boardSize){
         }
         else if (masir[k]==Left&&animals[id].power>0)
         {
-            animals[id].x=j;
-            animals[id].y=i;
+            j=animals[id].x;
+            i=animals[id].y;
             delete_id(id,i,j);
             j--;
             putOnboard(id,i,j);
@@ -581,8 +581,8 @@ int show_components(int boardSize){
         }
         else if (masir[k]==Up&&animals[id].power>0)
         {
-            animals[id].x=j;
-            animals[id].y=i;
+            j=animals[id].x;
+            i=animals[id].y;
             delete_id(id,i,j);
             i--;
             putOnboard(id,i,j);
@@ -680,8 +680,8 @@ int show_components(int boardSize){
         }
         else if (masir[k]==Down&&animals[id].power>0)
         {
-            animals[id].x=j;
-            animals[id].y=i;
+            j=animals[id].x;
+            i=animals[id].y;
             delete_id(id,i,j);
             i++;
             putOnboard(id,i,j);
@@ -785,8 +785,6 @@ int show_components(int boardSize){
 void delete_id(int id,int i,int j)
 {
     int a,b;
-    animals[id].x=j;
-    animals[id].y=i;
     for ( a = 2; a < board[i][j][0]+2; a++)
         if(board[i][j][a]==id)
             break;
