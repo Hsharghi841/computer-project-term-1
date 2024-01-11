@@ -443,7 +443,10 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                 }
                 else if(board[i][j][a]==CHOCOLATE)
+                {
                     animals[id].power++;
+                    board[i][j][a]=0;
+                }
                 else if(board[i][j][a]==FISH_2)
                 {
                     animals[id].energy+=2;
@@ -628,7 +631,7 @@ void move(int id,direction masir[5],int tedadgam){
                             }
                         }
                         for ( b = bmin; b < animals[id].id_mic[0]; b++)
-                            animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                        animals[id].id_mic[b]=animals[id].id_mic[b+1];
                         animals[id].id_mic[b]=0;
                         animals[id].score-=animals[min].score;
                         animals[id].id_mic[0]--;
@@ -645,7 +648,10 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                 }
                 else if(board[i][j][a]==CHOCOLATE)
+                {
                     animals[id].power++;
+                    board[i][j][a]=0;
+                }
                 else if(board[i][j][a]==FISH_2)
                 {
                     animals[id].energy+=2;
@@ -745,7 +751,10 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                 }
                 else if(board[i][j][a]==CHOCOLATE)
+                {
                     animals[id].power++;
+                    board[i][j][a]=0;
+                }
                 else if(board[i][j][a]==FISH_2)
                 {
                     animals[id].energy+=2;
