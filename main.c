@@ -543,7 +543,10 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                 }
                 else if(board[i][j][a]==CHOCOLATE)
+                {
                     animals[id].power++;
+                    board[i][j][a]=0;
+                }
                 else if(board[i][j][a]==FISH_2)
                 {
                     animals[id].energy+=2;
