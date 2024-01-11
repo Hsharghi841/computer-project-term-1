@@ -34,7 +34,8 @@ int putOnboard(int id, int width, int length);// putOnboard tries to put an obje
 void initwall(int n);
 void show_board(int n);
 int show_components(int boadSize);
-
+void move(int id,direction masir[5],int tedadgam);
+void delete_id(int id,int i,int j);
 
 // structures for objects (mice, cats, dogs)
 
@@ -47,6 +48,8 @@ struct animal{
     unsigned short dogdefense;
     unsigned short x;
     unsigned short y;
+    unsigned short freaz;
+    int id_mic[19];
 };
 
 typedef struct animal animal;
@@ -134,7 +137,6 @@ int main(){
     al_destroy_event_queue(queue);
     allegroDESTROY();	        
 }
-
 
 void initwall(int n)
 {
@@ -371,4 +373,414 @@ int show_components(int boardSize){
                 show_object(board[i][j][1], boardSize);
             }
         }
+}
+
+void move(int id,direction masir[5],int tedadgam){
+    int i,j,a,b,min,swich,bmin;
+    for (size_t k = 0; k < tedadgam; k++)
+    {
+        if (masir[k]==Right&&animals[id].power>0)
+        {
+            animals[id].x=j;
+            animals[id].y=i;
+            delete_id(id,i,j);
+            j++;
+            putOnboard(id,i,j);
+            if (id>0&&id<5)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        //war betwean id and board[i][j][a]
+            }
+            else if (id>4&&id<23)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        delete_id(id,i,j);
+                        animals[board[i][j][a]].score+=animals[id].score;
+                        animals[board[i][j][a]].id_mic[0]++;
+                        animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                    }
+            }
+            else if (id>22&&id<27)
+            {
+                animals[id].energy--;
+                swich=1;
+                a=1;
+                if(board[i][j][a]==TRAP)
+                {
+                    if (ainmals[id].id_mic[0])
+                    {
+                        min=ainmals[id].id_mic[1];
+                        bmin=1;
+                        for ( b = 2; b< ainmals[id].id_mic[0]+1; b++)
+                        {
+                            if(min>ainmals[id].id_mic[b])
+                            {
+                                min=ainmals[id].id_mic[b];
+                                bmin=b;
+                            }
+                        }
+                        for ( b = bmin; b < ainmals[id].id_mic[0]; b++)
+                            ainmals[id].id_mic[b]=ainmals[id].id_mic[b+1];
+                        ainmals[id].id_mic[b]=0;
+                        animals[id].score-=animals[min].score;
+                        ainmals[id].id_mic[0]--;
+                        putOnboard(min,animals[id].y,animals[id].x);
+                    }
+                    else
+                    {
+                        if(ainmals[id].power>2)
+                            ainmals[id].power-=2;
+                        else
+                        {
+                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                        }
+                    }
+                }
+                else if(board[i][j][a]==CHOCOLATE)
+                    animals[id].power++;
+                else if(board[i][j][a]==FISH_2)
+                {
+                    animals[id].energy+=2;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_3)
+                {
+                    animals[id].energy+=3;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_4)
+                {
+                    animals[id].energy+=4;
+                    board[i][j][a]=0;
+                }
+                for ( a = 2; a < board[i][j][0]+2&&swich; a++)
+                {
+                    if (board[i][j][a]>1&&board[i][j][a]<5)
+                    {
+                        //war betwean id and board[i][j][a]
+                    }
+                    else if (board[i][j][a]>4&&board[i][j][a]<23)
+                    {
+                        delete_id(board[i][j][a],i,j);
+                        animals[id].score+=animals[board[i][j][a]].score;
+                        animals[id].id_mic[0]++;
+                        animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                    }
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        //war betwean id and board[i][j][a]
+                    }
+                }
+            }
+        }
+        else if (masir[k]==Left&&animals[id].power>0)
+        {
+            animals[id].x=j;
+            animals[id].y=i;
+            delete_id(id,i,j);
+            j--;
+            putOnboard(id,i,j);
+            if (id>0&&id<5)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        //war betwean id and board[i][j][a]
+            }
+            else if (id>4&&id<23)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        delete_id(id,i,j);
+                        animals[board[i][j][a]].score+=animals[id].score;
+                        animals[board[i][j][a]].id_mic[0]++;
+                        animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                    }
+            }
+            else if (id>22&&id<27)
+            {
+                animals[id].energy--;
+                swich=1;
+                a=1;
+                if(board[i][j][a]==TRAP)
+                {
+                    if (ainmals[id].id_mic[0])
+                    {
+                        min=ainmals[id].id_mic[1];
+                        bmin=1;
+                        for ( b = 2; b< ainmals[id].id_mic[0]+1; b++)
+                        {
+                            if(min>ainmals[id].id_mic[b])
+                            {
+                                min=ainmals[id].id_mic[b];
+                                bmin=b;
+                            }
+                        }
+                        for ( b = bmin; b < ainmals[id].id_mic[0]; b++)
+                            ainmals[id].id_mic[b]=ainmals[id].id_mic[b+1];
+                        ainmals[id].id_mic[b]=0;
+                        animals[id].score-=animals[min].score;
+                        ainmals[id].id_mic[0]--;
+                        putOnboard(min,animals[id].y,animals[id].x);
+                    }
+                    else
+                    {
+                        if(ainmals[id].power>2)
+                            ainmals[id].power-=2;
+                        else
+                        {
+                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                        }
+                    }
+                }
+                else if(board[i][j][a]==CHOCOLATE)
+                    animals[id].power++;
+                else if(board[i][j][a]==FISH_2)
+                {
+                    animals[id].energy+=2;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_3)
+                {
+                    animals[id].energy+=3;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_4)
+                {
+                    animals[id].energy+=4;
+                    board[i][j][a]=0;
+                }
+                for ( a = 2; a < board[i][j][0]+2&&swich; a++)
+                {
+                    if (board[i][j][a]>1&&board[i][j][a]<5)
+                    {
+                        //war betwean id and board[i][j][a]
+                    }
+                    else if (board[i][j][a]>4&&board[i][j][a]<23)
+                    {
+                        delete_id(board[i][j][a],i,j);
+                        animals[id].score+=animals[board[i][j][a]].score;
+                        animals[id].id_mic[0]++;
+                        animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                    }
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        //war betwean id and board[i][j][a]
+                    }
+                }
+            }
+        }
+        else if (masir[k]==Up&&animals[id].power>0)
+        {
+            animals[id].x=j;
+            animals[id].y=i;
+            delete_id(id,i,j);
+            i--;
+            putOnboard(id,i,j);
+            if (id>0&&id<5)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        //war betwean id and board[i][j][a]
+            }
+            else if (id>4&&id<23)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        delete_id(id,i,j);
+                        animals[board[i][j][a]].score+=animals[id].score;
+                        animals[board[i][j][a]].id_mic[0]++;
+                        animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                    }
+            }
+            else if (id>22&&id<27)
+            {
+                animals[id].energy--;
+                swich=1;
+                a=1;
+                if(board[i][j][a]==TRAP)
+                {
+                    if (ainmals[id].id_mic[0])
+                    {
+                        min=ainmals[id].id_mic[1];
+                        bmin=1;
+                        for ( b = 2; b< ainmals[id].id_mic[0]+1; b++)
+                        {
+                            if(min>ainmals[id].id_mic[b])
+                            {
+                                min=ainmals[id].id_mic[b];
+                                bmin=b;
+                            }
+                        }
+                        for ( b = bmin; b < ainmals[id].id_mic[0]; b++)
+                            ainmals[id].id_mic[b]=ainmals[id].id_mic[b+1];
+                        ainmals[id].id_mic[b]=0;
+                        animals[id].score-=animals[min].score;
+                        ainmals[id].id_mic[0]--;
+                        putOnboard(min,animals[id].y,animals[id].x);
+                    }
+                    else
+                    {
+                        if(ainmals[id].power>2)
+                            ainmals[id].power-=2;
+                        else
+                        {
+                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                        }
+                    }
+                }
+                else if(board[i][j][a]==CHOCOLATE)
+                    animals[id].power++;
+                else if(board[i][j][a]==FISH_2)
+                {
+                    animals[id].energy+=2;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_3)
+                {
+                    animals[id].energy+=3;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_4)
+                {
+                    animals[id].energy+=4;
+                    board[i][j][a]=0;
+                }
+                for ( a = 2; a < board[i][j][0]+2&&swich; a++)
+                {
+                    if (board[i][j][a]>1&&board[i][j][a]<5)
+                    {
+                        //war betwean id and board[i][j][a]
+                    }
+                    else if (board[i][j][a]>4&&board[i][j][a]<23)
+                    {
+                        delete_id(board[i][j][a],i,j);
+                        animals[id].score+=animals[board[i][j][a]].score;
+                        animals[id].id_mic[0]++;
+                        animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                    }
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        //war betwean id and board[i][j][a]
+                    }
+                }
+            }
+        }
+        else if (masir[k]==Down&&animals[id].power>0)
+        {
+            animals[id].x=j;
+            animals[id].y=i;
+            delete_id(id,i,j);
+            i++;
+            putOnboard(id,i,j);
+            if (id>0&&id<5)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        //war betwean id and board[i][j][a]
+            }
+            else if (id>4&&id<23)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        delete_id(id,i,j);
+                        animals[board[i][j][a]].score+=animals[id].score;
+                        animals[board[i][j][a]].id_mic[0]++;
+                        animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                    }
+            }
+            else if (id>22&&id<27)
+            {
+                animals[id].energy--;
+                swich=1;
+                a=1;
+                if(board[i][j][a]==TRAP)
+                {
+                    if (ainmals[id].id_mic[0])
+                    {
+                        min=ainmals[id].id_mic[1];
+                        bmin=1;
+                        for ( b = 2; b< ainmals[id].id_mic[0]+1; b++)
+                        {
+                            if(min>ainmals[id].id_mic[b])
+                            {
+                                min=ainmals[id].id_mic[b];
+                                bmin=b;
+                            }
+                        }
+                        for ( b = bmin; b < ainmals[id].id_mic[0]; b++)
+                            ainmals[id].id_mic[b]=ainmals[id].id_mic[b+1];
+                        ainmals[id].id_mic[b]=0;
+                        animals[id].score-=animals[min].score;
+                        ainmals[id].id_mic[0]--;
+                        putOnboard(min,animals[id].y,animals[id].x);
+                    }
+                    else
+                    {
+                        if(ainmals[id].power>2)
+                            ainmals[id].power-=2;
+                        else
+                        {
+                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                        }
+                    }
+                }
+                else if(board[i][j][a]==CHOCOLATE)
+                    animals[id].power++;
+                else if(board[i][j][a]==FISH_2)
+                {
+                    animals[id].energy+=2;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_3)
+                {
+                    animals[id].energy+=3;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_4)
+                {
+                    animals[id].energy+=4;
+                    board[i][j][a]=0;
+                }
+                for ( a = 2; a < board[i][j][0]+2&&swich; a++)
+                {
+                    if (board[i][j][a]>1&&board[i][j][a]<5)
+                    {
+                        //war betwean id and board[i][j][a]
+                    }
+                    else if (board[i][j][a]>4&&board[i][j][a]<23)
+                    {
+                        delete_id(board[i][j][a],i,j);
+                        animals[id].score+=animals[board[i][j][a]].score;
+                        animals[id].id_mic[0]++;
+                        animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                    }
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        //war betwean id and board[i][j][a]
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
+void delete_id(int id,int i,int j)
+{
+    int a,b;
+    animals[id].x=j;
+    animals[id].y=i;
+    for ( a = 2; a < board[i][j][0]+2; a++)
+        if(board[i][j][a]==id)
+            break;
+    for ( b = a; b < board[i][j][0]+2; b++)
+        board[i][j][b]=board[i][j][b+1];
+    board[i][j][b]=0;
+    board[i][j][0]--;
 }
