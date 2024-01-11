@@ -23,6 +23,8 @@ extern ALLEGRO_DISPLAY * display;
 #define FISH_3 33
 #define FISH_4 34
 int FISH[3] = {FISH_2, FISH_3, FISH_4};
+enum direction {None , Up, Right, Down, Left};
+typedef enum direction direction;
 
 //functions:
 
@@ -54,8 +56,7 @@ struct animal{
 
 typedef struct animal animal;
 
-enum direction {None , Up, Right, Down, Left};
-typedef enum direction direction;
+
 
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
@@ -375,7 +376,7 @@ int show_components(int boardSize){
         }
 }
 
-void move(int id,direction masir[5],int tedadgam){
+/*void move(int id,direction masir[5],int tedadgam){
     int i,j,a,b,min,swich,bmin;
     for (size_t k = 0; k < tedadgam; k++)
     {
@@ -389,8 +390,10 @@ void move(int id,direction masir[5],int tedadgam){
             if (id>0&&id<5)
             {
                 for ( a = 2; a < board[i][j][0]+2; a++)
-                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                {
+                    //if (board[i][j][a]>22&&board[i][j][a]<27)
                         //war betwean id and board[i][j][a]
+                }
             }
             else if (id>4&&id<23)
             {
@@ -410,29 +413,29 @@ void move(int id,direction masir[5],int tedadgam){
                 a=1;
                 if(board[i][j][a]==TRAP)
                 {
-                    if (ainmals[id].id_mic[0])
+                    if (animals[id].id_mic[0])
                     {
-                        min=ainmals[id].id_mic[1];
+                        min=animals[id].id_mic[1];
                         bmin=1;
-                        for ( b = 2; b< ainmals[id].id_mic[0]+1; b++)
+                        for ( b = 2; b< animals[id].id_mic[0]+1; b++)
                         {
-                            if(min>ainmals[id].id_mic[b])
+                            if(min>animals[id].id_mic[b])
                             {
-                                min=ainmals[id].id_mic[b];
+                                min=animals[id].id_mic[b];
                                 bmin=b;
                             }
                         }
-                        for ( b = bmin; b < ainmals[id].id_mic[0]; b++)
-                            ainmals[id].id_mic[b]=ainmals[id].id_mic[b+1];
-                        ainmals[id].id_mic[b]=0;
+                        for ( b = bmin; b < animals[id].id_mic[0]; b++)
+                            animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                        animals[id].id_mic[b]=0;
                         animals[id].score-=animals[min].score;
-                        ainmals[id].id_mic[0]--;
+                        animals[id].id_mic[0]--;
                         putOnboard(min,animals[id].y,animals[id].x);
                     }
                     else
                     {
-                        if(ainmals[id].power>2)
-                            ainmals[id].power-=2;
+                        if(animals[id].power>2)
+                            animals[id].power-=2;
                         else
                         {
                             //در اینجا باید 3 تا از انرژی اش کم گردد
@@ -486,8 +489,11 @@ void move(int id,direction masir[5],int tedadgam){
             if (id>0&&id<5)
             {
                 for ( a = 2; a < board[i][j][0]+2; a++)
-                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                {
+				
+                    //if (board[i][j][a]>22&&board[i][j][a]<27)
                         //war betwean id and board[i][j][a]
+                }
             }
             else if (id>4&&id<23)
             {
@@ -507,29 +513,29 @@ void move(int id,direction masir[5],int tedadgam){
                 a=1;
                 if(board[i][j][a]==TRAP)
                 {
-                    if (ainmals[id].id_mic[0])
+                    if (animals[id].id_mic[0])
                     {
-                        min=ainmals[id].id_mic[1];
+                        min=animals[id].id_mic[1];
                         bmin=1;
-                        for ( b = 2; b< ainmals[id].id_mic[0]+1; b++)
+                        for ( b = 2; b< animals[id].id_mic[0]+1; b++)
                         {
-                            if(min>ainmals[id].id_mic[b])
+                            if(min>animals[id].id_mic[b])
                             {
-                                min=ainmals[id].id_mic[b];
+                                min=animals[id].id_mic[b];
                                 bmin=b;
                             }
                         }
-                        for ( b = bmin; b < ainmals[id].id_mic[0]; b++)
-                            ainmals[id].id_mic[b]=ainmals[id].id_mic[b+1];
-                        ainmals[id].id_mic[b]=0;
+                        for ( b = bmin; b < animals[id].id_mic[0]; b++)
+                            animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                        animals[id].id_mic[b]=0;
                         animals[id].score-=animals[min].score;
-                        ainmals[id].id_mic[0]--;
+                        animals[id].id_mic[0]--;
                         putOnboard(min,animals[id].y,animals[id].x);
                     }
                     else
                     {
-                        if(ainmals[id].power>2)
-                            ainmals[id].power-=2;
+                        if(animals[id].power>2)
+                            animals[id].power-=2;
                         else
                         {
                             //در اینجا باید 3 تا از انرژی اش کم گردد
@@ -583,8 +589,10 @@ void move(int id,direction masir[5],int tedadgam){
             if (id>0&&id<5)
             {
                 for ( a = 2; a < board[i][j][0]+2; a++)
-                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                {
+                    //if (board[i][j][a]>22&&board[i][j][a]<27)
                         //war betwean id and board[i][j][a]
+            	}
             }
             else if (id>4&&id<23)
             {
@@ -604,29 +612,29 @@ void move(int id,direction masir[5],int tedadgam){
                 a=1;
                 if(board[i][j][a]==TRAP)
                 {
-                    if (ainmals[id].id_mic[0])
+                    if (animals[id].id_mic[0])
                     {
-                        min=ainmals[id].id_mic[1];
+                        min=animals[id].id_mic[1];
                         bmin=1;
-                        for ( b = 2; b< ainmals[id].id_mic[0]+1; b++)
+                        for ( b = 2; b< animals[id].id_mic[0]+1; b++)
                         {
-                            if(min>ainmals[id].id_mic[b])
+                            if(min>animals[id].id_mic[b])
                             {
-                                min=ainmals[id].id_mic[b];
+                                min=animals[id].id_mic[b];
                                 bmin=b;
                             }
                         }
-                        for ( b = bmin; b < ainmals[id].id_mic[0]; b++)
-                            ainmals[id].id_mic[b]=ainmals[id].id_mic[b+1];
-                        ainmals[id].id_mic[b]=0;
+                        for ( b = bmin; b < animals[id].id_mic[0]; b++)
+                            animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                        animals[id].id_mic[b]=0;
                         animals[id].score-=animals[min].score;
-                        ainmals[id].id_mic[0]--;
+                        animals[id].id_mic[0]--;
                         putOnboard(min,animals[id].y,animals[id].x);
                     }
                     else
                     {
-                        if(ainmals[id].power>2)
-                            ainmals[id].power-=2;
+                        if(animals[id].power>2)
+                            animals[id].power-=2;
                         else
                         {
                             //در اینجا باید 3 تا از انرژی اش کم گردد
@@ -680,8 +688,11 @@ void move(int id,direction masir[5],int tedadgam){
             if (id>0&&id<5)
             {
                 for ( a = 2; a < board[i][j][0]+2; a++)
-                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                {
+				
+                   // if (board[i][j][a]>22&&board[i][j][a]<27)
                         //war betwean id and board[i][j][a]
+            	}
             }
             else if (id>4&&id<23)
             {
@@ -701,29 +712,29 @@ void move(int id,direction masir[5],int tedadgam){
                 a=1;
                 if(board[i][j][a]==TRAP)
                 {
-                    if (ainmals[id].id_mic[0])
+                    if (animals[id].id_mic[0])
                     {
-                        min=ainmals[id].id_mic[1];
+                        min=animals[id].id_mic[1];
                         bmin=1;
-                        for ( b = 2; b< ainmals[id].id_mic[0]+1; b++)
+                        for ( b = 2; b< animals[id].id_mic[0]+1; b++)
                         {
-                            if(min>ainmals[id].id_mic[b])
+                            if(min>animals[id].id_mic[b])
                             {
-                                min=ainmals[id].id_mic[b];
+                                min=animals[id].id_mic[b];
                                 bmin=b;
                             }
                         }
-                        for ( b = bmin; b < ainmals[id].id_mic[0]; b++)
-                            ainmals[id].id_mic[b]=ainmals[id].id_mic[b+1];
-                        ainmals[id].id_mic[b]=0;
+                        for ( b = bmin; b < animals[id].id_mic[0]; b++)
+                            animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                        animals[id].id_mic[b]=0;
                         animals[id].score-=animals[min].score;
-                        ainmals[id].id_mic[0]--;
+                        animals[id].id_mic[0]--;
                         putOnboard(min,animals[id].y,animals[id].x);
                     }
                     else
                     {
-                        if(ainmals[id].power>2)
-                            ainmals[id].power-=2;
+                        if(animals[id].power>2)
+                            animals[id].power-=2;
                         else
                         {
                             //در اینجا باید 3 تا از انرژی اش کم گردد
@@ -783,4 +794,4 @@ void delete_id(int id,int i,int j)
         board[i][j][b]=board[i][j][b+1];
     board[i][j][b]=0;
     board[i][j][0]--;
-}
+}*/
