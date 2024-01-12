@@ -38,6 +38,8 @@ void show_board(int n);
 int show_components(int boadSize);
 void move(int id,direction masir[5],int tedadgam);
 void delete_id(int id,int i,int j);
+void war_between_cat_dog(int catid,int dogid);
+void war_between_cat1_cat2(int cat1id,int cat2id);
 
 // structures for objects (mice, cats, dogs)
 
@@ -63,6 +65,7 @@ typedef struct animal animal;
 animal animals[27];
 int board[31][31][30];
 int wall[31][31];
+int numfish=10;
 
 
 int main(){
@@ -217,6 +220,8 @@ void initAnimals(){
         animals[i].energy = 3;
         animals[i].score = 3;
         animals[i].ID = i;
+        animals[i].freaz=0;
+        animals[i].id_mic[0]=0;
     }
     // 6 2-point mice
     for (size_t i = 9; i < 15; i++)
@@ -224,6 +229,8 @@ void initAnimals(){
         animals[i].energy = 2;
         animals[i].score = 2;
         animals[i].ID = i;
+        animals[i].freaz=0;
+        animals[i].id_mic[0]=0;
     }
     // 8 1-point mice
     for (size_t i = 15; i < 23; i++)
@@ -231,6 +238,8 @@ void initAnimals(){
         animals[i].energy = 1;
         animals[i].score = 1;
         animals[i].ID = i;
+        animals[i].freaz=0;
+        animals[i].id_mic[0]=0;
     }
     // cats (this part of code will change!)
     for (size_t i = 23; i <= 26; i++)
@@ -238,6 +247,8 @@ void initAnimals(){
         animals[i].energy = 5;
         animals[i].power = 2;
         animals[i].ID = i;
+        animals[i].freaz=0;
+        animals[i].id_mic[0]=0;
     }
     
     
@@ -380,7 +391,7 @@ void move(int id,direction masir[5],int tedadgam){
     int i,j,a,b,min,swich,bmin;
     for (size_t k = 0; k < tedadgam; k++)
     {
-        if (masir[k]==Right&&animals[id].power>0)
+        if (masir[k]==Right&&animals[id].power>0&&!animals[id].freaz)
         {
             j=animals[id].x;
             i=animals[id].y;
@@ -391,8 +402,8 @@ void move(int id,direction masir[5],int tedadgam){
             {
                 for ( a = 2; a < board[i][j][0]+2; a++)
                 {
-                    //if (board[i][j][a]>22&&board[i][j][a]<27)
-                        //war betwean id and board[i][j][a]
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        war_between_cat_dog(board[i][j][a],id);
                 }
             }
             else if (id>4&&id<23)
@@ -427,10 +438,10 @@ void move(int id,direction masir[5],int tedadgam){
                         }
                         for ( b = bmin; b < animals[id].id_mic[0]; b++)
                             animals[id].id_mic[b]=animals[id].id_mic[b+1];
-                        animals[id].id_mic[b]=0;
-                        animals[id].score-=animals[min].score;
-                        animals[id].id_mic[0]--;
-                        putOnboard(min,animals[id].y,animals[id].x);
+                            animals[id].id_mic[b]=0;
+                            animals[id].score-=animals[min].score;
+                            animals[id].id_mic[0]--;
+                            putOnboard(min,animals[min].y,animals[min].x);
                     }
                     else
                     {
@@ -451,22 +462,25 @@ void move(int id,direction masir[5],int tedadgam){
                 {
                     animals[id].energy+=2;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 else if(board[i][j][a]==FISH_3)
                 {
                     animals[id].energy+=3;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 else if(board[i][j][a]==FISH_4)
                 {
                     animals[id].energy+=4;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 for ( a = 2; a < board[i][j][0]+2&&swich; a++)
                 {
                     if (board[i][j][a]>1&&board[i][j][a]<5)
                     {
-                        //war betwean id and board[i][j][a]
+                        war_between_cat_dog(id,board[i][j][a]);
                     }
                     else if (board[i][j][a]>4&&board[i][j][a]<23)
                     {
@@ -477,12 +491,12 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                     if (board[i][j][a]>22&&board[i][j][a]<27)
                     {
-                        //war betwean id and board[i][j][a]
+                        war_between_cat1_cat2(id,board[i][j][a])
                     }
                 }
             }
         }
-        else if (masir[k]==Left&&animals[id].power>0)
+        else if (masir[k]==Left&&animals[id].power>0&&!animals[id].freaz)
         {
             j=animals[id].x;
             i=animals[id].y;
@@ -493,9 +507,8 @@ void move(int id,direction masir[5],int tedadgam){
             {
                 for ( a = 2; a < board[i][j][0]+2; a++)
                 {
-				
-                    //if (board[i][j][a]>22&&board[i][j][a]<27)
-                        //war betwean id and board[i][j][a]
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        war_between_cat_dog(board[i][j][a],id);
                 }
             }
             else if (id>4&&id<23)
@@ -533,7 +546,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[id].id_mic[b]=0;
                         animals[id].score-=animals[min].score;
                         animals[id].id_mic[0]--;
-                        putOnboard(min,animals[id].y,animals[id].x);
+                        putOnboard(min,animals[min].y,animals[min].x);
                     }
                     else
                     {
@@ -554,22 +567,25 @@ void move(int id,direction masir[5],int tedadgam){
                 {
                     animals[id].energy+=2;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 else if(board[i][j][a]==FISH_3)
                 {
                     animals[id].energy+=3;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 else if(board[i][j][a]==FISH_4)
                 {
                     animals[id].energy+=4;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 for ( a = 2; a < board[i][j][0]+2&&swich; a++)
                 {
                     if (board[i][j][a]>1&&board[i][j][a]<5)
                     {
-                        //war betwean id and board[i][j][a]
+                        war_between_cat_dog(id,board[i][j][a]);
                     }
                     else if (board[i][j][a]>4&&board[i][j][a]<23)
                     {
@@ -580,12 +596,12 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                     if (board[i][j][a]>22&&board[i][j][a]<27)
                     {
-                        //war betwean id and board[i][j][a]
+                        war_between_cat1_cat2(id,board[i][j][a])
                     }
                 }
             }
         }
-        else if (masir[k]==Up&&animals[id].power>0)
+        else if (masir[k]==Up&&animals[id].power>0&&!animals[id].freaz)
         {
             j=animals[id].x;
             i=animals[id].y;
@@ -596,9 +612,9 @@ void move(int id,direction masir[5],int tedadgam){
             {
                 for ( a = 2; a < board[i][j][0]+2; a++)
                 {
-                    //if (board[i][j][a]>22&&board[i][j][a]<27)
-                        //war betwean id and board[i][j][a]
-            	}
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        war_between_cat_dog(board[i][j][a],id);
+                }
             }
             else if (id>4&&id<23)
             {
@@ -635,7 +651,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[id].id_mic[b]=0;
                         animals[id].score-=animals[min].score;
                         animals[id].id_mic[0]--;
-                        putOnboard(min,animals[id].y,animals[id].x);
+                        putOnboard(min,animals[min].y,animals[min].x);
                     }
                     else
                     {
@@ -656,22 +672,25 @@ void move(int id,direction masir[5],int tedadgam){
                 {
                     animals[id].energy+=2;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 else if(board[i][j][a]==FISH_3)
                 {
                     animals[id].energy+=3;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 else if(board[i][j][a]==FISH_4)
                 {
                     animals[id].energy+=4;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 for ( a = 2; a < board[i][j][0]+2&&swich; a++)
                 {
                     if (board[i][j][a]>1&&board[i][j][a]<5)
                     {
-                        //war betwean id and board[i][j][a]
+                        war_between_cat_dog(id,board[i][j][a]);
                     }
                     else if (board[i][j][a]>4&&board[i][j][a]<23)
                     {
@@ -682,12 +701,12 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                     if (board[i][j][a]>22&&board[i][j][a]<27)
                     {
-                        //war betwean id and board[i][j][a]
+                        war_between_cat1_cat2(id,board[i][j][a])
                     }
                 }
             }
         }
-        else if (masir[k]==Down&&animals[id].power>0)
+        else if (masir[k]==Down&&animals[id].power>0&&!animals[id].freaz)
         {
             j=animals[id].x;
             i=animals[id].y;
@@ -698,10 +717,9 @@ void move(int id,direction masir[5],int tedadgam){
             {
                 for ( a = 2; a < board[i][j][0]+2; a++)
                 {
-				
-                   // if (board[i][j][a]>22&&board[i][j][a]<27)
-                        //war betwean id and board[i][j][a]
-            	}
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        war_between_cat_dog(board[i][j][a],id);
+                }
             }
             else if (id>4&&id<23)
             {
@@ -738,7 +756,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[id].id_mic[b]=0;
                         animals[id].score-=animals[min].score;
                         animals[id].id_mic[0]--;
-                        putOnboard(min,animals[id].y,animals[id].x);
+                        putOnboard(min,animals[min].y,animals[min].x);
                     }
                     else
                     {
@@ -759,22 +777,25 @@ void move(int id,direction masir[5],int tedadgam){
                 {
                     animals[id].energy+=2;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 else if(board[i][j][a]==FISH_3)
                 {
                     animals[id].energy+=3;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 else if(board[i][j][a]==FISH_4)
                 {
                     animals[id].energy+=4;
                     board[i][j][a]=0;
+                    numfish--;
                 }
                 for ( a = 2; a < board[i][j][0]+2&&swich; a++)
                 {
                     if (board[i][j][a]>1&&board[i][j][a]<5)
                     {
-                        //war betwean id and board[i][j][a]
+                        war_between_cat_dog(id,board[i][j][a]);
                     }
                     else if (board[i][j][a]>4&&board[i][j][a]<23)
                     {
@@ -785,7 +806,7 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                     if (board[i][j][a]>22&&board[i][j][a]<27)
                     {
-                        //war betwean id and board[i][j][a]
+                        war_between_cat1_cat2(id,board[i][j][a])
                     }
                 }
             }
@@ -804,4 +825,58 @@ void delete_id(int id,int i,int j)
         board[i][j][b]=board[i][j][b+1];
     board[i][j][b]=0;
     board[i][j][0]--;
-}*/
+}
+
+void war_between_cat_dog(int catid,int dogid)
+{
+    int b;
+    if (animals[catid].power*animals[catid].energy>=animals[dogid].power*animals[dogid].energy)
+    {
+        delete_id(dogid,animals[dogid].y,animals[dogid].x);
+        animals[catid].energy-=rond(animals[catid].power*((float)animals[catid].energy/animals[dogid].power));
+    }
+    else 
+    {
+        animals[catid].freaz=2;
+        for ( b = 1; b < animals[id].id_mic[0]+1; b++)
+        {
+            putOnboard(animals[id].id_mic[b],animals[animals[id].id_mic[b]].y,animals[animals[id].id_mic[b]].x);
+            animals[id].id_mic[b]=0;
+        }
+        animals[id].id_mic[0]=0;
+        animals[catid].power=2;
+        animals[catid].energy=5;
+        animals[dogid].energy-=rond(animals[dogid].power*((float)animals[dogid].energy/animals[catid].power));
+    } 
+}
+
+void war_between_cat1_cat2(int cat1id,int cat2id)
+{
+    int b;
+    if (animals[cat1id].power*animals[cat1id].energy>=animals[cat2id].power*animals[cat2id].energy)
+    {
+        animals[cat2id].freaz=2;
+        for ( b = 1; b < animals[cat2id].id_mic[0]+1; b++)
+        {
+            putOnboard(animals[cat2id].id_mic[b],animals[animals[cat2id].id_mic[b]].y,animals[animals[cat2id].id_mic[b]].x);
+            animals[cat2id].id_mic[b]=0;
+        }
+        animals[cat2id].id_mic[0]=0;
+        animals[cat2id].power=2;
+        animals[cat2id].energy=5;
+        animals[cat1id].energy-=rond(animals[cat1id].power*((float)animals[cat1id].energy/animals[cat2id].power));
+    }
+    else 
+    {
+        animals[cat1id].freaz=2;
+        for ( b = 1; b < animals[cat1id].id_mic[0]+1; b++)
+        {
+            putOnboard(animals[cat1id].id_mic[b],animals[animals[cat1id].id_mic[b]].y,animals[animals[cat1id].id_mic[b]].x);
+            animals[cat1id].id_mic[b]=0;
+        }
+        animals[cat1id].id_mic[0]=0;
+        animals[cat1id].power=2;
+        animals[cat1id].energy=5;
+        animals[cat2id].energy-=rond(animals[cat2id].power*((float)animals[cat2id].energy/animals[cat1id].power));
+    } 
+}
