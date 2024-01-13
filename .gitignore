@@ -1,7 +1,10 @@
 computer_project_term_1_private*
-.vscode
+
 
 
 dotOfiles/
-output/
+output/computer project term 1.exe
+output/allegro_monolith-5.2.dll
 .idea/
+
+.vscode/settings.json
