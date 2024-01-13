@@ -27,4 +27,9 @@ void find_cordinate_on_board(int x, int y, int *xBoard, int *yBoard);
 int show_slection_hover(int x, int y);
 void show_slections(coordinates selections[], int n);
 
+void show_background();
+void show_dice(int die[4], bool reset);
+
+void show_button(button btn);
+
 #endif

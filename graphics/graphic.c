@@ -1,3 +1,16 @@
+typedef struct button button;
+typedef struct animal animal;
+typedef struct coordinates coordinates;
+typedef enum direction direction;
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include <stdio.h>
+
 extern struct animal{
     int ID;
     char * name;
@@ -8,27 +21,39 @@ extern struct animal{
     unsigned short x;
     unsigned short y;
 };
-typedef struct animal animal;
 
 extern struct coordinates {
     int x;
     int y;
 };
-typedef struct coordinates coordinates;
+
+
+extern struct button {
+    ALLEGRO_BITMAP * icon;
+    coordinates from;
+    coordinates to;
+    bool is_showing;
+};
 
 extern enum direction {None , Up, Right, Down, Left};
-typedef enum direction direction;
 
-
-#include <stdio.h>
 #include "../graphics/graphic.h"
 
+
 ALLEGRO_DISPLAY * display;
-ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel;
+
+ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif;
+ALLEGRO_BITMAP * dice[7];
+
 ALLEGRO_FONT * font;
+
 ALLEGRO_MOUSE_STATE msestate;
+
 ALLEGRO_SAMPLE * selection_fail_audio;
+ALLEGRO_SAMPLE * selection_audio;
 ALLEGRO_SAMPLE_ID isPlayingSampleId;
+
+button diceThrowBTN;
 
 
 extern animal animals[27];
@@ -56,49 +81,98 @@ int allegroINIT(){
     
     al_install_mouse();
     
-    al_init_image_addon();
+    al_init_image_addon(); 
 	cursor = al_load_bitmap("cursor.tga");
     selsction = al_load_bitmap("selection.png");
     selsctionHavel = al_load_bitmap("selection_havel.png");
-	
+    background = al_load_bitmap("background.jpg");
+    dice[0] = al_load_bitmap("dice/dice_0.png");
+    dice[1] = al_load_bitmap("dice/dice_1.png");
+    dice[2] = al_load_bitmap("dice/dice_2.png");
+    dice[3] = al_load_bitmap("dice/dice_3.png");
+    dice[4] = al_load_bitmap("dice/dice_4.png");
+    dice[5] = al_load_bitmap("dice/dice_5.png");
+    dice[6] = al_load_bitmap("dice/dice_6.png");
+
+    diceThrowBTN.from.x = 885;
+    diceThrowBTN.from.y = 570;
+    diceThrowBTN.to.x = 1085;
+    diceThrowBTN.to.y = 670;
+    diceThrowBTN.icon = al_load_bitmap("buttons/trow dice button.png");
+
+    if(!diceThrowBTN.icon){
+        printf("error loading btn!");
+        return 0;
+    }
+    
+    for(int i = 0;i <= 6;i++){
+        if(!dice[i]){
+            printf("error loading dice!");
+            return 0;
+        }
+        
+    }
+
+    
 	if (!cursor) {
       printf("Error loading cursor.tga\n");
-      return -1;
+      return 0;
     }
 	
 	if (!selsction) {
       printf("Error loading cursor.tga\n");
-      return -1;
+      return 0;
     }
 	
 	if (!selsctionHavel) {
       printf("Error loading cursor.tga\n");
-      return -1;
+      return 0;
     }
 
     al_install_audio();
     al_init_acodec_addon();
-    al_reserve_samples(1);
+    al_reserve_samples(2);
     selection_fail_audio = al_load_sample("./audios/board select fail.wav");
     if(!selection_fail_audio){
         printf("audio error!");
     }
+    selection_audio = al_load_sample("./audios/blub.wav");
+    if(!selection_audio){
+        printf("audio error!");
+    }
+
+
 
     return 1;
 }
 
 int allegroDESTROY(){
 	
-	al_destroy_display(display);
+
 	al_destroy_font(font);
+
     al_shutdown_font_addon();
+
 	al_shutdown_primitives_addon();
+
 	al_destroy_mouse_cursor(cursor);
 	al_uninstall_mouse();
+
 	al_shutdown_image_addon();
+    al_destroy_bitmap(cursor);
+    al_destroy_bitmap(selsction);
+    al_destroy_bitmap(selsctionHavel);
+    al_destroy_bitmap(background);
+    al_destroy_bitmap(mygif);
+    for (size_t i = 0; i <= 6; i++){
+        al_destroy_bitmap(dice[i]);
+    }
+    
+    
     al_destroy_sample(selection_fail_audio);
     al_uninstall_audio();
 	
+	al_destroy_display(display);
 	return 1;
 }
 
@@ -209,6 +283,29 @@ void find_cordinate_on_board(int x, int y, int *xBoard, int *yBoard){
     length = width = 700 /boardSize;
     *xBoard = ((x - 10) / length);
     *yBoard = ((y - 10) / width);
+}
+
+void show_background(){
+    al_draw_scaled_bitmap(background, 0, 0, 1920, 1080, 0, 0, 1280, 720, 0);
+}
+
+void show_button(button btn){
+    al_draw_scaled_bitmap(btn.icon, 0, 0, al_get_bitmap_width(btn.icon), al_get_bitmap_height(btn.icon), btn.from.x, btn.from.y, btn.to.x - btn.from.x, btn.to.y - btn.from.y, 0);
+}
+
+void show_dice(int die[4], bool reset){
+    static mydice[4];
+    if(reset)
+        for (size_t i = 0; i < 4; i++){
+            if(die[i] == -1)mydice[i] = rand() % 6 + 1;
+            else mydice[i] = die[i];
+        }
+    
+    int x = 740;
+    for (size_t i = 0; i < 4; i++){
+        al_draw_scaled_bitmap(dice[mydice[i]], 0, 0, 54, 53, x, 400, 120, 120, 0);
+        x += 130;
+    }
 }
 
 

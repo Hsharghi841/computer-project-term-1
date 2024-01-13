@@ -1,6 +1,10 @@
 
 // *in the name of god*
 
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+
+
 // defines :
 #define sq(x) (x) * (x) // for square a number
 #define get_cat_id(x) (x) + 22
@@ -12,6 +16,8 @@
 int FISH[3] = {FISH_2, FISH_3, FISH_4};
 #define ________________________________________$_START_GAME_$________________________________________ main
 #define _________________________________________$_END_GAME_$_________________________________________ }
+
+// structures:
 
 struct coordinates {
     int x;
@@ -32,6 +38,16 @@ struct animal{
 };
 typedef struct animal animal;
 
+struct button {
+    ALLEGRO_BITMAP * icon;
+    coordinates from;
+    coordinates to;
+    bool is_showing;
+};
+typedef struct button button;
+
+extern button diceThrowBTN;
+
 
 enum direction {None , Up, Right, Down, Left};
 typedef enum direction direction;
@@ -46,10 +62,11 @@ typedef enum turns turns;
 #include <stdlib.h>
 #include "./graphics/graphic.h"
 
-
+// allegro variables:
 extern ALLEGRO_DISPLAY * display;
 extern ALLEGRO_SAMPLE * selection_fail_audio;
 extern ALLEGRO_SAMPLE_ID isPlayingSampleId;
+extern ALLEGRO_SAMPLE * selection_audio;
 
 //functions:
 
@@ -66,6 +83,11 @@ direction find_direction(int x, int y, int xboard, int yboard);
 int isEqualCoordinates(coordinates a, coordinates b);
 int check_wall(coordinates a, coordinates b);
 int check_wall2(int x, int y, coordinates b);
+int check_button(button b, int x, int y);
+int throw_next_die(int dice[4], bool needThrow[4]);
+int is_dice_repeated(int dice[4], bool repeatedDice[4]);
+void swap(int *a, int * b);
+void set_turns(int dice[4]);
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
@@ -74,7 +96,8 @@ int boardSize;
 int wall[31][31];
 turns catslist[4];
 int catsNumber = 0;
-turns turn;
+turns turn[4];
+
 
 int ________________________________________$_START_GAME_$________________________________________(){
 
@@ -94,14 +117,22 @@ int ________________________________________$_START_GAME_$______________________
     
     
     
-    allegroINIT();
+    if(!allegroINIT())return 0;
     		        
     initwall();
     startSettingBoard();
     
-    next_turn();
-    next_turn();
+    turns turn = none;
 
+    
+    int dice[4] = {0};
+    int diceTimer = 0;
+    bool needThrowdie[4] = {0};
+    for (size_t i = 0; i < catsNumber; i++){
+        needThrowdie[catslist[i] - 1] = 1;
+    }
+    bool throwingDice = 0;
+    diceThrowBTN.is_showing = 1;
 
     ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
     al_start_timer(timer);
@@ -142,7 +173,7 @@ int ________________________________________$_START_GAME_$______________________
 
 
         if(event.type == ALLEGRO_EVENT_MOUSE_AXES){
-            if(is_mouse_on_Board(event.mouse.x, event.mouse.y)){
+            if(turn && is_mouse_on_Board(event.mouse.x, event.mouse.y)){
                 coordinates onBoard;
                 find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
                 if(needShowSelectionHover = (is_mouse_nextto(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y) && check_wall2(animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y, onBoard)) && !selecting){
@@ -154,6 +185,8 @@ int ________________________________________$_START_GAME_$______________________
                         if(moves[nmoves] = find_direction(onBoard.x, onBoard.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y)){
                             nmoves++;
                             selectionlist[nselection] = onBoard;
+                            al_stop_sample(&isPlayingSampleId);
+                            al_play_sample(selection_audio, 0.5, 0.0, nselection * 0.5 + 1, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
                             nselection++;
                         }
                     }
@@ -174,6 +207,8 @@ int ________________________________________$_START_GAME_$______________________
                             if(moves[nmoves] = find_direction(onBoard.x, onBoard.y, selectionlist[nselection - 1].x, selectionlist[nselection - 1].y)){
                                 nmoves++;
                                 selectionlist[nselection] = onBoard;
+                                al_stop_sample(&isPlayingSampleId);
+                                al_play_sample(selection_audio, 0.5, 0.0, nselection * 0.5 + 1, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
                                 nselection++;
                             }
                             if(nmoves > 3){
@@ -183,6 +218,8 @@ int ________________________________________$_START_GAME_$______________________
                                 mouseButtonDown = 0;
                             }
                         } else { // if wall exist
+                            al_stop_sample(&isPlayingSampleId);
+                            al_play_sample(selection_audio, 0.5, 0.0, 2.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
                             selecting = 0;
                             nmoves = 0;
                             nselection = 0;
@@ -193,25 +230,38 @@ int ________________________________________$_START_GAME_$______________________
                 // printf("%d\n", wall[onBoard.x][onBoard.y]);
             }
             else {// if mosue is not on board
-                selecting = 0;
-                nmoves = 0;
-                nselection = 0;
-                mouseButtonDown = 0;
+                if(selecting){
+                    al_stop_sample(&isPlayingSampleId);
+                    al_play_sample(selection_audio, 0.5, 0.0, 3, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+                    selecting = 0;
+                    nmoves = 0;
+                    nselection = 0;
+                    mouseButtonDown = 0;
+                }
             }
+            
             // printf("%d\n", nmoves);
         }
 
         if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
             mouseButtonDown = 1;
-            coordinates onBoard;
-            find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
-            if(event.mouse.button == 1 && (needShowSelectionHover || (onBoard.x == animals[get_cat_id(turn)].x && onBoard.y == animals[get_cat_id(turn)].y))){
-                
+            if(is_mouse_on_Board(event.mouse.x, event.mouse.y)){
+                coordinates onBoard;
+                find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
+                if(event.mouse.button == 1 && (needShowSelectionHover || (onBoard.x == animals[get_cat_id(turn)].x && onBoard.y == animals[get_cat_id(turn)].y))){
+                    
+                }
+                else{
+                    al_play_sample(selection_fail_audio, 1, 0, 1.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+                    mouseButtonDown = 0;
+                }
             }
-            else{
-                al_play_sample(selection_fail_audio, 1, 0, 1.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
-                mouseButtonDown = 0;
+
+            if(!throwingDice && !turn && check_button(diceThrowBTN, event.mouse.x, event.mouse.y)){
+                throwingDice = 1;
+                diceThrowBTN.is_showing = 0;
             }
+
         }
 
         if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
@@ -231,25 +281,52 @@ int ________________________________________$_START_GAME_$______________________
 
         if(event.type == ALLEGRO_EVENT_TIMER){
             if(needUpdateBoardDisplay){
-                al_clear_to_color(al_map_rgb(255, 255, 255));
+                show_background();
                 show_board();
                 show_components();
                 show_walls();
-                
 
                 oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
                 needUpdateBoardDisplay = 0;
             }else{
                 al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
             }
+
+            if(throwingDice){
+                throwingDice = throw_next_die(dice, needThrowdie);
+                if(!throwingDice){
+                    set_turns(dice);
+                    if(!is_dice_repeated(dice, needThrowdie)){
+                        turn = next_turn();
+                        printf("first: %d\n", turn);
+                        diceThrowBTN.is_showing = 0;
+                    }else{
+                        diceThrowBTN.is_showing = 1;
+                    }
+                }
+            }
+
+            if(diceThrowBTN.is_showing){
+                show_button(diceThrowBTN);
+            }
+
+            if(1){
+                show_dice(dice, !(diceTimer));
+                if(!diceTimer)diceTimer += 2;
+                diceTimer--;
+            }
+
             if(needShowSelectionHover){
                 needShowSelectionHover = show_slection_hover(mx, my);
             }
+
             if(selecting && nselection){
                 
                 show_slections(selectionlist, nselection);
             }
+
             if(showMouse)put_mouse();
+
             al_flip_display();
         }
 
@@ -500,25 +577,94 @@ int show_components(){
 }
 
 turns next_turn(){
-    static int tn = 4;
-    static turns tlist[4];
-
-    tn++;
-    if(tn > catsNumber){
-        for (size_t i = 0; i < catsNumber; i++)
-            tlist[i] = catslist[i];
-        
-        tn = 0;
-        turn = none;
+    static int nturn = -1;
+    nturn++;
+    if(nturn >= catsNumber){
+        nturn = -1;
         return none;
     }
-    int r = rand() % (catsNumber - tn + 1);
-    turn = tlist[r];
-    tlist[r] = tlist[catsNumber - tn];
-    return turn;
-
+    printf("%d %d %d %d\n", turn[0], turn[1], turn[2], turn[3]);
+    return turn[nturn];
 }
 
+void set_turns(int dice[4]){
+    int mylist[4];
+    static int nRepeatedDice = 0;
+    static int repeatedDice[4] = {0};
+    for (size_t i = 0; i < 4; i++)
+        mylist[i] = dice[i];
+    if(!nRepeatedDice)
+        for (int i = catsNumber - 1;i >= 0; i--){
+            int maxindex = 0;
+            for (int j = 1;j < 4;j++){
+                if(mylist[maxindex] < mylist[j]){
+                    maxindex = j;
+                }
+            }
+            turn[catsNumber - i - 1] = maxindex + 1;
+            if(i < catsNumber - 1){
+                if(dice[turn[catsNumber - 2 - i] - 1] == mylist[maxindex]){
+                    if(!repeatedDice[turn[catsNumber - 2 - i] - 1]){
+                        repeatedDice[turn[catsNumber - 2 - i] - 1] = repeatedDice[maxindex] = ++nRepeatedDice;
+                    }else{
+                        repeatedDice[maxindex] = repeatedDice[turn[catsNumber - 2 - i] - 1];
+                    }
+                }
+            }
+            mylist[maxindex] = -2;  
+        }
+    else if(nRepeatedDice == 1){
+        nRepeatedDice = 0;
+        int f;
+        for (f = 0; f < catsNumber; f++)
+            if(repeatedDice[turn[f] - 1] == 1)break;
+        
+        for(int i = f;i < catsNumber && repeatedDice[turn[i] - 1] == 1;i++){
+            int maxindex = i;
+            for (int j = i + 1;j < catsNumber && repeatedDice[turn[j] - 1] == 1; j++){
+                if(mylist[turn[j] - 1] > mylist[turn[maxindex] - 1]){
+                    maxindex = j;
+                }
+            }
+            swap(&turn[i], &turn[maxindex]);
+            if(i > f){
+                if(dice[turn[i - 1] - 1] == mylist[turn[i] - 1]){
+                    if(!repeatedDice[turn[i - 1] - 1]){
+                        repeatedDice[turn[i] - 1] = repeatedDice[turn[i - 1] - 1] = ++nRepeatedDice;
+                    }else{
+                        repeatedDice[turn[i] - 1] = repeatedDice[turn[i - 1] - 1];
+                    }
+                }
+                else
+                    repeatedDice[turn[i] - 1] = 0;
+            }else{
+                repeatedDice[turn[i] - 1] = 0;
+            }
+            
+            mylist[turn[i] - 1] = -2;
+        }    
+    }else if(nRepeatedDice == 2){
+        nRepeatedDice = 0;
+        if(mylist[turn[0] - 1] < mylist[turn[1] - 1]){
+            swap(&turn[0], &turn[1]);
+            repeatedDice[turn[0] - 1] = 0;
+            repeatedDice[turn[1] - 1] = 0;
+        }else if(mylist[turn[0] - 1] == mylist[turn[1] - 1]){
+            repeatedDice[turn[0] - 1] = 1;
+            repeatedDice[turn[1] - 1] = 1;
+            nRepeatedDice = 1;
+        }
+
+        if(mylist[turn[2] - 1] < mylist[turn[3] - 1]){
+            swap(&turn[2], &turn[3]);
+            repeatedDice[turn[2] - 1] = 0;
+            repeatedDice[turn[3] - 1] = 0;
+        }else if(mylist[turn[2] - 1] == mylist[turn[3] - 1]){
+            repeatedDice[turn[2] - 1] = repeatedDice[turn[3] - 1] = ++nRepeatedDice;
+        }
+    }
+}
+        
 direction find_direction(int x2, int y2, int x1, int y1){
     
     if(x2 == x1 + 1)return Right;
@@ -572,4 +718,75 @@ int check_wall2(int x, int y, coordinates b){
         return 0;
     }
     return 1;
+}
+
+int check_button(button b, int x, int y){
+    return ((b.from.x <= x && x <= b.to.x) && (b.from.y <= y && y <= b.to.y)) || 
+            ((b.to.x <= x && x <= b.from.x) && (b.to.y <= y && y <= b.from.y));
+}
+
+int throw_next_die(int dice[4], bool needThrow[4]){
+    const int delay = 40;
+    static int timer = 0;
+    static int dieNum = 0;
+    if(!timer && !dieNum){
+        for(int i = 0;i < 4;i++)
+            if(needThrow[i])
+                dice[i] = -1;
+        
+    }
+
+    if(!dieNum)
+        if(timer >= 1.5 * delay){
+            if(needThrow[dieNum]){
+                dice[dieNum] = rand() % 6 + 1;
+                timer = 0;
+            }
+            dieNum++;
+        }else;
+    else if(timer >= delay){
+        if(needThrow[dieNum]){
+            dice[dieNum] = rand() % 6 + 1;
+            timer = 0;
+        }
+        dieNum++;
+        if(dieNum >= 4){
+                dieNum = 0;
+                timer = 0;
+                return 0;
+        }
+    }
+
+    timer++;
+
+    return 1;
+}
+
+int is_dice_repeated(int dice[4], bool repeatedDice[4]){
+    bool hasRep = 0;
+    bool myrep[4] = {0};
+    for (size_t i = 0; i < 4; i++)
+        if(repeatedDice[i])
+            for (size_t j = i + 1; j < 4; j++){
+                if(repeatedDice[j]){
+                    if(dice[i] == -1 || !dice[i])break;
+                    if(dice[j] == -1 || !dice[j])continue;
+                    if(dice[i] == dice[j]){
+                        myrep[i] = myrep[j] = 1;
+                        hasRep = 1;
+                    }
+                }
+            }
+    for (size_t i = 0; i < 4; i++)
+        repeatedDice[i] = myrep[i];
+    
+    
+
+    return hasRep;
+}
+
+void swap(int *a, int * b){
+    int temp = *b;
+    *b = *a;
+    *a = temp;
 }
