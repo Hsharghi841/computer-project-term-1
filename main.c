@@ -25,6 +25,7 @@ struct coordinates {
 };
 typedef struct coordinates coordinates;
 
+
 // structures for objects (mice, cats, dogs)
 struct animal{
     int ID;
@@ -35,6 +36,8 @@ struct animal{
     unsigned short dogdefense;
     unsigned short x;
     unsigned short y;
+    unsigned short freaz;
+    int id_mic[19];
 };
 typedef struct animal animal;
 
@@ -51,6 +54,7 @@ extern button diceThrowBTN;
 
 enum direction {None , Up, Right, Down, Left};
 typedef enum direction direction;
+
 
 enum turns {none, cat1, cat2, cat3, cat4};
 typedef enum turns turns;
@@ -88,6 +92,10 @@ int throw_next_die(int dice[4], bool needThrow[4]);
 int is_dice_repeated(int dice[4], bool repeatedDice[4]);
 void swap(int *a, int * b);
 void set_turns(int dice[4]);
+void move(int id,direction masir[5],int tedadgam);
+void delete_id(int id,int i,int j);
+void war_between_cat_dog(int catid,int dogid);
+void war_between_cat1_cat2(int cat1id,int cat2id);
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
@@ -97,6 +105,7 @@ int wall[31][31];
 turns catslist[4];
 int catsNumber = 0;
 turns turn[4];
+int numfish=10;
 
 
 int ________________________________________$_START_GAME_$________________________________________(){
@@ -421,6 +430,8 @@ void initAnimals(){
         animals[i].energy = 3;
         animals[i].score = 3;
         animals[i].ID = i;
+        animals[i].freaz=0;
+        animals[i].id_mic[0]=0;
     }
     // 6 2-point mice
     for (size_t i = 9; i < 15; i++)
@@ -428,6 +439,8 @@ void initAnimals(){
         animals[i].energy = 2;
         animals[i].score = 2;
         animals[i].ID = i;
+        animals[i].freaz=0;
+        animals[i].id_mic[0]=0;
     }
     // 8 1-point mice
     for (size_t i = 15; i < 23; i++)
@@ -435,6 +448,8 @@ void initAnimals(){
         animals[i].energy = 1;
         animals[i].score = 1;
         animals[i].ID = i;
+        animals[i].freaz=0;
+        animals[i].id_mic[0]=0;
     }
     // cats (this part of code will change!)
     for (size_t i = 23; i <= 26; i++)
@@ -442,6 +457,8 @@ void initAnimals(){
         animals[i].energy = 5;
         animals[i].power = 2;
         animals[i].ID = i;
+        animals[i].freaz=0;
+        animals[i].id_mic[0]=0;
     }
     
     
@@ -789,4 +806,498 @@ void swap(int *a, int * b){
     int temp = *b;
     *b = *a;
     *a = temp;
+}
+
+void move(int id,direction masir[5],int tedadgam){
+    int i,j,a,b,min,swich,bmin;
+    for (size_t k = 0; k < tedadgam; k++)
+    {
+        if (masir[k]==Right&&animals[id].power>0&&!animals[id].freaz)
+        {
+            j=animals[id].x;
+            i=animals[id].y;
+            delete_id(id,i,j);
+            j++;
+            putOnboard(id,i,j);
+            if (id>0&&id<5)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                {
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        war_between_cat_dog(board[i][j][a],id);
+                }
+            }
+            else if (id>4&&id<23)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        delete_id(id,i,j);
+                        animals[board[i][j][a]].score+=animals[id].score;
+                        animals[board[i][j][a]].id_mic[0]++;
+                        animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                    }
+            }
+            else if (id>22&&id<27)
+            {
+                animals[id].energy--;
+                swich=1;
+                a=1;
+                if(board[i][j][a]==TRAP)
+                {
+                    if (animals[id].id_mic[0])
+                    {
+                        min=animals[id].id_mic[1];
+                        bmin=1;
+                        for ( b = 2; b< animals[id].id_mic[0]+1; b++)
+                        {
+                            if(min>animals[id].id_mic[b])
+                            {
+                                min=animals[id].id_mic[b];
+                                bmin=b;
+                            }
+                        }
+                        for ( b = bmin; b < animals[id].id_mic[0]; b++)
+                            animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                            animals[id].id_mic[b]=0;
+                            animals[id].score-=animals[min].score;
+                            animals[id].id_mic[0]--;
+                            putOnboard(min,animals[min].y,animals[min].x);
+                    }
+                    else
+                    {
+                        if(animals[id].power>2)
+                            animals[id].power-=2;
+                        else
+                        {
+                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                        }
+                    }
+                }
+                else if(board[i][j][a]==CHOCOLATE)
+                {
+                    animals[id].power++;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_2)
+                {
+                    animals[id].energy+=2;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                else if(board[i][j][a]==FISH_3)
+                {
+                    animals[id].energy+=3;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                else if(board[i][j][a]==FISH_4)
+                {
+                    animals[id].energy+=4;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                for ( a = 2; a < board[i][j][0]+2&&swich; a++)
+                {
+                    if (board[i][j][a]>1&&board[i][j][a]<5)
+                    {
+                        war_between_cat_dog(id,board[i][j][a]);
+                    }
+                    else if (board[i][j][a]>4&&board[i][j][a]<23)
+                    {
+                        delete_id(board[i][j][a],i,j);
+                        animals[id].score+=animals[board[i][j][a]].score;
+                        animals[id].id_mic[0]++;
+                        animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                    }
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        war_between_cat1_cat2(id,board[i][j][a]);
+                    }
+                }
+            }
+        }
+        else if (masir[k]==Left&&animals[id].power>0&&!animals[id].freaz)
+        {
+            j=animals[id].x;
+            i=animals[id].y;
+            delete_id(id,i,j);
+            j--;
+            putOnboard(id,i,j);
+            if (id>0&&id<5)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                {
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        war_between_cat_dog(board[i][j][a],id);
+                }
+            }
+            else if (id>4&&id<23)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        delete_id(id,i,j);
+                        animals[board[i][j][a]].score+=animals[id].score;
+                        animals[board[i][j][a]].id_mic[0]++;
+                        animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                    }
+            }
+            else if (id>22&&id<27)
+            {
+                animals[id].energy--;
+                swich=1;
+                a=1;
+                if(board[i][j][a]==TRAP)
+                {
+                    if (animals[id].id_mic[0])
+                    {
+                        min=animals[id].id_mic[1];
+                        bmin=1;
+                        for ( b = 2; b< animals[id].id_mic[0]+1; b++)
+                        {
+                            if(min>animals[id].id_mic[b])
+                            {
+                                min=animals[id].id_mic[b];
+                                bmin=b;
+                            }
+                        }
+                        for ( b = bmin; b < animals[id].id_mic[0]; b++)
+                            animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                        animals[id].id_mic[b]=0;
+                        animals[id].score-=animals[min].score;
+                        animals[id].id_mic[0]--;
+                        putOnboard(min,animals[min].y,animals[min].x);
+                    }
+                    else
+                    {
+                        if(animals[id].power>2)
+                            animals[id].power-=2;
+                        else
+                        {
+                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                        }
+                    }
+                }
+                else if(board[i][j][a]==CHOCOLATE)
+                {
+                    animals[id].power++;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_2)
+                {
+                    animals[id].energy+=2;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                else if(board[i][j][a]==FISH_3)
+                {
+                    animals[id].energy+=3;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                else if(board[i][j][a]==FISH_4)
+                {
+                    animals[id].energy+=4;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                for ( a = 2; a < board[i][j][0]+2&&swich; a++)
+                {
+                    if (board[i][j][a]>1&&board[i][j][a]<5)
+                    {
+                        war_between_cat_dog(id,board[i][j][a]);
+                    }
+                    else if (board[i][j][a]>4&&board[i][j][a]<23)
+                    {
+                        delete_id(board[i][j][a],i,j);
+                        animals[id].score+=animals[board[i][j][a]].score;
+                        animals[id].id_mic[0]++;
+                        animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                    }
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        war_between_cat1_cat2(id,board[i][j][a]);
+                    }
+                }
+            }
+        }
+        else if (masir[k]==Up&&animals[id].power>0&&!animals[id].freaz)
+        {
+            j=animals[id].x;
+            i=animals[id].y;
+            delete_id(id,i,j);
+            i--;
+            putOnboard(id,i,j);
+            if (id>0&&id<5)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                {
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        war_between_cat_dog(board[i][j][a],id);
+                }
+            }
+            else if (id>4&&id<23)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        delete_id(id,i,j);
+                        animals[board[i][j][a]].score+=animals[id].score;
+                        animals[board[i][j][a]].id_mic[0]++;
+                        animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                    }
+            }
+            else if (id>22&&id<27)
+            {
+                animals[id].energy--;
+                swich=1;
+                a=1;
+                if(board[i][j][a]==TRAP)
+                {
+                    if (animals[id].id_mic[0])
+                    {
+                        min=animals[id].id_mic[1];
+                        bmin=1;
+                        for ( b = 2; b< animals[id].id_mic[0]+1; b++)
+                        {
+                            if(min>animals[id].id_mic[b])
+                            {
+                                min=animals[id].id_mic[b];
+                                bmin=b;
+                            }
+                        }
+                        for ( b = bmin; b < animals[id].id_mic[0]; b++)
+                        animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                        animals[id].id_mic[b]=0;
+                        animals[id].score-=animals[min].score;
+                        animals[id].id_mic[0]--;
+                        putOnboard(min,animals[min].y,animals[min].x);
+                    }
+                    else
+                    {
+                        if(animals[id].power>2)
+                            animals[id].power-=2;
+                        else
+                        {
+                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                        }
+                    }
+                }
+                else if(board[i][j][a]==CHOCOLATE)
+                {
+                    animals[id].power++;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_2)
+                {
+                    animals[id].energy+=2;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                else if(board[i][j][a]==FISH_3)
+                {
+                    animals[id].energy+=3;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                else if(board[i][j][a]==FISH_4)
+                {
+                    animals[id].energy+=4;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                for ( a = 2; a < board[i][j][0]+2&&swich; a++)
+                {
+                    if (board[i][j][a]>1&&board[i][j][a]<5)
+                    {
+                        war_between_cat_dog(id,board[i][j][a]);
+                    }
+                    else if (board[i][j][a]>4&&board[i][j][a]<23)
+                    {
+                        delete_id(board[i][j][a],i,j);
+                        animals[id].score+=animals[board[i][j][a]].score;
+                        animals[id].id_mic[0]++;
+                        animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                    }
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        war_between_cat1_cat2(id,board[i][j][a]);
+                    }
+                }
+            }
+        }
+        else if (masir[k]==Down&&animals[id].power>0&&!animals[id].freaz)
+        {
+            j=animals[id].x;
+            i=animals[id].y;
+            delete_id(id,i,j);
+            i++;
+            putOnboard(id,i,j);
+            if (id>0&&id<5)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                {
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                        war_between_cat_dog(board[i][j][a],id);
+                }
+            }
+            else if (id>4&&id<23)
+            {
+                for ( a = 2; a < board[i][j][0]+2; a++)
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        delete_id(id,i,j);
+                        animals[board[i][j][a]].score+=animals[id].score;
+                        animals[board[i][j][a]].id_mic[0]++;
+                        animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                    }
+            }
+            else if (id>22&&id<27)
+            {
+                animals[id].energy--;
+                swich=1;
+                a=1;
+                if(board[i][j][a]==TRAP)
+                {
+                    if (animals[id].id_mic[0])
+                    {
+                        min=animals[id].id_mic[1];
+                        bmin=1;
+                        for ( b = 2; b< animals[id].id_mic[0]+1; b++)
+                        {
+                            if(min>animals[id].id_mic[b])
+                            {
+                                min=animals[id].id_mic[b];
+                                bmin=b;
+                            }
+                        }
+                        for ( b = bmin; b < animals[id].id_mic[0]; b++)
+                            animals[id].id_mic[b]=animals[id].id_mic[b+1];
+                        animals[id].id_mic[b]=0;
+                        animals[id].score-=animals[min].score;
+                        animals[id].id_mic[0]--;
+                        putOnboard(min,animals[min].y,animals[min].x);
+                    }
+                    else
+                    {
+                        if(animals[id].power>2)
+                            animals[id].power-=2;
+                        else
+                        {
+                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                        }
+                    }
+                }
+                else if(board[i][j][a]==CHOCOLATE)
+                {
+                    animals[id].power++;
+                    board[i][j][a]=0;
+                }
+                else if(board[i][j][a]==FISH_2)
+                {
+                    animals[id].energy+=2;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                else if(board[i][j][a]==FISH_3)
+                {
+                    animals[id].energy+=3;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                else if(board[i][j][a]==FISH_4)
+                {
+                    animals[id].energy+=4;
+                    board[i][j][a]=0;
+                    numfish--;
+                }
+                for ( a = 2; a < board[i][j][0]+2&&swich; a++)
+                {
+                    if (board[i][j][a]>1&&board[i][j][a]<5)
+                    {
+                        war_between_cat_dog(id,board[i][j][a]);
+                    }
+                    else if (board[i][j][a]>4&&board[i][j][a]<23)
+                    {
+                        delete_id(board[i][j][a],i,j);
+                        animals[id].score+=animals[board[i][j][a]].score;
+                        animals[id].id_mic[0]++;
+                        animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                    }
+                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    {
+                        war_between_cat1_cat2(id,board[i][j][a]);
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
+void delete_id(int id,int i,int j)
+{
+    int a,b;
+    for ( a = 2; a < board[i][j][0]+2; a++)
+        if(board[i][j][a]==id)
+            break;
+    for ( b = a; b < board[i][j][0]+2; b++)
+        board[i][j][b]=board[i][j][b+1];
+    board[i][j][b]=0;
+    board[i][j][0]--;
+}
+
+void war_between_cat_dog(int catid,int dogid)
+{
+    int b;
+    if (animals[catid].power*animals[catid].energy>=animals[dogid].power*animals[dogid].energy)
+    {
+        delete_id(dogid,animals[dogid].y,animals[dogid].x);
+        animals[catid].energy-=rond(animals[catid].power*((float)animals[catid].energy/animals[dogid].power));
+    }
+    else 
+    {
+        animals[catid].freaz=2;
+        for ( b = 1; b < animals[catid].id_mic[0]+1; b++)
+        {
+            putOnboard(animals[catid].id_mic[b],animals[animals[catid].id_mic[b]].y,animals[animals[catid].id_mic[b]].x);
+            animals[catid].id_mic[b]=0;
+        }
+        animals[catid].id_mic[0]=0;
+        animals[catid].power=2;
+        animals[catid].energy=5;
+        animals[dogid].energy-=rond(animals[dogid].power*((float)animals[dogid].energy/animals[catid].power));
+    } 
+}
+
+void war_between_cat1_cat2(int cat1id,int cat2id)
+{
+    int b;
+    if (animals[cat1id].power*animals[cat1id].energy>=animals[cat2id].power*animals[cat2id].energy)
+    {
+        animals[cat2id].freaz=2;
+        for ( b = 1; b < animals[cat2id].id_mic[0]+1; b++)
+        {
+            putOnboard(animals[cat2id].id_mic[b],animals[animals[cat2id].id_mic[b]].y,animals[animals[cat2id].id_mic[b]].x);
+            animals[cat2id].id_mic[b]=0;
+        }
+        animals[cat2id].id_mic[0]=0;
+        animals[cat2id].power=2;
+        animals[cat2id].energy=5;
+        animals[cat1id].energy-=rond(animals[cat1id].power*((float)animals[cat1id].energy/animals[cat2id].power));
+    }
+    else 
+    {
+        animals[cat1id].freaz=2;
+        for ( b = 1; b < animals[cat1id].id_mic[0]+1; b++)
+        {
+            putOnboard(animals[cat1id].id_mic[b],animals[animals[cat1id].id_mic[b]].y,animals[animals[cat1id].id_mic[b]].x);
+            animals[cat1id].id_mic[b]=0;
+        }
+        animals[cat1id].id_mic[0]=0;
+        animals[cat1id].power=2;
+        animals[cat1id].energy=5;
+        animals[cat2id].energy-=rond(animals[cat2id].power*((float)animals[cat2id].energy/animals[cat1id].power));
+    } 
 }
