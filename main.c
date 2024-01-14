@@ -278,8 +278,17 @@ int ________________________________________$_START_GAME_$______________________
             if(selecting){
                 selecting = 0;
                 // move function
+                move(get_cat_id(turn), moves, nmoves);
                 nmoves = 0;
                 nselection = 0;
+                turn = next_turn();
+                if(!turn){
+                    diceThrowBTN.is_showing = 1;
+                    for (size_t i = 0; i < catsNumber; i++){
+                        needThrowdie[catslist[i] - 1] = 1;
+                    }
+                    
+                }
             }
         }
 
@@ -307,7 +316,6 @@ int ________________________________________$_START_GAME_$______________________
                     set_turns(dice);
                     if(!is_dice_repeated(dice, needThrowdie)){
                         turn = next_turn();
-                        printf("first: %d\n", turn);
                         diceThrowBTN.is_showing = 0;
                     }else{
                         diceThrowBTN.is_showing = 1;
@@ -600,7 +608,7 @@ turns next_turn(){
         nturn = -1;
         return none;
     }
-    printf("%d %d %d %d\n", turn[0], turn[1], turn[2], turn[3]);
+    printf("turn : %d \n", turn[nturn]);
     return turn[nturn];
 }
 
@@ -738,14 +746,15 @@ int check_wall2(int x, int y, coordinates b){
 }
 
 int check_button(button b, int x, int y){
-    return ((b.from.x <= x && x <= b.to.x) && (b.from.y <= y && y <= b.to.y)) || 
-            ((b.to.x <= x && x <= b.from.x) && (b.to.y <= y && y <= b.from.y));
+    return b.is_showing && (((b.from.x <= x && x <= b.to.x) && (b.from.y <= y && y <= b.to.y)) || 
+            ((b.to.x <= x && x <= b.from.x) && (b.to.y <= y && y <= b.from.y)));
 }
 
 int throw_next_die(int dice[4], bool needThrow[4]){
     const int delay = 40;
     static int timer = 0;
     static int dieNum = 0;
+    printf("timer : %d  dieNum : %d\n", timer, dieNum);
     if(!timer && !dieNum){
         for(int i = 0;i < 4;i++)
             if(needThrow[i])
@@ -1254,7 +1263,7 @@ void war_between_cat_dog(int catid,int dogid)
     if (animals[catid].power*animals[catid].energy>=animals[dogid].power*animals[dogid].energy)
     {
         delete_id(dogid,animals[dogid].y,animals[dogid].x);
-        animals[catid].energy-=rond(animals[catid].power*((float)animals[catid].energy/animals[dogid].power));
+        animals[catid].energy-=round(animals[catid].power*((float)animals[catid].energy/animals[dogid].power));
     }
     else 
     {
@@ -1267,7 +1276,7 @@ void war_between_cat_dog(int catid,int dogid)
         animals[catid].id_mic[0]=0;
         animals[catid].power=2;
         animals[catid].energy=5;
-        animals[dogid].energy-=rond(animals[dogid].power*((float)animals[dogid].energy/animals[catid].power));
+        animals[dogid].energy-=round(animals[dogid].power*((float)animals[dogid].energy/animals[catid].power));
     } 
 }
 
@@ -1285,7 +1294,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
         animals[cat2id].id_mic[0]=0;
         animals[cat2id].power=2;
         animals[cat2id].energy=5;
-        animals[cat1id].energy-=rond(animals[cat1id].power*((float)animals[cat1id].energy/animals[cat2id].power));
+        animals[cat1id].energy-=round(animals[cat1id].power*((float)animals[cat1id].energy/animals[cat2id].power));
     }
     else 
     {
@@ -1298,6 +1307,6 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
         animals[cat1id].id_mic[0]=0;
         animals[cat1id].power=2;
         animals[cat1id].energy=5;
-        animals[cat2id].energy-=rond(animals[cat2id].power*((float)animals[cat2id].energy/animals[cat1id].power));
+        animals[cat2id].energy-=round(animals[cat2id].power*((float)animals[cat2id].energy/animals[cat1id].power));
     } 
 }
