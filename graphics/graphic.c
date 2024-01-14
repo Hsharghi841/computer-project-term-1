@@ -20,6 +20,8 @@ extern struct animal{
     unsigned short dogdefense;
     unsigned short x;
     unsigned short y;
+    unsigned short freaz;
+    int id_mic[19];
 };
 
 extern struct coordinates {
@@ -221,6 +223,7 @@ void show_walls(){
 }
 
 int show_animal(int id){
+    // printf("id : %d  x : %d  y : %d\n", id, animals[id].x, animals[id].y);
     return show_object(id, animals[id].x, animals[id].y);
 }
 
