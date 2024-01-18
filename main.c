@@ -129,7 +129,19 @@ int ________________________________________$_START_GAME_$______________________
     if(!allegroINIT())return 0;
     		        
     initwall();
+    initAnimals();
     startSettingBoard();
+
+    // for (size_t i = 0; i < boardSize; i++)
+    // {
+    //     for (int j = 0;j < boardSize;j++)
+    //     {
+    //         printf("%3d", board[i][j][2]);
+    //     }
+    //     printf("\n");
+        
+    // }
+    
     
     turns turn = none;
 
@@ -279,6 +291,8 @@ int ________________________________________$_START_GAME_$______________________
                 selecting = 0;
                 // move function
                 move(get_cat_id(turn), moves, nmoves);
+                printf("move done!\n");
+                needUpdateBoardDisplay = 1;
                 nmoves = 0;
                 nselection = 0;
                 turn = next_turn();
@@ -306,6 +320,7 @@ int ________________________________________$_START_GAME_$______________________
 
                 oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
                 needUpdateBoardDisplay = 0;
+                printf("need display : 0!\n");
             }else{
                 al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
             }
@@ -754,7 +769,6 @@ int throw_next_die(int dice[4], bool needThrow[4]){
     const int delay = 40;
     static int timer = 0;
     static int dieNum = 0;
-    printf("timer : %d  dieNum : %d\n", timer, dieNum);
     if(!timer && !dieNum){
         for(int i = 0;i < 4;i++)
             if(needThrow[i])
@@ -819,8 +833,10 @@ void swap(int *a, int * b){
 
 void move(int id,direction masir[5],int tedadgam){
     int i,j,a,b,min,swich,bmin;
+    printf("id : %d\n", id);
     for (size_t k = 0; k < tedadgam; k++)
     {
+        printf("id : %d\tmasir [%d] : %d\tanimalenergy : %d\t freaz : %d\n", id, k, masir[k],animals[id].energy, animals[id].freaz);
         if (masir[k]==Right&&animals[id].power>0&&!animals[id].freaz)
         {
             j=animals[id].x;
