@@ -129,7 +129,19 @@ int ________________________________________$_START_GAME_$______________________
     if(!allegroINIT())return 0;
     		        
     initwall();
+    initAnimals();
     startSettingBoard();
+
+    // for (size_t i = 0; i < boardSize; i++)
+    // {
+    //     for (int j = 0;j < boardSize;j++)
+    //     {
+    //         printf("%3d", board[i][j][2]);
+    //     }
+    //     printf("\n");
+        
+    // }
+    
     
     turns turn = none;
 
@@ -235,8 +247,7 @@ int ________________________________________$_START_GAME_$______________________
                             mouseButtonDown = 0;
                         }
                     }
-                }
-                // printf("%d\n", wall[onBoard.x][onBoard.y]);
+            	}
             }
             else {// if mosue is not on board
                 if(selecting){
@@ -248,10 +259,7 @@ int ________________________________________$_START_GAME_$______________________
                     mouseButtonDown = 0;
                 }
             }
-            
-            // printf("%d\n", nmoves);
         }
-
         if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
             mouseButtonDown = 1;
             if(is_mouse_on_Board(event.mouse.x, event.mouse.y)){
@@ -279,10 +287,12 @@ int ________________________________________$_START_GAME_$______________________
                 selecting = 0;
                 // move function
                 move(get_cat_id(turn), moves, nmoves);
+                needUpdateBoardDisplay = 1;
                 nmoves = 0;
                 nselection = 0;
                 turn = next_turn();
                 if(!turn){
+                	//حرکت سگ و موش _اضافه شدن انرژی 
                     diceThrowBTN.is_showing = 1;
                     for (size_t i = 0; i < catsNumber; i++){
                         needThrowdie[catslist[i] - 1] = 1;
@@ -608,7 +618,6 @@ turns next_turn(){
         nturn = -1;
         return none;
     }
-    printf("turn : %d \n", turn[nturn]);
     return turn[nturn];
 }
 
@@ -754,7 +763,6 @@ int throw_next_die(int dice[4], bool needThrow[4]){
     const int delay = 40;
     static int timer = 0;
     static int dieNum = 0;
-    printf("timer : %d  dieNum : %d\n", timer, dieNum);
     if(!timer && !dieNum){
         for(int i = 0;i < 4;i++)
             if(needThrow[i])
@@ -821,7 +829,7 @@ void move(int id,direction masir[5],int tedadgam){
     int i,j,a,b,min,swich,bmin;
     for (size_t k = 0; k < tedadgam; k++)
     {
-        if (masir[k]==Right&&animals[id].power>0&&!animals[id].freaz)
+        if (masir[k]==Right&&animals[id].energy>0&&!animals[id].freaz)
         {
             j=animals[id].x;
             i=animals[id].y;
@@ -879,7 +887,7 @@ void move(int id,direction masir[5],int tedadgam){
                             animals[id].power-=2;
                         else
                         {
-                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                            //ط¯ط± ط§غŒظ†ط¬ط§ ط¨ط§غŒط¯ 3 طھط§ ط§ط² ط§ظ†ط±عکغŒ ط§ط´ ع©ظ… ع¯ط±ط¯ط¯
                         }
                     }
                 }
@@ -919,14 +927,14 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[id].id_mic[0]++;
                         animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
                     }
-                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    if (board[i][j][a]>22&&board[i][j][a]<27&&board[i][j][a]!=id)
                     {
                         war_between_cat1_cat2(id,board[i][j][a]);
                     }
                 }
             }
         }
-        else if (masir[k]==Left&&animals[id].power>0&&!animals[id].freaz)
+        else if (masir[k]==Left&&animals[id].energy>0&&!animals[id].freaz)
         {
             j=animals[id].x;
             i=animals[id].y;
@@ -984,7 +992,7 @@ void move(int id,direction masir[5],int tedadgam){
                             animals[id].power-=2;
                         else
                         {
-                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                            //ط¯ط± ط§غŒظ†ط¬ط§ ط¨ط§غŒط¯ 3 طھط§ ط§ط² ط§ظ†ط±عکغŒ ط§ط´ ع©ظ… ع¯ط±ط¯ط¯
                         }
                     }
                 }
@@ -1024,14 +1032,14 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[id].id_mic[0]++;
                         animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
                     }
-                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    if (board[i][j][a]>22&&board[i][j][a]<27&&board[i][j][a]!=id)
                     {
                         war_between_cat1_cat2(id,board[i][j][a]);
                     }
                 }
             }
         }
-        else if (masir[k]==Up&&animals[id].power>0&&!animals[id].freaz)
+        else if (masir[k]==Up&&animals[id].energy>0&&!animals[id].freaz)
         {
             j=animals[id].x;
             i=animals[id].y;
@@ -1089,7 +1097,7 @@ void move(int id,direction masir[5],int tedadgam){
                             animals[id].power-=2;
                         else
                         {
-                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                            //ط¯ط± ط§غŒظ†ط¬ط§ ط¨ط§غŒط¯ 3 طھط§ ط§ط² ط§ظ†ط±عکغŒ ط§ط´ ع©ظ… ع¯ط±ط¯ط¯
                         }
                     }
                 }
@@ -1129,14 +1137,14 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[id].id_mic[0]++;
                         animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
                     }
-                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    if (board[i][j][a]>22&&board[i][j][a]<27&&board[i][j][a]!=id)
                     {
                         war_between_cat1_cat2(id,board[i][j][a]);
                     }
                 }
             }
         }
-        else if (masir[k]==Down&&animals[id].power>0&&!animals[id].freaz)
+        else if (masir[k]==Down&&animals[id].energy>0&&!animals[id].freaz)
         {
             j=animals[id].x;
             i=animals[id].y;
@@ -1194,7 +1202,7 @@ void move(int id,direction masir[5],int tedadgam){
                             animals[id].power-=2;
                         else
                         {
-                            //در اینجا باید 3 تا از انرژی اش کم گردد
+                            //ط¯ط± ط§غŒظ†ط¬ط§ ط¨ط§غŒط¯ 3 طھط§ ط§ط² ط§ظ†ط±عکغŒ ط§ط´ ع©ظ… ع¯ط±ط¯ط¯
                         }
                     }
                 }
@@ -1234,7 +1242,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[id].id_mic[0]++;
                         animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
                     }
-                    if (board[i][j][a]>22&&board[i][j][a]<27)
+                    if (board[i][j][a]>22&&board[i][j][a]<27&&board[i][j][a]!=id)
                     {
                         war_between_cat1_cat2(id,board[i][j][a]);
                     }
@@ -1242,7 +1250,8 @@ void move(int id,direction masir[5],int tedadgam){
             }
         }
     }
-    
+    if(animals[id].freaz)
+        	animals[id].freaz--;
 }
 
 void delete_id(int id,int i,int j)
@@ -1267,7 +1276,7 @@ void war_between_cat_dog(int catid,int dogid)
     }
     else 
     {
-        animals[catid].freaz=2;
+        animals[catid].freaz=3;
         for ( b = 1; b < animals[catid].id_mic[0]+1; b++)
         {
             putOnboard(animals[catid].id_mic[b],animals[animals[catid].id_mic[b]].y,animals[animals[catid].id_mic[b]].x);
@@ -1285,7 +1294,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
     int b;
     if (animals[cat1id].power*animals[cat1id].energy>=animals[cat2id].power*animals[cat2id].energy)
     {
-        animals[cat2id].freaz=2;
+        animals[cat2id].freaz=3;
         for ( b = 1; b < animals[cat2id].id_mic[0]+1; b++)
         {
             putOnboard(animals[cat2id].id_mic[b],animals[animals[cat2id].id_mic[b]].y,animals[animals[cat2id].id_mic[b]].x);
@@ -1298,7 +1307,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
     }
     else 
     {
-        animals[cat1id].freaz=2;
+        animals[cat1id].freaz=3;
         for ( b = 1; b < animals[cat1id].id_mic[0]+1; b++)
         {
             putOnboard(animals[cat1id].id_mic[b],animals[animals[cat1id].id_mic[b]].y,animals[animals[cat1id].id_mic[b]].x);

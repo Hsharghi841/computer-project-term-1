@@ -235,7 +235,7 @@ int show_object(int id, int x, int y){
 
     al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
     al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boardSize);
-
+	//تصویر اینجا اضافه گردد
     al_draw_textf(font, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%s", ch[id]);
 
     return 1;
