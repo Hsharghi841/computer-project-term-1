@@ -44,10 +44,10 @@ extern enum direction {None , Up, Right, Down, Left};
 
 ALLEGRO_DISPLAY * display;
 
-ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif;
+ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif, * scoreboardBMP, * playerSelectionBMP;
 ALLEGRO_BITMAP * dice[7];
 
-ALLEGRO_FONT * font;
+ALLEGRO_FONT * font, * numFont;
 
 ALLEGRO_MOUSE_STATE msestate;
 
@@ -77,7 +77,9 @@ int allegroINIT(){
 	al_hide_mouse_cursor(display);
 	
     al_init_font_addon();
-	font = al_create_builtin_font();
+    al_init_ttf_addon();
+	font = al_load_ttf_font("fonts/font.ttf", 20, 0);
+	numFont = al_load_ttf_font("fonts/number font.ttf", 20, 0);
 	
     al_init_primitives_addon();
     
@@ -95,6 +97,8 @@ int allegroINIT(){
     dice[4] = al_load_bitmap("dice/dice_4.png");
     dice[5] = al_load_bitmap("dice/dice_5.png");
     dice[6] = al_load_bitmap("dice/dice_6.png");
+    scoreboardBMP = al_load_bitmap("scoreboard.png");
+    playerSelectionBMP = al_load_bitmap("select_player.png");
 
     diceThrowBTN.from.x = 885;
     diceThrowBTN.from.y = 570;
@@ -169,6 +173,8 @@ int allegroDESTROY(){
     for (size_t i = 0; i <= 6; i++){
         al_destroy_bitmap(dice[i]);
     }
+    al_destroy_bitmap(scoreboardBMP);
+    al_destroy_bitmap(playerSelectionBMP);
     
     
     al_destroy_sample(selection_fail_audio);
@@ -236,7 +242,7 @@ int show_object(int id, int x, int y){
     al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
     al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boardSize);
 	//تصویر اینجا اضافه گردد
-    al_draw_textf(font, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%s", ch[id]);
+    al_draw_textf(numFont, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%s", ch[id]);
 
     return 1;
 }
@@ -310,6 +316,8 @@ void show_dice(int die[4], bool reset){
         x += 130;
     }
 }
+
+
 
 
 
