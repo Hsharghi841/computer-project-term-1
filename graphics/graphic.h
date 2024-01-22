@@ -31,5 +31,6 @@ void show_background();
 void show_dice(int die[4], bool reset);
 
 void show_button(button btn);
+void show_scoreboard();
 
 #endif

@@ -2,6 +2,7 @@ typedef struct button button;
 typedef struct animal animal;
 typedef struct coordinates coordinates;
 typedef enum direction direction;
+typedef enum turns turns;
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
@@ -10,10 +11,13 @@ typedef enum direction direction;
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <stdio.h>
+#include <string.h>
+
+#define get_cat_id(x) (x) + 22
 
 extern struct animal{
     int ID;
-    char * name;
+    char name[11];
     unsigned short energy;
     unsigned short power;
     unsigned short score;
@@ -39,6 +43,8 @@ extern struct button {
 
 extern enum direction {None , Up, Right, Down, Left};
 
+extern enum turns {none, cat1, cat2, cat3, cat4};
+
 #include "../graphics/graphic.h"
 
 
@@ -47,7 +53,7 @@ ALLEGRO_DISPLAY * display;
 ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif, * scoreboardBMP, * playerSelectionBMP;
 ALLEGRO_BITMAP * dice[7];
 
-ALLEGRO_FONT * font, * numFont;
+ALLEGRO_FONT * font, * numFont, * fontsml;
 
 ALLEGRO_MOUSE_STATE msestate;
 
@@ -61,6 +67,8 @@ button diceThrowBTN;
 extern animal animals[27];
 extern int boardSize;
 extern int wall[31][31];
+extern turns catslist[4];
+extern int catsNumber;
 
 // extern animal animals[27];
 
@@ -78,8 +86,10 @@ int allegroINIT(){
 	
     al_init_font_addon();
     al_init_ttf_addon();
-	font = al_load_ttf_font("fonts/font.ttf", 20, 0);
-	numFont = al_load_ttf_font("fonts/number font.ttf", 20, 0);
+	font = al_load_ttf_font("fonts/font.ttf", 30, 0);
+	fontsml = al_load_ttf_font("fonts/font.ttf", 20, 0);
+	numFont = al_load_ttf_font("fonts/number font.ttf", 50, 0);
+    
 	
     al_init_primitives_addon();
     
@@ -242,7 +252,7 @@ int show_object(int id, int x, int y){
     al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
     al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boardSize);
 	//تصویر اینجا اضافه گردد
-    al_draw_textf(numFont, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%s", ch[id]);
+    al_draw_textf(fontsml, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%s", ch[id]);
 
     return 1;
 }
@@ -267,7 +277,7 @@ void show_slections(coordinates selections[], int n){
 
     for (size_t i = 0; i < n; i++)
     {
-        al_draw_scaled_bitmap(selsction, 0, 0, 250, 243, selections[i].x * length + 10, selections[i].y * width + 10, length, width, ALLEGRO_FLIP_HORIZONTAL);
+        al_draw_scaled_bitmap(selsction, 0, 0, 250, 243, selections[i].x * length + 10, selections[i].y * width + 10, length, width, 0);
     }
     // printf("*********************\n");
 }
@@ -314,6 +324,21 @@ void show_dice(int die[4], bool reset){
     for (size_t i = 0; i < 4; i++){
         al_draw_scaled_bitmap(dice[mydice[i]], 0, 0, 54, 53, x, 400, 120, 120, 0);
         x += 130;
+    }
+}
+
+void show_scoreboard(){
+    al_draw_scaled_bitmap(scoreboardBMP, 0, 0, 1280, 720, 740, 100, 510, 287, 0);
+    for(int i = 0; i < 4; i++){
+        if(animals[get_cat_id(i + 1)].name[0] - '0'){
+            if(strlen(animals[get_cat_id(i + 1)].name) < 7)
+                al_draw_textf(font, al_map_rgb(0, 0, 0), 800 + i * 130, 125, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
+            else
+                al_draw_textf(fontsml, al_map_rgb(0, 0, 0), 800 + i * 130, 127, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
+            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 195, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].score);
+            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 270, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].energy);
+            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 337, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].power);
+        }        
     }
 }
 

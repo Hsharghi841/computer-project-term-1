@@ -29,7 +29,7 @@ typedef struct coordinates coordinates;
 // structures for objects (mice, cats, dogs)
 struct animal{
     int ID;
-    char * name;
+    char name[11];
     unsigned short energy;
     unsigned short power;
     unsigned short score;
@@ -116,9 +116,8 @@ int ________________________________________$_START_GAME_$______________________
     for (size_t i = 0; i < 4; i++)
     {
         printf("cat %d : ", i + 1);
-        int a;
-        scanf("%d", &a);
-        if(a){
+        scanf("%10s", animals[get_cat_id(i + 1)].name);
+        if(animals[get_cat_id(i + 1)].name[0] - '0'){
             catslist[catsNumber] = i + 1;
             catsNumber++;
         }
@@ -309,7 +308,9 @@ int ________________________________________$_START_GAME_$______________________
 
         if(event.type == ALLEGRO_EVENT_TIMER){
             if(needUpdateBoardDisplay){
+
                 show_background();
+                show_scoreboard();
                 show_board();
                 show_components();
                 show_walls();
@@ -418,25 +419,25 @@ void initwall()
 
 void initAnimals(){
 
-    animals[1].name = "bulldog";
+    // animals[1].name = "bulldog";
     animals[1].energy = 5;
     animals[1].power = 5;
     animals[1].dogdefense = 30;
     animals[1].ID = 1;
 
-    animals[2].name = "pitbull";
+    // animals[2].name = "pitbull";
     animals[2].energy = 2;
     animals[2].power = 2;
     animals[2].dogdefense = 15;
     animals[2].ID = 2;
 
-    animals[3].name = "Shepherd";
+    // animals[3].name = "Shepherd";
     animals[3].energy = 3;
     animals[3].power = 2;
     animals[3].dogdefense = 20;
     animals[3].ID = 3;
 
-    animals[4].name = "BulldogJr";
+    // animals[4].name = "BulldogJr";
     animals[4].energy = 1;
     animals[4].power = 1;
     animals[4].dogdefense = 5;
