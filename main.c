@@ -30,7 +30,7 @@ typedef struct coordinates coordinates;
 struct animal{
     int ID;
     char name[11];
-    unsigned short energy;
+    short energy;
     unsigned short power;
     unsigned short score;
     unsigned short dogdefense;
@@ -910,10 +910,10 @@ void move(int id,direction masir[5],int tedadgam){
                 for ( a = 2; a < board[i][j][0]+2; a++)
                     if (board[i][j][a]>22&&board[i][j][a]<27)
                     {
-                        delete_id(id,i,j);
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        delete_id(id,i,j);
                     }
             }
             else if (id>22&&id<27)
@@ -983,10 +983,10 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                     else if (board[i][j][a]>4&&board[i][j][a]<23)
                     {
-                        delete_id(board[i][j][a],i,j);
                         animals[id].score+=animals[board[i][j][a]].score;
                         animals[id].id_mic[0]++;
                         animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                        delete_id(board[i][j][a],i,j);
                     }
                     if (board[i][j][a]>22&&board[i][j][a]<27&&board[i][j][a]!=id)
                     {
@@ -1015,10 +1015,10 @@ void move(int id,direction masir[5],int tedadgam){
                 for ( a = 2; a < board[i][j][0]+2; a++)
                     if (board[i][j][a]>22&&board[i][j][a]<27)
                     {
-                        delete_id(id,i,j);
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        delete_id(id,i,j);
                     }
             }
             else if (id>22&&id<27)
@@ -1088,10 +1088,10 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                     else if (board[i][j][a]>4&&board[i][j][a]<23)
                     {
-                        delete_id(board[i][j][a],i,j);
                         animals[id].score+=animals[board[i][j][a]].score;
                         animals[id].id_mic[0]++;
                         animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                        delete_id(board[i][j][a],i,j);
                     }
                     if (board[i][j][a]>22&&board[i][j][a]<27&&board[i][j][a]!=id)
                     {
@@ -1120,10 +1120,10 @@ void move(int id,direction masir[5],int tedadgam){
                 for ( a = 2; a < board[i][j][0]+2; a++)
                     if (board[i][j][a]>22&&board[i][j][a]<27)
                     {
-                        delete_id(id,i,j);
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        delete_id(id,i,j);
                     }
             }
             else if (id>22&&id<27)
@@ -1193,10 +1193,10 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                     else if (board[i][j][a]>4&&board[i][j][a]<23)
                     {
-                        delete_id(board[i][j][a],i,j);
                         animals[id].score+=animals[board[i][j][a]].score;
                         animals[id].id_mic[0]++;
                         animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                        delete_id(board[i][j][a],i,j);
                     }
                     if (board[i][j][a]>22&&board[i][j][a]<27&&board[i][j][a]!=id)
                     {
@@ -1225,10 +1225,10 @@ void move(int id,direction masir[5],int tedadgam){
                 for ( a = 2; a < board[i][j][0]+2; a++)
                     if (board[i][j][a]>22&&board[i][j][a]<27)
                     {
-                        delete_id(id,i,j);
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        delete_id(id,i,j);
                     }
             }
             else if (id>22&&id<27)
@@ -1298,10 +1298,10 @@ void move(int id,direction masir[5],int tedadgam){
                     }
                     else if (board[i][j][a]>4&&board[i][j][a]<23)
                     {
-                        delete_id(board[i][j][a],i,j);
                         animals[id].score+=animals[board[i][j][a]].score;
                         animals[id].id_mic[0]++;
                         animals[id].id_mic[animals[id].id_mic[0]]=board[i][j][a];
+                        delete_id(board[i][j][a],i,j);
                     }
                     if (board[i][j][a]>22&&board[i][j][a]<27&&board[i][j][a]!=id)
                     {
@@ -1310,9 +1310,18 @@ void move(int id,direction masir[5],int tedadgam){
                 }
             }
         }
+        printf("\n#%d %d",animals[id].score,animals[id].id_mic[0]);
     }
     if(animals[id].freaz)
-        	animals[id].freaz--;
+   	{
+   		animals[id].freaz--;
+   		if(!animals[id].freaz)
+   		{
+   			animals[id].energy=5;
+			animals[id].power=2;	
+		}
+	}
+        	
 }
 
 void delete_id(int id,int i,int j)
@@ -1345,8 +1354,9 @@ void war_between_cat_dog(int catid,int dogid)
             animals[catid].id_mic[b]=0;
         }
         animals[catid].id_mic[0]=0;
-        animals[catid].power=2;
-        animals[catid].energy=5;
+        animals[catid].power=0;
+        animals[catid].energy=1;
+        animals[catid].score=0;
         animals[dogid].dogdefense-=round(animals[dogid].power*((float)animals[dogid].energy/animals[catid].power));
     } 
 }
@@ -1359,12 +1369,15 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
         animals[cat2id].freaz=3;
         for ( b = 1; b < animals[cat2id].id_mic[0]+1; b++)
         {
-            putOnboard(animals[cat2id].id_mic[b],animals[animals[cat2id].id_mic[b]].y,animals[animals[cat2id].id_mic[b]].x);
+            animals[cat1id].id_mic[0]++;
+            animals[cat2id].id_mic[animals[cat1id].id_mic[0]]=animals[cat2id].id_mic[b];
             animals[cat2id].id_mic[b]=0;
         }
         animals[cat2id].id_mic[0]=0;
-        animals[cat2id].power=2;
-        animals[cat2id].energy=5;
+        animals[cat2id].power=0;
+        animals[cat2id].energy=1;
+        animals[cat1id].score+=animals[cat2id].score;
+        animals[cat2id].score=0;
         animals[cat1id].energy-=round(animals[cat1id].power*((float)animals[cat1id].energy/animals[cat2id].power));
     }
     else 
@@ -1372,12 +1385,15 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
         animals[cat1id].freaz=3;
         for ( b = 1; b < animals[cat1id].id_mic[0]+1; b++)
         {
-            putOnboard(animals[cat1id].id_mic[b],animals[animals[cat1id].id_mic[b]].y,animals[animals[cat1id].id_mic[b]].x);
+            animals[cat2id].id_mic[0]++;
+            animals[cat1id].id_mic[animals[cat2id].id_mic[0]]=animals[cat1id].id_mic[b];
             animals[cat1id].id_mic[b]=0;
         }
         animals[cat1id].id_mic[0]=0;
-        animals[cat1id].power=2;
-        animals[cat1id].energy=5;
+        animals[cat1id].power=0;
+        animals[cat1id].energy=1;
+        animals[cat2id].score+=animals[cat1id].score;
+        animals[cat1id].score=0;
         animals[cat2id].energy-=round(animals[cat2id].power*((float)animals[cat2id].energy/animals[cat1id].power));
     } 
 }

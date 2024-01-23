@@ -18,7 +18,7 @@ typedef enum turns turns;
 extern struct animal{
     int ID;
     char name[11];
-    unsigned short energy;
+    short energy;
     unsigned short power;
     unsigned short score;
     unsigned short dogdefense;
