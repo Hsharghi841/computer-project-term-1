@@ -89,7 +89,7 @@ int allegroINIT(){
     al_init_ttf_addon();
 	font = al_load_ttf_font("fonts/font.ttf", 30, 0);
 	fontsml = al_load_ttf_font("fonts/font.ttf", 20, 0);
-	numFont = al_load_ttf_font("fonts/number font.ttf", 40, 0);
+	numFont = al_load_ttf_font("fonts/number font.ttf", 30, 0);
     
 	
     al_init_primitives_addon();
