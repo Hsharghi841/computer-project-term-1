@@ -664,7 +664,7 @@ int show_components(){
                 }
             }
 
-            if(board[i][j][1]){
+            if(board[i][j][1] && board[i][j][1] != TRAP){
                 show_object(board[i][j][1], j, i);
             }
         }
