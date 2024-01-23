@@ -62,6 +62,7 @@ typedef enum turns turns;
 
 
 #include <stdio.h>
+#include <conio.h>
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
@@ -117,7 +118,7 @@ int ________________________________________$_START_GAME_$______________________
     printf("enter the size of board : ");
     scanf("%d",&boardSize);
 
-    int roundLimit, playingRound = 0;
+    int roundLimit, playingRound = 1;
     printf("enter the rounds of playing : ");
     scanf("%d", &roundLimit);
 
@@ -304,7 +305,7 @@ int ________________________________________$_START_GAME_$______________________
                         if (!animals[get_cat_id(catslist[i])].freaz)
                             animals[get_cat_id(catslist[i])].energy++;
                     }
-                    
+
                     diceThrowBTN.is_showing = 1;
                     for (size_t i = 0; i < catsNumber; i++){
                         needThrowdie[catslist[i] - 1] = 1;
@@ -328,6 +329,7 @@ int ________________________________________$_START_GAME_$______________________
                     show_background();
                 show_board();
                 show_components();
+                if(turn)show_animal(get_cat_id(turn));
                 show_walls();
                 oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
                 needUpdateBoardDisplay = 0;
@@ -399,8 +401,16 @@ int ________________________________________$_START_GAME_$______________________
 
     	
 	}
+
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
+    show_board();
+    show_components();
+    show_walls();
+    show_scoreboard();
+    al_flip_display();
+    printf("\n******\n");
+    getch();
     allegroDESTROY();
 
 _________________________________________$_END_GAME_$_________________________________________

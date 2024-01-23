@@ -26,6 +26,7 @@ extern struct animal{
     unsigned short y;
     unsigned short freaz;
     int id_mic[19];
+    bool on_board;
 };
 
 extern struct coordinates {
@@ -299,11 +300,12 @@ int show_object(int id, int x, int y){
 
     al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
     al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boardSize);
-	if((id>0&&id<27)||id>27)
+	if((id>0&&id<27)||id>27){
 		al_draw_scaled_bitmap(anipic[id],0,0,512,512,x,y,width,length,0);
+        return 1;
+    }
+    return 0;
     
-    
-    return 1;
 }
 
 int show_slection_hover(int x, int y){
