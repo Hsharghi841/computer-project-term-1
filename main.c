@@ -38,6 +38,7 @@ struct animal{
     unsigned short y;
     unsigned short freaz;
     int id_mic[19];
+    bool on_board;
 };
 typedef struct animal animal;
 
@@ -96,6 +97,7 @@ void move(int id,direction masir[5],int tedadgam);
 void delete_id(int id,int i,int j);
 void war_between_cat_dog(int catid,int dogid);
 void war_between_cat1_cat2(int cat1id,int cat2id);
+void move_dog_mice();
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
@@ -131,18 +133,6 @@ int ________________________________________$_START_GAME_$______________________
     initwall();
     initAnimals();
     startSettingBoard();
-
-    // for (size_t i = 0; i < boardSize; i++)
-    // {
-    //     for (int j = 0;j < boardSize;j++)
-    //     {
-    //         printf("%3d", board[i][j][2]);
-    //     }
-    //     printf("\n");
-        
-    // }
-    
-    
     turns turn = none;
 
     
@@ -292,7 +282,12 @@ int ________________________________________$_START_GAME_$______________________
                 nselection = 0;
                 turn = next_turn();
                 if(!turn){
-                	//حرکت سگ و موش _اضافه شدن انرژی 
+                    move_dog_mice();
+                    for (size_t i = 0; i < catsNumber; i++)
+                    {
+                        if (!animals[get_cat_id(catslist[i])].freaz)
+                            animals[get_cat_id(catslist[i])].energy++;
+                    }
                     diceThrowBTN.is_showing = 1;
                     for (size_t i = 0; i < catsNumber; i++){
                         needThrowdie[catslist[i] - 1] = 1;
@@ -423,24 +418,32 @@ void initAnimals(){
     animals[1].power = 5;
     animals[1].dogdefense = 30;
     animals[1].ID = 1;
+    animals[1].freaz=0;
+    animals[1].on_board=1;
 
     animals[2].name = "pitbull";
     animals[2].energy = 2;
     animals[2].power = 2;
     animals[2].dogdefense = 15;
     animals[2].ID = 2;
+    animals[2].freaz=0;
+    animals[2].on_board=1;
 
     animals[3].name = "Shepherd";
     animals[3].energy = 3;
     animals[3].power = 2;
     animals[3].dogdefense = 20;
     animals[3].ID = 3;
+    animals[3].freaz=0;
+    animals[3].on_board=1;
 
     animals[4].name = "BulldogJr";
     animals[4].energy = 1;
     animals[4].power = 1;
     animals[4].dogdefense = 5;
     animals[4].ID = 4;
+    animals[4].freaz=0;
+    animals[4].on_board=1;
 
     // 4 3-point mice
     for (size_t i = 5; i < 9; i++)
@@ -450,6 +453,7 @@ void initAnimals(){
         animals[i].ID = i;
         animals[i].freaz=0;
         animals[i].id_mic[0]=0;
+        animals[i].on_board=1;
     }
     // 6 2-point mice
     for (size_t i = 9; i < 15; i++)
@@ -459,6 +463,7 @@ void initAnimals(){
         animals[i].ID = i;
         animals[i].freaz=0;
         animals[i].id_mic[0]=0;
+        animals[i].on_board=1;
     }
     // 8 1-point mice
     for (size_t i = 15; i < 23; i++)
@@ -468,6 +473,7 @@ void initAnimals(){
         animals[i].ID = i;
         animals[i].freaz=0;
         animals[i].id_mic[0]=0;
+        animals[i].on_board=1;
     }
     // cats (this part of code will change!)
     for (size_t i = 23; i <= 26; i++)
@@ -477,6 +483,7 @@ void initAnimals(){
         animals[i].ID = i;
         animals[i].freaz=0;
         animals[i].id_mic[0]=0;
+        animals[i].on_board=1;
     }
     
     
@@ -528,6 +535,7 @@ int putOnboard(int id, int width, int length){
         board[width][length][0]++;
         animals[id].x = length;
         animals[id].y = width;
+        animals[id].on_board=1;
         return 1;
     }
     {// must add code of objects in if
@@ -827,8 +835,10 @@ void swap(int *a, int * b){
 
 void move(int id,direction masir[5],int tedadgam){
     int i,j,a,b,min,swich,bmin;
+    printf("\n%d",id);
     for (size_t k = 0; k < tedadgam; k++)
     {
+    	printf("\n*%d",masir[k]);
         if (masir[k]==Right&&animals[id].energy>0&&!animals[id].freaz)
         {
             j=animals[id].x;
@@ -887,7 +897,7 @@ void move(int id,direction masir[5],int tedadgam){
                             animals[id].power-=2;
                         else
                         {
-                            //ط¯ط± ط§غŒظ†ط¬ط§ ط¨ط§غŒط¯ 3 طھط§ ط§ط² ط§ظ†ط±عکغŒ ط§ط´ ع©ظ… ع¯ط±ط¯ط¯
+                            animals[id].energy-=3;
                         }
                     }
                 }
@@ -992,7 +1002,7 @@ void move(int id,direction masir[5],int tedadgam){
                             animals[id].power-=2;
                         else
                         {
-                            //ط¯ط± ط§غŒظ†ط¬ط§ ط¨ط§غŒط¯ 3 طھط§ ط§ط² ط§ظ†ط±عکغŒ ط§ط´ ع©ظ… ع¯ط±ط¯ط¯
+                            animals[id].energy-=3;
                         }
                     }
                 }
@@ -1097,7 +1107,7 @@ void move(int id,direction masir[5],int tedadgam){
                             animals[id].power-=2;
                         else
                         {
-                            //ط¯ط± ط§غŒظ†ط¬ط§ ط¨ط§غŒط¯ 3 طھط§ ط§ط² ط§ظ†ط±عکغŒ ط§ط´ ع©ظ… ع¯ط±ط¯ط¯
+                            animals[id].energy-=3;
                         }
                     }
                 }
@@ -1202,7 +1212,7 @@ void move(int id,direction masir[5],int tedadgam){
                             animals[id].power-=2;
                         else
                         {
-                            //ط¯ط± ط§غŒظ†ط¬ط§ ط¨ط§غŒط¯ 3 طھط§ ط§ط² ط§ظ†ط±عکغŒ ط§ط´ ع©ظ… ع¯ط±ط¯ط¯
+                            animals[id].energy-=3;
                         }
                     }
                 }
@@ -1264,12 +1274,13 @@ void delete_id(int id,int i,int j)
         board[i][j][b]=board[i][j][b+1];
     board[i][j][b]=0;
     board[i][j][0]--;
+    animals[id].on_board=0;
 }
 
 void war_between_cat_dog(int catid,int dogid)
 {
     int b;
-    if (animals[catid].power*animals[catid].energy>=animals[dogid].power*animals[dogid].energy)
+    if (animals[catid].power*animals[catid].energy>=animals[dogid].power*animals[dogid].dogdefense)
     {
         delete_id(dogid,animals[dogid].y,animals[dogid].x);
         animals[catid].energy-=round(animals[catid].power*((float)animals[catid].energy/animals[dogid].power));
@@ -1285,14 +1296,14 @@ void war_between_cat_dog(int catid,int dogid)
         animals[catid].id_mic[0]=0;
         animals[catid].power=2;
         animals[catid].energy=5;
-        animals[dogid].energy-=round(animals[dogid].power*((float)animals[dogid].energy/animals[catid].power));
+        animals[dogid].dogdefense-=round(animals[dogid].power*((float)animals[dogid].energy/animals[catid].power));
     } 
 }
 
 void war_between_cat1_cat2(int cat1id,int cat2id)
 {
     int b;
-    if (animals[cat1id].power*animals[cat1id].energy>=animals[cat2id].power*animals[cat2id].energy)
+    if (animals[cat1id].power*animals[cat1id].energy>animals[cat2id].power*animals[cat2id].energy)
     {
         animals[cat2id].freaz=3;
         for ( b = 1; b < animals[cat2id].id_mic[0]+1; b++)
@@ -1318,4 +1329,63 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
         animals[cat1id].energy=5;
         animals[cat2id].energy-=round(animals[cat2id].power*((float)animals[cat2id].energy/animals[cat1id].power));
     } 
+}
+
+void move_dog_mice(){
+    direction direction, masir[5];
+    int i,j,temp=0;
+    for (size_t a = 1; a < 23; a++)
+    {
+        direction=rand()%4+1;
+        temp=0;
+        if(animals[a].on_board)
+        {
+            i=animals[a].y;
+            j=animals[a].x;
+            for (size_t b = 0; b < animals[a].energy; b++)
+            {
+                if (direction==1)
+                {
+                    if(wall[i-temp-1][j]!=1&&wall[i][j+temp]!=3&&i-temp>0)
+                    {
+                        masir[b]=Up;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==2)
+                {
+                    if(wall[i][j+temp]!=2&&wall[i][j+temp]!=3&&j+temp<boardSize-1)
+                    {
+                        masir[b]=Right;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==3)
+                {
+                    if(wall[i+temp][j]!=1&&wall[i][j+temp]!=3&&i+temp<boardSize-1)
+                    {
+                        masir[b]=Down;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==4)
+                {
+                    if(wall[i][j-temp-1]!=2&&wall[i][j+temp]!=3&&j-temp>0)
+                    {
+                        masir[b]=Left;
+                        temp++;
+                    }
+                    else
+                        break;
+                }  
+            }
+            move(a,masir,temp);
+        }
+    }
 }

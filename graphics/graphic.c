@@ -45,7 +45,7 @@ extern enum direction {None , Up, Right, Down, Left};
 ALLEGRO_DISPLAY * display;
 
 ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif;
-ALLEGRO_BITMAP * dice[7];
+ALLEGRO_BITMAP * dice[7],*anipic[35];
 
 ALLEGRO_FONT * font;
 
@@ -95,6 +95,30 @@ int allegroINIT(){
     dice[4] = al_load_bitmap("dice/dice_4.png");
     dice[5] = al_load_bitmap("dice/dice_5.png");
     dice[6] = al_load_bitmap("dice/dice_6.png");
+    anipic[1]= al_load_bitmap("animals/bulldog.png");
+    anipic[2]= al_load_bitmap("animals/doberman.png");
+    anipic[3]= al_load_bitmap("animals/sheperd.png");
+    anipic[4]= al_load_bitmap("animals/bulljr.png");
+    for (size_t i = 5; i < 9; i++)
+    {
+        anipic[i]= al_load_bitmap("animals/mouse3.png");
+    }
+    for (size_t i = 9; i < 15; i++)
+    {
+        anipic[i]= al_load_bitmap("animals/mouse.png");
+    }
+    for (size_t i = 15; i < 23; i++)
+    {
+        anipic[i]= al_load_bitmap("animals/mouse1.png");
+    }
+    anipic[23]= al_load_bitmap("animals/cat1.png");
+    anipic[24]= al_load_bitmap("animals/cat2.png");
+    anipic[25]= al_load_bitmap("animals/cat3.png");
+    anipic[26]= al_load_bitmap("animals/cat4.png");
+    anipic[28]= al_load_bitmap("animals/chocolate.png");
+    anipic[32]= al_load_bitmap("animals/fish2.png");
+    anipic[33]= al_load_bitmap("animals/fish3.png");
+    anipic[34]= al_load_bitmap("animals/fish4.png");
 
     diceThrowBTN.from.x = 885;
     diceThrowBTN.from.y = 570;
@@ -114,7 +138,20 @@ int allegroINIT(){
         }
         
     }
-
+    for(int i = 1;i <= 26;i++){
+        if(!anipic[i]){
+            printf("error loading anipic! %d",i);
+            return 0;
+        }
+        
+    }
+    for(int i = 32;i <= 34;i++){
+        if(!anipic[i]){
+            printf("error loading anipic!");
+            return 0;
+        }
+        
+    }
     
 	if (!cursor) {
       printf("Error loading cursor.tga\n");
@@ -169,7 +206,9 @@ int allegroDESTROY(){
     for (size_t i = 0; i <= 6; i++){
         al_destroy_bitmap(dice[i]);
     }
-    
+    for (size_t i = 0; i <= 34; i++){
+        al_destroy_bitmap(anipic[i]);
+    }
     
     al_destroy_sample(selection_fail_audio);
     al_uninstall_audio();
@@ -198,26 +237,34 @@ void show_board(){
 
 void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2, float thickness)
 {
-    if (wall[i][j]==1)
+    if (wall[i][j]==1&&i!=boardSize-1)
     {
         al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(146, 255, 71));
     }
-    if (wall[i][j]==2)
+    if (wall[i][j]==2&&j!=boardSize-1)
     {
         al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(146, 255, 71));
     }
-    if (wall[i][j]==3)
+    if (wall[i][j]==3&&j!=boardSize-1&&i!=boardSize-1)
     {
         al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(146, 255, 71));
         al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(146, 255, 71));
+    }
+    if (i==boardSize-1&&wall[i][j]&&j!=boardSize-1)
+    {
+        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(146, 255, 71));
+    }
+    if(j==boardSize-1&&wall[i][j]&&i!=boardSize-1)
+    {
+        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(146, 255, 71));
     }
 }
 
 void show_walls(){
 	int x ,y;
 	x = y = 700 / boardSize;
-    for (int i = 10; (i-10)/x < boardSize-1; i+=x)
-        for (int j = 10; (j-10)/y < boardSize-1; j+=y){
+    for (int i = 10; (i-10)/x < boardSize; i+=x)
+        for (int j = 10; (j-10)/y < boardSize; j+=y){
            	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y, 60 / boardSize);
         }
 }
@@ -236,8 +283,10 @@ int show_object(int id, int x, int y){
     al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
     al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boardSize);
 	//تصویر اینجا اضافه گردد
-    al_draw_textf(font, al_map_rgb(100, 45, 114), x + length / 2, y + width / 2, ALLEGRO_ALIGN_CENTRE,"%s", ch[id]);
-
+	if((id>0&&id<27)||id>27)
+		al_draw_scaled_bitmap(anipic[id],0,0,512,512,x,y,width,length,0);
+    
+    
     return 1;
 }
 
@@ -252,8 +301,6 @@ int show_slection_hover(int x, int y){
     
     
 }
-
-
 
 void show_slections(coordinates selections[], int n){
     int length, width;
