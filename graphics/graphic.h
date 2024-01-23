@@ -32,5 +32,7 @@ void show_dice(int die[4], bool reset);
 
 void show_button(button btn);
 void show_scoreboard();
+void show_turn(turns turn);
+void show_round(int round);
 
 #endif

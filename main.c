@@ -111,8 +111,15 @@ int numfish=10;
 int ________________________________________$_START_GAME_$________________________________________(){
 
 	srand(time(0));
+
+    printf("enter the size of board : ");
     scanf("%d",&boardSize);
 
+    int roundLimit, playingRound = 0;
+    printf("enter the rounds of playing : ");
+    scanf("%d", &roundLimit);
+
+    printf("enter cats name :(enter 0 for empty)\n");
     for (size_t i = 0; i < 4; i++)
     {
         printf("cat %d : ", i + 1);
@@ -122,6 +129,8 @@ int ________________________________________$_START_GAME_$______________________
             catsNumber++;
         }
     }
+
+
     
     
     
@@ -172,7 +181,9 @@ int ________________________________________$_START_GAME_$______________________
 
     bool needUpdateBoardDisplay = 1;
     bool needShowSelectionHover = 0;
-    ALLEGRO_BITMAP * oldBoardDisplay;
+    bool needUpdateScoreboard = 1;
+    bool needUpdateRoundshowing = 1;
+    ALLEGRO_BITMAP * oldBoardDisplay = NULL;
     // mx : x of mouse , my : y of mouse
     int mx, my;
 
@@ -259,6 +270,7 @@ int ________________________________________$_START_GAME_$______________________
                 }
             }
         }
+
         if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
             mouseButtonDown = 1;
             if(is_mouse_on_Board(event.mouse.x, event.mouse.y)){
@@ -287,11 +299,16 @@ int ________________________________________$_START_GAME_$______________________
                 // move function
                 move(get_cat_id(turn), moves, nmoves);
                 needUpdateBoardDisplay = 1;
+                needUpdateScoreboard = 1;
                 nmoves = 0;
                 nselection = 0;
                 turn = next_turn();
                 if(!turn){
-                	//حرکت سگ و موش _اضافه شدن انرژی 
+                    if(++playingRound > roundLimit)break;// end of game
+                    needUpdateRoundshowing = 1;
+
+                	// حرکت سگ و موش _اضافه شدن انرژی
+
                     diceThrowBTN.is_showing = 1;
                     for (size_t i = 0; i < catsNumber; i++){
                         needThrowdie[catslist[i] - 1] = 1;
@@ -309,17 +326,37 @@ int ________________________________________$_START_GAME_$______________________
         if(event.type == ALLEGRO_EVENT_TIMER){
             if(needUpdateBoardDisplay){
 
-                show_background();
-                show_scoreboard();
+                if(oldBoardDisplay)
+                    al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+                else 
+                    show_background();
                 show_board();
                 show_components();
                 show_walls();
-
                 oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
                 needUpdateBoardDisplay = 0;
-            }else{
-                al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
             }
+
+            if(needUpdateScoreboard){
+                if(oldBoardDisplay)
+                    al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+                show_scoreboard();
+                show_turn(turn);
+                oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                needUpdateScoreboard = 0;
+            }
+
+            if(needUpdateRoundshowing){
+                if(oldBoardDisplay)
+                    al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+                show_round(playingRound);
+                oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                needUpdateRoundshowing = 0;
+            }
+
+            if(needUpdateBoardDisplay || needUpdateScoreboard || needUpdateRoundshowing);
+            else al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+
 
             if(throwingDice){
                 throwingDice = throw_next_die(dice, needThrowdie);
@@ -327,6 +364,7 @@ int ________________________________________$_START_GAME_$______________________
                     set_turns(dice);
                     if(!is_dice_repeated(dice, needThrowdie)){
                         turn = next_turn();
+                        needUpdateScoreboard = 1;
                         diceThrowBTN.is_showing = 0;
                     }else{
                         diceThrowBTN.is_showing = 1;
@@ -337,6 +375,7 @@ int ________________________________________$_START_GAME_$______________________
             if(diceThrowBTN.is_showing){
                 show_button(diceThrowBTN);
             }
+
 
             if(1){
                 show_dice(dice, !(diceTimer));

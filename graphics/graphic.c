@@ -88,7 +88,7 @@ int allegroINIT(){
     al_init_ttf_addon();
 	font = al_load_ttf_font("fonts/font.ttf", 30, 0);
 	fontsml = al_load_ttf_font("fonts/font.ttf", 20, 0);
-	numFont = al_load_ttf_font("fonts/number font.ttf", 50, 0);
+	numFont = al_load_ttf_font("fonts/number font.ttf", 40, 0);
     
 	
     al_init_primitives_addon();
@@ -328,18 +328,31 @@ void show_dice(int die[4], bool reset){
 }
 
 void show_scoreboard(){
-    al_draw_scaled_bitmap(scoreboardBMP, 0, 0, 1280, 720, 740, 100, 510, 287, 0);
+    al_draw_scaled_bitmap(scoreboardBMP, 0, 0, 1280, 720, 730, 100, 528, 292, 0);
     for(int i = 0; i < 4; i++){
         if(animals[get_cat_id(i + 1)].name[0] - '0'){
             if(strlen(animals[get_cat_id(i + 1)].name) < 7)
                 al_draw_textf(font, al_map_rgb(0, 0, 0), 800 + i * 130, 125, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
             else
                 al_draw_textf(fontsml, al_map_rgb(0, 0, 0), 800 + i * 130, 127, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
-            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 195, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].score);
-            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 270, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].energy);
-            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 337, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].power);
+            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 203, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].score);
+            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 275, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].energy);
+            al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 342, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].power);
         }        
     }
+}
+
+void show_turn(turns turn){
+    if(turn)
+        al_draw_scaled_bitmap(playerSelectionBMP, 0, 0, 320, 187, (turn - 1) * 130 + 736, 100, 127.5, 74.5, 0);
+}
+
+void show_round(int round){
+    printf("updated\n");
+    al_draw_filled_rectangle(994, 40, 1258, 90, al_map_rgb(0X43, 0X28, 0X18));
+    al_draw_filled_rectangle(999, 45, 1253, 85, al_map_rgb(0x99, 0x58, 0x2a));
+    al_draw_textf(font, al_map_rgb(0x6f, 0x1d, 0x1b), 1015, 52, ALLEGRO_ALIGN_LEFT, "round :");
+    al_draw_textf(numFont, al_map_rgb(0x6f, 0x1d, 0x1b), 1170, 49, ALLEGRO_ALIGN_CENTRE, "%d", round);
 }
 
 
