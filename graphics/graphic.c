@@ -51,7 +51,7 @@ extern enum turns {none, cat1, cat2, cat3, cat4};
 
 ALLEGRO_DISPLAY * display;
 
-ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif, * scoreboardBMP, * playerSelectionBMP;
+ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif, * scoreboardBMP, * playerSelectionBMP , * playerFreazeBMP;
 ALLEGRO_BITMAP * dice[7],*anipic[35];
 
 ALLEGRO_FONT * font, * numFont, * fontsml;
@@ -110,6 +110,7 @@ int allegroINIT(){
     dice[6] = al_load_bitmap("dice/dice_6.png");
     scoreboardBMP = al_load_bitmap("scoreboard.png");
     playerSelectionBMP = al_load_bitmap("select_player.png");
+    playerFreazeBMP = al_load_bitmap("freazed_player.png");
     anipic[1]= al_load_bitmap("animals/bulldog.png");
     anipic[2]= al_load_bitmap("animals/doberman.png");
     anipic[3]= al_load_bitmap("animals/sheperd.png");
@@ -383,7 +384,8 @@ void show_scoreboard(){
             if(strlen(animals[get_cat_id(i + 1)].name) < 7)
                 al_draw_textf(font, al_map_rgb(0, 0, 0), 800 + i * 130, 125, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
             else
-                al_draw_textf(fontsml, al_map_rgb(0, 0, 0), 800 + i * 130, 127, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
+                al_draw_textf(fontsml, al_map_rgb(0, 0, 0), 800 + i * 130, 127, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name); 
+            if(animals[get_cat_id(i + 1)].freaz)al_draw_scaled_bitmap(playerFreazeBMP, 0, 0, 320, 187, i * 130 + 736, 100, 127.5, 74.5, 0);
             al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 203, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].score);
             al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 275, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].energy);
             al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 342, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].power);

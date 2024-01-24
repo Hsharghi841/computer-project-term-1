@@ -99,6 +99,7 @@ void delete_id(int id,int i,int j);
 void war_between_cat_dog(int catid,int dogid);
 void war_between_cat1_cat2(int cat1id,int cat2id);
 void move_dog_mice();
+void set_fishes();
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
@@ -299,6 +300,8 @@ int ________________________________________$_START_GAME_$______________________
                     if(++playingRound > roundLimit)break;// end of game
                     needUpdateRoundshowing = 1;
 
+                    if(numfish < catsNumber)set_fishes();
+
                     move_dog_mice();
                     for (size_t i = 0; i < catsNumber; i++)
                     {
@@ -409,7 +412,7 @@ int ________________________________________$_START_GAME_$______________________
     show_walls();
     show_scoreboard();
     al_flip_display();
-    printf("\n******\n");
+    printf("\npress any key to exit . . .\n");
     getch();
     allegroDESTROY();
 
@@ -634,11 +637,11 @@ int startSettingBoard(){
     
     // fishes :
     
-    int fishes[10];
-    for (int i = 0; i < 10; ++i)
+    int fishes[43];
+    numfish = sq(boardSize) / 45 * 2;
+    for (int i = 0; i < numfish; ++i)
         fishes[i] = FISH[rand() % 3];
-    
-    sortObject(fishes, 10);
+    sortObject(fishes, numfish);
     
     // Chocolate :
     
@@ -652,6 +655,14 @@ int startSettingBoard(){
     
     
     
+}
+
+void set_fishes(){
+    int fishes[43];
+    numfish = sq(boardSize) / 45 * 2;
+    for (int i = 0; i < numfish; ++i)
+        fishes[i] = FISH[rand() % 3];
+    sortObject(fishes, numfish);
 }
 
 int show_components(){
