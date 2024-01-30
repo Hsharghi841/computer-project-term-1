@@ -1386,7 +1386,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
 void move_dog_mice(){
     direction direction, masir[5];
     int i,j,temp=0;
-    for (size_t a = 1; a < 23; a++)
+    for (size_t a = 22; a >0; a++)
     {
         direction=rand()%4+1;
         temp=0;
