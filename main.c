@@ -29,7 +29,7 @@ typedef struct coordinates coordinates;
 // structures for objects (mice, cats, dogs)
 struct animal{
     int ID;
-    char name[11];
+    char name[20];
     short energy;
     unsigned short power;
     unsigned short score;
@@ -50,7 +50,7 @@ struct button {
 };
 typedef struct button button;
 
-extern button diceThrowBTN;
+extern button diceThrowBTN, playBTN, optionsBTN, loadBTN, exitBTN, backBTN, changeBTN, startBTN;
 
 
 enum direction {None , Up, Right, Down, Left};
@@ -59,6 +59,8 @@ typedef enum direction direction;
 
 enum turns {none, cat1, cat2, cat3, cat4};
 typedef enum turns turns;
+
+enum {endofGame, firstmenu, ingame, gameStarter} page = firstmenu;
 
 
 #include <stdio.h>
@@ -110,311 +112,558 @@ turns catslist[4];
 int catsNumber = 0;
 turns turn[4];
 int numfish=10;
+int roundLimit;
 
 
 int ________________________________________$_START_GAME_$________________________________________(){
 
 	srand(time(0));
 
-    printf("enter the size of board : ");
-    scanf("%d",&boardSize);
+    boardSize = 15;
 
-    int roundLimit, playingRound = 1;
-    printf("enter the rounds of playing : ");
-    scanf("%d", &roundLimit);
+    roundLimit = 15;
 
-    printf("enter cats name :(enter 0 for empty)\n");
-    for (size_t i = 0; i < 4; i++)
-    {
-        printf("cat %d : ", i + 1);
-        scanf("%10s", animals[get_cat_id(i + 1)].name);
-        if(animals[get_cat_id(i + 1)].name[0] - '0'){
-            catslist[catsNumber] = i + 1;
-            catsNumber++;
-        }
+    for (size_t i = 0; i < 4; i++){
+        animals[get_cat_id(i + 1)].name[0] = 0;
     }
 
 
-    
-    
-    
     if(!allegroINIT())return 0;
     		        
-    initwall();
-    initAnimals();
-    startSettingBoard();
-    turns turn = none;
-
+    page = firstmenu;
     
-    int dice[4] = {0};
-    int diceTimer = 0;
-    bool needThrowdie[4] = {0};
-    for (size_t i = 0; i < catsNumber; i++){
-        needThrowdie[catslist[i] - 1] = 1;
-    }
-    bool throwingDice = 0;
-    diceThrowBTN.is_showing = 1;
-
-    ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
-    al_start_timer(timer);
-
-
-    ALLEGRO_EVENT event;
-    ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
-    al_register_event_source(queue, al_get_mouse_event_source());
-    al_register_event_source(queue, al_get_timer_event_source(timer));
-    al_register_event_source(queue, al_get_display_event_source(display));
+    while (page){
     
-    bool showMouse = 1;
-    bool mouseButtonDown = 0;
-    bool selecting = 0;
-    coordinates selectionlist[5];
-    int nselection = 0;
+        
+        if(page == firstmenu){
+            
+            bool showMouse = 1;
 
-    bool needUpdateBoardDisplay = 1;
-    bool needShowSelectionHover = 0;
-    bool needUpdateScoreboard = 1;
-    bool needUpdateRoundshowing = 1;
-    ALLEGRO_BITMAP * oldBoardDisplay = NULL;
-    // mx : x of mouse , my : y of mouse
-    int mx, my;
+            ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
+            al_start_timer(timer);
+            
+            ALLEGRO_EVENT event;
+            ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+            al_register_event_source(queue, al_get_mouse_event_source());
+            al_register_event_source(queue, al_get_timer_event_source(timer));
+            al_register_event_source(queue, al_get_display_event_source(display));
 
-    direction moves[4];
-    int nmoves = 0;
+            show_background();
+            show_name_of_game();
+            playBTN.is_showing = 1;
+            loadBTN.is_showing = 1;
+            optionsBTN.is_showing = 1;
+            exitBTN.is_showing = 1;
+            show_button(playBTN);
+            show_button(loadBTN);
+            show_button(optionsBTN);
+            show_button(exitBTN);
+            
+            ALLEGRO_BITMAP * oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
 
-    while(1){
-    	al_wait_for_event(queue,&event);
+            while (page == firstmenu){
+                al_wait_for_event(queue,&event);
 
+                if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
+                    showMouse = 0;
+                }
 
-        if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
-            showMouse = 0;
-        }
+                if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
+                    showMouse = 1;
+                }
 
-        if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
-            showMouse = 1;
-        }
+                if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+                    if(check_button(exitBTN, event.mouse.x, event.mouse.y)){
+                        page = endofGame;
+                        break;
+                    }
 
-
-        if(event.type == ALLEGRO_EVENT_MOUSE_AXES){
-            if(turn && is_mouse_on_Board(event.mouse.x, event.mouse.y)){
-                coordinates onBoard;
-                find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
-                if(needShowSelectionHover = (is_mouse_nextto(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y) && check_wall2(animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y, onBoard)) && !selecting){
-                    
-                    mx = event.mouse.x;
-                    my = event.mouse.y;
-                    if(mouseButtonDown){
-                        selecting = 1;
-                        if(moves[nmoves] = find_direction(onBoard.x, onBoard.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y)){
-                            nmoves++;
-                            selectionlist[nselection] = onBoard;
-                            al_stop_sample(&isPlayingSampleId);
-                            al_play_sample(selection_audio, 0.5, 0.0, nselection * 0.5 + 1, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
-                            nselection++;
-                        }
+                    if(check_button(playBTN, event.mouse.x, event.mouse.y)){
+                        page = gameStarter;
+                        break;
                     }
                 }
-                if(selecting && !isEqualCoordinates(selectionlist[nselection - 1], onBoard)){
-                    if(nselection > 1 && selectionlist[nselection - 2].x == onBoard.x && selectionlist[nselection - 2].y == onBoard.y){
-                        nselection--;
-                        nmoves--;
+
+                if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+                    page = endofGame;
+                    break;
+                }
+
+                if(event.type == ALLEGRO_EVENT_TIMER){
+                    
+                    al_draw_bitmap(oldDisplay, 0, 0, 0);
+
+
+
+
+                    if(showMouse)put_mouse();
+
+                    al_flip_display();
+                }
+
+
+                
+            }
+            al_destroy_event_queue(queue);
+            al_stop_timer(timer);
+            al_destroy_timer(timer);
+
+            playBTN.is_showing = 0;
+            loadBTN.is_showing = 0;
+            optionsBTN.is_showing = 0;
+            exitBTN.is_showing = 0;
+        }
+        
+
+        if(page == gameStarter){
+
+            bool showMouse = 1;
+            bool needUpdateDisplay = 1;
+
+            ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
+            al_start_timer(timer);
+            
+            ALLEGRO_EVENT event;
+            ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+            al_register_event_source(queue, al_get_mouse_event_source());
+            al_register_event_source(queue, al_get_timer_event_source(timer));
+            al_register_event_source(queue, al_get_display_event_source(display));
+
+            
+            backBTN.is_showing = 1;
+            button boardSizeChange = changeBTN, roundLimitChange = changeBTN;
+            roundLimitChange.from.y += 50;
+            roundLimitChange.to.y += 50;
+            boardSizeChange.is_showing = 1;
+            roundLimitChange.is_showing = 1;
+            startBTN.is_showing = 1;
+
+            button name1;
+            name1.from.x = 600;
+            name1.from.y = 300;
+            name1.to.x = 850;
+            name1.to.y = 350;
+            name1.is_showing = 1;
+            button name2, name3, name4;
+            name2 = name1;
+            name2.from.y += 60;
+            name2.to.y += 60;
+            name3 = name2;
+            name3.from.y += 60;
+            name3.to.y += 60;
+            name4 = name3;
+            name4.from.y += 60;
+            name4.to.y += 60;
+
+
+            ALLEGRO_BITMAP * oldDisplay;
+            
+            while (page == gameStarter){
+                al_wait_for_event(queue,&event);
+
+                if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
+                    showMouse = 0;
+                }
+
+                if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
+                    showMouse = 1;
+                }
+
+                if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+                    page = endofGame;
+                    break;
+                }
+                
+                if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+                    if(check_button(backBTN, event.mouse.x, event.mouse.y)){
+                        page = firstmenu;
+                        break;
                     }
-                    else if(nselection == 1 && onBoard.x == animals[get_cat_id(turn)].x && onBoard.y == animals[get_cat_id(turn)].y){
-                        selecting = 0;
-                        nmoves = 0;
-                        nselection = 0;
+                    
+                    if(check_button(boardSizeChange, event.mouse.x, event.mouse.y)){
+                        
+                        char str[20];
+                        scan_from_display(str);
+                        int temp = atoi(str);
+                        if(temp <= 31 && temp >= 15)
+                            boardSize = temp;
+                        else{
+
+                        }
+                        needUpdateDisplay = 1;
+                    }
+
+                    if(check_button(roundLimitChange, event.mouse.x, event.mouse.y)){
+                        
+                        char str[20];
+                        scan_from_display(str);
+                        int temp = atoi(str);
+                        if(temp <= 30 && temp >= 2)
+                            roundLimit = temp;
+                        else{
+                            
+                        }
+                        needUpdateDisplay = 1;
+                    }
+
+                    if(check_button(name1, event.mouse.x, event.mouse.y)){
+                        scan_from_display(animals[get_cat_id(cat1)].name);
+                        needUpdateDisplay = 1;
+                    }
+
+                    if(check_button(name2, event.mouse.x, event.mouse.y)){
+                        scan_from_display(animals[get_cat_id(cat2)].name);
+                        needUpdateDisplay = 1;
+                    }
+
+                    if(check_button(name3, event.mouse.x, event.mouse.y)){
+                        scan_from_display(animals[get_cat_id(cat3)].name);
+                        needUpdateDisplay = 1;
+                    }
+
+                    if(check_button(name4, event.mouse.x, event.mouse.y)){
+                        scan_from_display(animals[get_cat_id(cat4)].name);
+                        needUpdateDisplay = 1;
+                    }
+                    
+                    if(check_button(startBTN, event.mouse.x, event.mouse.y)){
+                        for (int i = 0; i < 4; i++){
+                            if(animals[get_cat_id(i + 1)].name[0]){
+                                catslist[catsNumber++] = i + 1;
+                            }
+                        }
+
+                        page = ingame;
+                        break;
                         
                     }
-                    else {
-                        if(check_wall(selectionlist[nselection - 1], onBoard)){
-                            if(moves[nmoves] = find_direction(onBoard.x, onBoard.y, selectionlist[nselection - 1].x, selectionlist[nselection - 1].y)){
-                                nmoves++;
-                                selectionlist[nselection] = onBoard;
-                                al_stop_sample(&isPlayingSampleId);
-                                al_play_sample(selection_audio, 0.5, 0.0, nselection * 0.5 + 1, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
-                                nselection++;
+                    
+                }
+
+                if(event.type == ALLEGRO_EVENT_TIMER){
+                    if(needUpdateDisplay){
+                        show_background();
+                        al_draw_filled_rectangle(0, 0, 1280, 720, al_premul_rgba(255, 255, 255, 128));
+                        show_starting_menu();
+                        show_button(backBTN);
+                        show_button(boardSizeChange);
+                        show_button(roundLimitChange);
+                        show_button(startBTN);
+                        oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                        needUpdateDisplay = 0;
+                    }else
+                        al_draw_bitmap(oldDisplay, 0, 0, 0);
+
+
+
+
+                    if(showMouse)put_mouse();
+
+                    al_flip_display();
+                }
+
+
+                
+            }
+
+            al_destroy_event_queue(queue);
+            al_stop_timer(timer);
+            al_destroy_timer(timer);
+        }
+    
+
+        if(page == ingame){
+            initwall();
+            initAnimals();
+            startSettingBoard();
+            turns turn = none;
+            int playingRound = 1;
+            
+            int dice[4] = {0};
+            int diceTimer = 0;
+            bool needThrowdie[4] = {0};
+            for (size_t i = 0; i < catsNumber; i++){
+                needThrowdie[catslist[i] - 1] = 1;
+            }
+            bool throwingDice = 0;
+            diceThrowBTN.is_showing = 1;
+
+            ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
+            al_start_timer(timer);
+
+
+            ALLEGRO_EVENT event;
+            ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+            al_register_event_source(queue, al_get_mouse_event_source());
+            al_register_event_source(queue, al_get_keyboard_event_source());
+            al_register_event_source(queue, al_get_timer_event_source(timer));
+            al_register_event_source(queue, al_get_display_event_source(display));
+            
+            bool showMouse = 1;
+            bool mouseButtonDown = 0;
+            bool selecting = 0;
+            coordinates selectionlist[5];
+            int nselection = 0;
+
+            bool needUpdateBoardDisplay = 1;
+            bool needShowSelectionHover = 0;
+            bool needUpdateScoreboard = 1;
+            bool needUpdateRoundshowing = 1;
+            ALLEGRO_BITMAP * oldBoardDisplay = NULL;
+            // mx : x of mouse , my : y of mouse
+            int mx, my;
+
+            direction moves[4];
+            int nmoves = 0;
+
+            while(page == ingame){
+                al_wait_for_event(queue,&event);
+
+
+                if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
+                    showMouse = 0;
+                }
+
+                if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
+                    showMouse = 1;
+                }
+
+
+                if(event.type == ALLEGRO_EVENT_MOUSE_AXES){
+                    if(turn && is_mouse_on_Board(event.mouse.x, event.mouse.y)){
+                        coordinates onBoard;
+                        find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
+                        if(needShowSelectionHover = (is_mouse_nextto(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y) && check_wall2(animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y, onBoard)) && !selecting){
+                            
+                            mx = event.mouse.x;
+                            my = event.mouse.y;
+                            if(mouseButtonDown){
+                                selecting = 1;
+                                if(moves[nmoves] = find_direction(onBoard.x, onBoard.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y)){
+                                    nmoves++;
+                                    selectionlist[nselection] = onBoard;
+                                    al_stop_sample(&isPlayingSampleId);
+                                    al_play_sample(selection_audio, 0.5, 0.0, nselection * 0.5 + 1, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+                                    nselection++;
+                                }
                             }
-                            if(nmoves > 3){
+                        }
+                        if(selecting && !isEqualCoordinates(selectionlist[nselection - 1], onBoard)){
+                            if(nselection > 1 && selectionlist[nselection - 2].x == onBoard.x && selectionlist[nselection - 2].y == onBoard.y){
+                                nselection--;
+                                nmoves--;
+                            }
+                            else if(nselection == 1 && onBoard.x == animals[get_cat_id(turn)].x && onBoard.y == animals[get_cat_id(turn)].y){
                                 selecting = 0;
                                 nmoves = 0;
                                 nselection = 0;
-                                mouseButtonDown = 0;
+                                
                             }
-                        } else { // if wall exist
+                            else {
+                                if(check_wall(selectionlist[nselection - 1], onBoard)){
+                                    if(moves[nmoves] = find_direction(onBoard.x, onBoard.y, selectionlist[nselection - 1].x, selectionlist[nselection - 1].y)){
+                                        nmoves++;
+                                        selectionlist[nselection] = onBoard;
+                                        al_stop_sample(&isPlayingSampleId);
+                                        al_play_sample(selection_audio, 0.5, 0.0, nselection * 0.5 + 1, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+                                        nselection++;
+                                    }
+                                    if(nmoves > 3){
+                                        selecting = 0;
+                                        nmoves = 0;
+                                        nselection = 0;
+                                        mouseButtonDown = 0;
+                                    }
+                                } else { // if wall exist
+                                    al_stop_sample(&isPlayingSampleId);
+                                    al_play_sample(selection_audio, 0.5, 0.0, 2.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+                                    selecting = 0;
+                                    nmoves = 0;
+                                    nselection = 0;
+                                    mouseButtonDown = 0;
+                                }
+                            }
+                        }
+                    }
+                    else {// if mosue is not on board
+                        if(selecting){
                             al_stop_sample(&isPlayingSampleId);
-                            al_play_sample(selection_audio, 0.5, 0.0, 2.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+                            al_play_sample(selection_audio, 0.5, 0.0, 3, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
                             selecting = 0;
                             nmoves = 0;
                             nselection = 0;
                             mouseButtonDown = 0;
                         }
                     }
-            	}
-            }
-            else {// if mosue is not on board
-                if(selecting){
-                    al_stop_sample(&isPlayingSampleId);
-                    al_play_sample(selection_audio, 0.5, 0.0, 3, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
-                    selecting = 0;
-                    nmoves = 0;
-                    nselection = 0;
-                    mouseButtonDown = 0;
                 }
-            }
-        }
 
-        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
-            mouseButtonDown = 1;
-            if(is_mouse_on_Board(event.mouse.x, event.mouse.y)){
-                coordinates onBoard;
-                find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
-                if(event.mouse.button == 1 && (needShowSelectionHover || (onBoard.x == animals[get_cat_id(turn)].x && onBoard.y == animals[get_cat_id(turn)].y))){
-                    
-                }
-                else{
-                    al_play_sample(selection_fail_audio, 1, 0, 1.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
-                    mouseButtonDown = 0;
-                }
-            }
-
-            if(!throwingDice && !turn && check_button(diceThrowBTN, event.mouse.x, event.mouse.y)){
-                throwingDice = 1;
-                diceThrowBTN.is_showing = 0;
-            }
-
-        }
-
-        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
-            mouseButtonDown = 0;
-            if(selecting){
-                selecting = 0;
-                // move function
-                move(get_cat_id(turn), moves, nmoves);
-                needUpdateBoardDisplay = 1;
-                needUpdateScoreboard = 1;
-                nmoves = 0;
-                nselection = 0;
-                turn = next_turn();
-                if(!turn){
-
-                    if(++playingRound > roundLimit)break;// end of game
-                    needUpdateRoundshowing = 1;
-
-                    if(numfish < catsNumber)set_fishes();
-
-                    move_dog_mice();
-                    for (size_t i = 0; i < catsNumber; i++)
-                    {
-                        if (!animals[get_cat_id(catslist[i])].freaz)
-                            animals[get_cat_id(catslist[i])].energy++;
+                if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+                    mouseButtonDown = 1;
+                    if(is_mouse_on_Board(event.mouse.x, event.mouse.y)){
+                        coordinates onBoard;
+                        find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
+                        if(event.mouse.button == 1 && (needShowSelectionHover || (onBoard.x == animals[get_cat_id(turn)].x && onBoard.y == animals[get_cat_id(turn)].y))){
+                            
+                        }
+                        else{
+                            al_play_sample(selection_fail_audio, 1, 0, 1.5, ALLEGRO_PLAYMODE_ONCE, &isPlayingSampleId);
+                            mouseButtonDown = 0;
+                        }
                     }
 
-                    diceThrowBTN.is_showing = 1;
-                    for (size_t i = 0; i < catsNumber; i++){
-                        needThrowdie[catslist[i] - 1] = 1;
-                    }
-                    
-                }
-            }
-        }
-
-
-        if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
-            break;
-        }
-
-        if(event.type == ALLEGRO_EVENT_TIMER){
-            if(needUpdateBoardDisplay){
-
-                if(oldBoardDisplay)
-                    al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
-                else 
-                    show_background();
-                show_board();
-                show_components();
-                if(turn)show_animal(get_cat_id(turn));
-                show_walls();
-                oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
-                needUpdateBoardDisplay = 0;
-            }
-
-            if(needUpdateScoreboard){
-                if(oldBoardDisplay)
-                    al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
-                show_scoreboard();
-                show_turn(turn);
-                oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
-                needUpdateScoreboard = 0;
-            }
-
-            if(needUpdateRoundshowing){
-                if(oldBoardDisplay)
-                    al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
-                show_round(playingRound);
-                oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
-                needUpdateRoundshowing = 0;
-            }
-
-            if(needUpdateBoardDisplay || needUpdateScoreboard || needUpdateRoundshowing);
-            else al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
-
-
-            if(throwingDice){
-                throwingDice = throw_next_die(dice, needThrowdie);
-                if(!throwingDice){
-                    set_turns(dice);
-                    if(!is_dice_repeated(dice, needThrowdie)){
-                        turn = next_turn();
-                        needUpdateScoreboard = 1;
+                    if(!throwingDice && !turn && check_button(diceThrowBTN, event.mouse.x, event.mouse.y)){
+                        throwingDice = 1;
                         diceThrowBTN.is_showing = 0;
-                    }else{
-                        diceThrowBTN.is_showing = 1;
+                    }
+
+                }
+
+                if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
+                    mouseButtonDown = 0;
+                    if(selecting){
+                        selecting = 0;
+                        // move function
+                        move(get_cat_id(turn), moves, nmoves);
+                        needUpdateBoardDisplay = 1;
+                        needUpdateScoreboard = 1;
+                        nmoves = 0;
+                        nselection = 0;
+                        turn = next_turn();
+                        if(!turn){
+
+                            if(++playingRound > roundLimit){
+                                page = firstmenu;
+                                break;// end of game
+                            }
+                            needUpdateRoundshowing = 1;
+
+                            if(numfish < catsNumber)set_fishes();
+
+                            move_dog_mice();
+                            for (size_t i = 0; i < catsNumber; i++)
+                            {
+                                if (!animals[get_cat_id(catslist[i])].freaz)
+                                    animals[get_cat_id(catslist[i])].energy++;
+                            }
+
+                            diceThrowBTN.is_showing = 1;
+                            for (size_t i = 0; i < catsNumber; i++){
+                                needThrowdie[catslist[i] - 1] = 1;
+                            }
+                            
+                        }
                     }
                 }
-            }
-
-            if(diceThrowBTN.is_showing){
-                show_button(diceThrowBTN);
-            }
 
 
-            if(1){
-                show_dice(dice, !(diceTimer));
-                if(!diceTimer)diceTimer += 2;
-                diceTimer--;
-            }
+                if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+                    page = endofGame;
+                    break;
+                }
 
-            if(needShowSelectionHover){
-                needShowSelectionHover = show_slection_hover(mx, my);
-            }
+                if(event.type == ALLEGRO_EVENT_TIMER){
+                    if(needUpdateBoardDisplay){
 
-            if(selecting && nselection){
+                        if(oldBoardDisplay)
+                            al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+                        else 
+                            show_background();
+                        show_board();
+                        show_components();
+                        if(turn)show_animal(get_cat_id(turn));
+                        show_walls();
+                        oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                        needUpdateBoardDisplay = 0;
+                    }
+
+                    if(needUpdateScoreboard){
+                        if(oldBoardDisplay)
+                            al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+                        show_scoreboard();
+                        show_turn(turn);
+                        oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                        needUpdateScoreboard = 0;
+                    }
+
+                    if(needUpdateRoundshowing){
+                        if(oldBoardDisplay)
+                            al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+                        show_round(playingRound);
+                        oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                        needUpdateRoundshowing = 0;
+                    }
+
+                    if(needUpdateBoardDisplay || needUpdateScoreboard || needUpdateRoundshowing);
+                    else al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
+
+
+                    if(throwingDice){
+                        throwingDice = throw_next_die(dice, needThrowdie);
+                        if(!throwingDice){
+                            set_turns(dice);
+                            if(!is_dice_repeated(dice, needThrowdie)){
+                                turn = next_turn();
+                                needUpdateScoreboard = 1;
+                                diceThrowBTN.is_showing = 0;
+                            }else{
+                                diceThrowBTN.is_showing = 1;
+                            }
+                        }
+                    }
+
+                    if(diceThrowBTN.is_showing){
+                        show_button(diceThrowBTN);
+                    }
+
+
+                    if(1){
+                        show_dice(dice, !(diceTimer));
+                        if(!diceTimer)diceTimer += 2;
+                        diceTimer--;
+                    }
+
+                    if(needShowSelectionHover){
+                        needShowSelectionHover = show_slection_hover(mx, my);
+                    }
+
+                    if(selecting && nselection){
+                        
+                        show_slections(selectionlist, nselection);
+                    }
+
+                    if(showMouse)put_mouse();
+
+                    al_flip_display();
+                }
+
+
+            
+
+
                 
-                show_slections(selectionlist, nselection);
             }
-
-            if(showMouse)put_mouse();
-
+        
+            al_unregister_event_source(queue, al_get_mouse_event_source());
+            al_unregister_event_source(queue, al_get_timer_event_source(timer));
+            al_unregister_event_source(queue, al_get_display_event_source(display));
+            al_destroy_timer(timer);
+            show_board();
+            show_components();
+            show_walls();
+            show_scoreboard();
             al_flip_display();
+            if(page)
+                al_wait_for_event(queue, &event);
+            al_destroy_event_queue(queue);
+            
         }
 
-
+    }// end of game
     
 
-
-    	
-	}
-
-    al_destroy_timer(timer);
-    al_destroy_event_queue(queue);
-    show_board();
-    show_components();
-    show_walls();
-    show_scoreboard();
-    al_flip_display();
-    printf("\npress any key to exit . . .\n");
-    getch();
     allegroDESTROY();
+
+    
 
 _________________________________________$_END_GAME_$_________________________________________
 

@@ -35,4 +35,8 @@ void show_scoreboard();
 void show_turn(turns turn);
 void show_round(int round);
 
+void show_name_of_game();
+void show_starting_menu();
+void scan_from_display(char result[20]);
+
 #endif

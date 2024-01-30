@@ -17,7 +17,7 @@ typedef enum turns turns;
 
 extern struct animal{
     int ID;
-    char name[11];
+    char name[20];
     short energy;
     unsigned short power;
     unsigned short score;
@@ -54,7 +54,7 @@ ALLEGRO_DISPLAY * display;
 ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif, * scoreboardBMP, * playerSelectionBMP , * playerFreazeBMP;
 ALLEGRO_BITMAP * dice[7],*anipic[35];
 
-ALLEGRO_FONT * font, * numFont, * fontsml;
+ALLEGRO_FONT * scoreboardFont, * numFont, * numFont2, * scoreboardFontsml, * namefont, * menuFont;
 
 ALLEGRO_MOUSE_STATE msestate;
 
@@ -62,7 +62,7 @@ ALLEGRO_SAMPLE * selection_fail_audio;
 ALLEGRO_SAMPLE * selection_audio;
 ALLEGRO_SAMPLE_ID isPlayingSampleId;
 
-button diceThrowBTN;
+button diceThrowBTN, playBTN, optionsBTN, loadBTN, exitBTN, backBTN, changeBTN, startBTN;
 
 
 extern animal animals[27];
@@ -70,14 +70,8 @@ extern int boardSize;
 extern int wall[31][31];
 extern turns catslist[4];
 extern int catsNumber;
+extern int roundLimit;
 
-// extern animal animals[27];
-
-char *ch[35] = {"", "d1", "d2", "d3", "d4", "m1",
-              "m2", "m3", "m4", "m5", "m6", "m7", "m8", "m9", "m10", "m11", "m12", "m13", "m14", "m15", "m16", "m17", "m18",
-              "c1", "c2", "c3", "c4",
-              "T", "Choco", "", "", "", "F1", "F2", "F3"
-              };
 
 int allegroINIT(){
 	
@@ -87,12 +81,16 @@ int allegroINIT(){
 	
     al_init_font_addon();
     al_init_ttf_addon();
-	font = al_load_ttf_font("fonts/font.ttf", 30, 0);
-	fontsml = al_load_ttf_font("fonts/font.ttf", 20, 0);
+	scoreboardFont = al_load_ttf_font("fonts/font.ttf", 30, 0);
+	scoreboardFontsml = al_load_ttf_font("fonts/font.ttf", 20, 0);
 	numFont = al_load_ttf_font("fonts/number font.ttf", 30, 0);
-    
+	numFont2 = al_load_ttf_font("fonts/number font 2.ttf", 30, 0);
+    namefont = al_load_ttf_font("fonts/font.ttf", 100, 0);
+    menuFont = al_load_ttf_font("fonts/menu font.ttf", 40, 0);
 	
     al_init_primitives_addon();
+
+    al_install_keyboard();
     
     al_install_mouse();
     
@@ -141,6 +139,56 @@ int allegroINIT(){
     diceThrowBTN.to.x = 1085;
     diceThrowBTN.to.y = 670;
     diceThrowBTN.icon = al_load_bitmap("buttons/trow dice button.png");
+
+    int length = 290, height = 130; 
+    playBTN.from.x = 1100 - length / 2;
+    playBTN.from.y = 600 - height / 2;
+    playBTN.to.x = 1100 + length / 2;
+    playBTN.to.y = 600 + height / 2;
+    playBTN.icon = al_load_bitmap("buttons/play.png");
+
+    loadBTN.from.x = 794 - length / 2;
+    loadBTN.from.y = 600 - height / 2;
+    loadBTN.to.x = 794 + length / 2;
+    loadBTN.to.y = 600 + height / 2;
+    loadBTN.icon = al_load_bitmap("buttons/load.png");
+
+    optionsBTN.from.x = 486 - length / 2;
+    optionsBTN.from.y = 600 - height / 2;
+    optionsBTN.to.x = 486 + length / 2;
+    optionsBTN.to.y = 600 + height / 2;
+    optionsBTN.icon = al_load_bitmap("buttons/options.png");
+
+    exitBTN.from.x = 180 - length / 2;
+    exitBTN.from.y = 600 - height / 2;
+    exitBTN.to.x = 180 + length / 2;
+    exitBTN.to.y = 600 + height / 2;
+    exitBTN.icon = al_load_bitmap("buttons/exit.png");
+
+    length = 200;
+    height = 90;
+
+    backBTN.from.x = 290 - length / 2;
+    backBTN.from.y = 650 - height / 2;
+    backBTN.to.x = 290 + length / 2;
+    backBTN.to.y = 650 + height / 2;
+    backBTN.icon = al_load_bitmap("buttons/back.png");
+
+    startBTN.from.x = 990 - length / 2;
+    startBTN.from.y = 650 - height / 2;
+    startBTN.to.x = 990 + length / 2;
+    startBTN.to.y = 650 + height / 2;
+    startBTN.icon = al_load_bitmap("buttons/start.png");
+
+    height = al_get_font_line_height(numFont2) + 10;
+    length = height * 2.2;
+    changeBTN.from.x = 1090 - length;
+    changeBTN.from.y = 145;
+    changeBTN.to.x = 1090;
+    changeBTN.to.y = 145 + height;
+    changeBTN.icon = al_load_bitmap("buttons/change.png");
+
+
 
     if(!diceThrowBTN.icon){
         printf("error loading btn!");
@@ -204,7 +252,7 @@ int allegroINIT(){
 int allegroDESTROY(){
 	
 
-	al_destroy_font(font);
+	al_destroy_font(scoreboardFont);
 
     al_shutdown_font_addon();
 
@@ -212,6 +260,8 @@ int allegroDESTROY(){
 
 	al_destroy_mouse_cursor(cursor);
 	al_uninstall_mouse();
+
+    al_uninstall_keyboard();
 
 	al_shutdown_image_addon();
     al_destroy_bitmap(cursor);
@@ -248,7 +298,7 @@ void show_board(){
     x=y=700 /boardSize;
     for (int i = 10; (i-10)/x < boardSize; i+=x)
         for (int j = 10; (j-10)/y < boardSize; j+=y){
-            al_draw_filled_rectangle(i,j,i+x,j+y, al_map_rgb(190,156,84));
+            al_draw_filled_rectangle(i,j,i+x,j+y, al_map_rgb(204, 191, 123));
             al_draw_rectangle(i,j,i+x,j+y, al_map_rgb(158,153,101),60 / boardSize);
         }
     
@@ -258,24 +308,24 @@ void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2, float thickn
 {
     if (wall[i][j]==1&&i!=boardSize-1)
     {
-        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(146, 255, 71));
+        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(46, 64, 28));
     }
     if (wall[i][j]==2&&j!=boardSize-1)
     {
-        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(146, 255, 71));
+        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(46, 64, 28));
     }
     if (wall[i][j]==3&&j!=boardSize-1&&i!=boardSize-1)
     {
-        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(146, 255, 71));
-        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(146, 255, 71));
+        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(46, 64, 28));
+        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(46, 64, 28));
     }
     if (i==boardSize-1&&wall[i][j]&&j!=boardSize-1)
     {
-        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(146, 255, 71));
+        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(46, 64, 28));
     }
     if(j==boardSize-1&&wall[i][j]&&i!=boardSize-1)
     {
-        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(146, 255, 71));
+        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(46, 64, 28));
     }
 }
 
@@ -299,7 +349,7 @@ int show_object(int id, int x, int y){
     x = x * length + 10;
     y = y * width + 10;
 
-    al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(190,156,84));
+    al_draw_filled_rectangle(x, y, x + length, y + width, al_map_rgb(204, 191, 123));
     al_draw_rectangle(x, y, x + length, y + width, al_map_rgb(158,153,101), 60 / boardSize);
 	if((id>0&&id<27)||id>27){
 		al_draw_scaled_bitmap(anipic[id],0,0,512,512,x,y,width,length,0);
@@ -382,9 +432,9 @@ void show_scoreboard(){
     for(int i = 0; i < 4; i++){
         if(animals[get_cat_id(i + 1)].name[0] - '0'){
             if(strlen(animals[get_cat_id(i + 1)].name) < 7)
-                al_draw_textf(font, al_map_rgb(0, 0, 0), 800 + i * 130, 125, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
+                al_draw_textf(scoreboardFont, al_map_rgb(0, 0, 0), 800 + i * 130, 125, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
             else
-                al_draw_textf(fontsml, al_map_rgb(0, 0, 0), 800 + i * 130, 127, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name); 
+                al_draw_textf(scoreboardFontsml, al_map_rgb(0, 0, 0), 800 + i * 130, 127, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name); 
             if(animals[get_cat_id(i + 1)].freaz)al_draw_scaled_bitmap(playerFreazeBMP, 0, 0, 320, 187, i * 130 + 736, 100, 127.5, 74.5, 0);
             al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 203, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].score);
             al_draw_textf(numFont, al_map_rgb(0, 0, 0), 800 + i * 130, 275, ALLEGRO_ALIGN_CENTRE, "%d", animals[get_cat_id(i + 1)].energy);
@@ -402,8 +452,126 @@ void show_round(int round){
     printf("updated\n");
     al_draw_filled_rectangle(994, 40, 1258, 90, al_map_rgb(0X43, 0X28, 0X18));
     al_draw_filled_rectangle(999, 45, 1253, 85, al_map_rgb(0x99, 0x58, 0x2a));
-    al_draw_textf(font, al_map_rgb(0x6f, 0x1d, 0x1b), 1015, 52, ALLEGRO_ALIGN_LEFT, "round :");
+    al_draw_textf(scoreboardFont, al_map_rgb(0x6f, 0x1d, 0x1b), 1015, 52, ALLEGRO_ALIGN_LEFT, "round :");
     al_draw_textf(numFont, al_map_rgb(0x6f, 0x1d, 0x1b), 1170, 49, ALLEGRO_ALIGN_CENTRE, "%d", round);
+}
+
+void show_name_of_game(){
+    al_draw_text(namefont, al_map_rgb(240, 45, 58), 610, 20, ALLEGRO_ALIGN_CENTRE, "Mr. Clobber's backyard");
+}
+
+void show_starting_menu(){
+    al_draw_text(menuFont, al_map_rgb(240, 45, 58), 640, 30, ALLEGRO_ALIGN_CENTRE, "starting menu");
+
+    al_draw_text(menuFont, al_map_rgb(67, 40, 24), 200, 150, ALLEGRO_ALIGN_LEFT, "size of board");
+    al_draw_filled_rectangle(700, 150, 800, 150 + al_get_font_line_height(numFont2), al_map_rgb(255, 255, 255));
+    al_draw_rectangle(700, 150, 800, 150 + al_get_font_line_height(numFont2), al_map_rgb(51, 53, 51), 1);
+    al_draw_textf(numFont2, al_map_rgb(67, 40, 24), 750, 155, ALLEGRO_ALIGN_CENTRE, "%d", boardSize);
+
+    al_draw_text(menuFont, al_map_rgb(67, 40, 24), 200, 200, ALLEGRO_ALIGN_LEFT, "rounds");
+    al_draw_filled_rectangle(700, 200, 800, 200 + al_get_font_line_height(numFont2), al_map_rgb(255, 255, 255));
+    al_draw_rectangle(700, 200, 800, 200 + al_get_font_line_height(numFont2), al_map_rgb(51, 53, 51), 1);
+    al_draw_textf(numFont2, al_map_rgb(67, 40, 24), 750, 205, ALLEGRO_ALIGN_CENTRE, "%d", roundLimit);
+
+
+    al_draw_text(menuFont, al_map_rgb(255, 0, 0), 200, 300, ALLEGRO_ALIGN_LEFT, "player 1");
+    al_draw_filled_rectangle(600, 300, 850, 300 + al_get_font_line_height(numFont2), al_map_rgb(255, 255, 255));
+    al_draw_rectangle(600, 300, 850, 300 + al_get_font_line_height(numFont2), al_map_rgb(51, 53, 51), 1);
+    al_draw_text(scoreboardFont, al_map_rgb(67, 40, 24), 725, 308, ALLEGRO_ALIGN_CENTRE, animals[get_cat_id(cat1)].name);
+    
+    al_draw_text(menuFont, al_map_rgb(0, 255, 0), 200, 360, ALLEGRO_ALIGN_LEFT, "player 2");
+    al_draw_filled_rectangle(600, 360, 850, 360 + al_get_font_line_height(numFont2), al_map_rgb(255, 255, 255));
+    al_draw_rectangle(600, 360, 850, 360 + al_get_font_line_height(numFont2), al_map_rgb(51, 53, 51), 1);
+    al_draw_text(scoreboardFont, al_map_rgb(67, 40, 24), 725, 368, ALLEGRO_ALIGN_CENTRE, animals[get_cat_id(cat2)].name);
+
+
+    al_draw_text(menuFont, al_map_rgb(0, 0, 255), 200, 420, ALLEGRO_ALIGN_LEFT, "player 3");
+    al_draw_filled_rectangle(600, 420, 850, 420 + al_get_font_line_height(numFont2), al_map_rgb(255, 255, 255));
+    al_draw_rectangle(600, 420, 850, 420 + al_get_font_line_height(numFont2), al_map_rgb(51, 53, 51), 1);
+    al_draw_text(scoreboardFont, al_map_rgb(67, 40, 24), 725, 428, ALLEGRO_ALIGN_CENTRE, animals[get_cat_id(cat3)].name);
+
+    al_draw_text(menuFont, al_map_rgb(255, 255, 0), 200, 480, ALLEGRO_ALIGN_LEFT, "player 4");
+    al_draw_filled_rectangle(600, 480, 850, 480 + al_get_font_line_height(numFont2), al_map_rgb(255, 255, 255));
+    al_draw_rectangle(600, 480, 850, 480 + al_get_font_line_height(numFont2), al_map_rgb(51, 53, 51), 1);
+    al_draw_text(scoreboardFont, al_map_rgb(67, 40, 24), 725, 488, ALLEGRO_ALIGN_CENTRE, animals[get_cat_id(cat4)].name);
+
+}
+
+void scan_from_display(char result[20]){
+    
+    al_draw_filled_rectangle(0, 0, 1280, 720, al_premul_rgba(51, 53, 51, 128));
+    al_draw_filled_rectangle(300, 330, 980, 390, al_map_rgb(255, 255, 255));
+    al_flip_display();
+    result[0] = 0;
+    int len = 0;
+    bool showMouse = 1;
+
+    ALLEGRO_EVENT event;
+    ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+    al_register_event_source(queue, al_get_keyboard_event_source());
+    al_register_event_source(queue, al_get_display_event_source(display));
+
+    ALLEGRO_BITMAP * oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
+
+    while (1){
+        al_wait_for_event(queue,&event);
+
+        if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+            break;
+        }
+        
+        if(event.type == ALLEGRO_EVENT_KEY_CHAR){
+            if(event.keyboard.keycode == ALLEGRO_KEY_ENTER || event.keyboard.keycode == ALLEGRO_KEY_PAD_ENTER){
+                return;
+            }
+
+            if(event.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
+                result[0] = 0;
+                return;
+            }
+
+            if(event.keyboard.keycode == ALLEGRO_KEY_BACKSPACE){
+                if(len)
+                    result[--len] = '\0';
+            }
+
+            if(event.keyboard.keycode >= ALLEGRO_KEY_A && event.keyboard.keycode <= ALLEGRO_KEY_Z){
+                int toascii = 'a' - ALLEGRO_KEY_A;
+                if(event.keyboard.modifiers == ALLEGRO_KEYMOD_SHIFT || event.keyboard.modifiers == ALLEGRO_KEYMOD_CAPSLOCK)
+                    toascii = 'A' - ALLEGRO_KEY_A;
+                result[len++] = event.keyboard.keycode + toascii;
+                result[len] = '\0';
+            }
+
+            if(event.keyboard.keycode >= ALLEGRO_KEY_0 && event.keyboard.keycode <= ALLEGRO_KEY_9){
+                int toascii = '0' - ALLEGRO_KEY_0;
+                
+                result[len++] = event.keyboard.keycode + toascii;
+                result[len] = '\0';
+            }
+
+            if(event.keyboard.keycode >= ALLEGRO_KEY_PAD_0 && event.keyboard.keycode <= ALLEGRO_KEY_PAD_9){
+                int toascii = '0' - ALLEGRO_KEY_PAD_0;
+                
+                result[len++] = event.keyboard.keycode + toascii;
+                result[len] = '\0';
+            }
+
+            al_draw_filled_rectangle(300, 330, 980, 390, al_map_rgb(255, 255, 255));
+            al_draw_text(numFont2, al_map_rgb(0, 0, 0), 640, 340, ALLEGRO_ALIGN_CENTRE, result);
+            al_flip_display();
+
+        }
+        
+
+
+        
+    }
+
+    al_destroy_event_queue(queue);
+    
+    
+
 }
 
 
