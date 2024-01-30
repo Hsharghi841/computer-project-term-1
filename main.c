@@ -131,6 +131,15 @@ int ________________________________________$_START_GAME_$______________________
     if(!allegroINIT())return 0;
     		        
     page = firstmenu;
+
+    button log;
+    log.from.x = 740;
+    log.from.y = 570;
+    log.to.x = 870;
+    log.to.y = 670;
+    log.icon = al_load_bitmap("log.png");
+    log.is_showing = 1;
+
     
     while (page){
     
@@ -327,6 +336,7 @@ int ________________________________________$_START_GAME_$______________________
                     }
                     
                     if(check_button(startBTN, event.mouse.x, event.mouse.y)){
+                        catsNumber = 0;
                         for (int i = 0; i < 4; i++){
                             if(animals[get_cat_id(i + 1)].name[0]){
                                 catslist[catsNumber++] = i + 1;
@@ -516,6 +526,10 @@ int ________________________________________$_START_GAME_$______________________
                         diceThrowBTN.is_showing = 0;
                     }
 
+                    if(check_button(log, event.mouse.x, event.mouse.y)){
+                        printlog();
+                    }
+
                 }
 
                 if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
@@ -568,6 +582,7 @@ int ________________________________________$_START_GAME_$______________________
                             al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
                         else 
                             show_background();
+                        show_button(log);
                         show_board();
                         show_components();
                         if(turn)show_animal(get_cat_id(turn));
@@ -604,6 +619,7 @@ int ________________________________________$_START_GAME_$______________________
                             if(!is_dice_repeated(dice, needThrowdie)){
                                 turn = next_turn();
                                 needUpdateScoreboard = 1;
+                                needUpdateBoardDisplay = 1;
                                 diceThrowBTN.is_showing = 0;
                             }else{
                                 diceThrowBTN.is_showing = 1;
@@ -642,7 +658,7 @@ int ________________________________________$_START_GAME_$______________________
 
                 
             }
-        
+            
             al_unregister_event_source(queue, al_get_mouse_event_source());
             al_unregister_event_source(queue, al_get_timer_event_source(timer));
             al_unregister_event_source(queue, al_get_display_event_source(display));
@@ -779,8 +795,8 @@ void initAnimals(){
         animals[i].on_board=1;
     }
     // cats (this part of code will change!)
-    for (size_t i = 23; i <= 26; i++)
-    {
+    for (size_t i = 23; i <= 26; i++){
+        animals[i].score = 0;
         animals[i].energy = 5;
         animals[i].power = 2;
         animals[i].ID = i;
@@ -855,6 +871,15 @@ int putOnboard(int id, int width, int length){
 }
 
 int startSettingBoard(){
+
+    for (int i = 0; i < boardSize; i++){
+        for (int j = 0; j < boardSize; j++){
+            for(int k = board[i][j][0] + 1; k >= 0; k--){
+                board[i][j][k] = 0;
+            }
+        }
+    }
+
     // cats : 
 
     if(boardSize % 2 == 1) {
@@ -1716,3 +1741,25 @@ void move_dog_mice(){
         }
     }
 }
+
+void printlog(){
+    printf("catnumber : %d { ", catsNumber);
+    for (int i = 0; i < catsNumber; i++){
+        printf("%d ", catslist[i]);
+    }
+    printf("}\n");
+    printf("board : \n\n");
+    for (int i = 0; i < boardSize; i++){
+        for (int j = 0; j < boardSize; j++){
+            printf("%3d", board[i][j][1]);
+        }
+        printf("   ");
+        for (int j = 0; j < boardSize; j++){
+            printf("%3d", board[i][j][2]);
+        }
+        printf("\n");
+    }
+    
+}
+
+

@@ -95,7 +95,7 @@ int allegroINIT(){
     al_install_mouse();
     
     al_init_image_addon(); 
-	cursor = al_load_bitmap("cursor.tga");
+	cursor = al_load_bitmap("cursor.png");
     selsction = al_load_bitmap("selection.png");
     selsctionHavel = al_load_bitmap("selection_havel.png");
     background = al_load_bitmap("background.jpg");
