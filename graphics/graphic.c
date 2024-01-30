@@ -132,8 +132,8 @@ int allegroINIT(){
     anipic[25]= al_load_bitmap("animals/cat3.png");
     anipic[26]= al_load_bitmap("animals/cat4.png");
     anipic[28]= al_load_bitmap("animals/chocolate.png");
-    anipic[32]= al_load_bitmap("animals/fish2.png");
-    anipic[33]= al_load_bitmap("animals/fish3.png");
+    anipic[32]= al_load_bitmap("animals/fish4.png");
+    anipic[33]= al_load_bitmap("animals/fish4.png");
     anipic[34]= al_load_bitmap("animals/fish4.png");
 
     diceThrowBTN.from.x = 885;

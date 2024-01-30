@@ -1,0 +1,6 @@
+Name of winner=sd
+Score of winner=5
+Name of 2=fg
+Score of 2=2
+Name of 3=df
+Score of 3=0
