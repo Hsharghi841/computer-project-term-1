@@ -74,6 +74,7 @@ extern int wall[31][31];
 extern turns catslist[4];
 extern int catsNumber;
 extern int roundLimit;
+extern int playingRound;
 extern int numfish;
 
 int allegroINIT(){
@@ -88,7 +89,7 @@ int allegroINIT(){
 	scoreboardFontsml = al_load_ttf_font("fonts/font.ttf", 20, 0);
 	numFont = al_load_ttf_font("fonts/number font.ttf", 30, 0);
 	numFont2 = al_load_ttf_font("fonts/number font 2.ttf", 30, 0);
-	numFont2sml = al_load_ttf_font("fonts/number font 2.ttf", 20, 0);
+	numFont2sml = al_load_ttf_font("fonts/number font 2.ttf", 25, 0);
     namefont = al_load_ttf_font("fonts/font.ttf", 100, 0);
     menuFont = al_load_ttf_font("fonts/menu font.ttf", 40, 0);
 	
@@ -496,7 +497,7 @@ void show_round(int round){
 }
 
 void show_name_of_game(){
-    al_draw_text(namefont, al_map_rgb(240, 45, 58), 610, 20, ALLEGRO_ALIGN_CENTRE, "Mr. Clobber's backyard");
+    al_draw_text(namefont, al_map_rgb(240, 45, 58), 640, 20, ALLEGRO_ALIGN_CENTRE, "Mr. Clobber's backyard");
 }
 
 void show_starting_menu(){
@@ -718,10 +719,12 @@ enum page show_pause_menu(){
                 saveFile = fopen(Direction, "wb");
                 fwrite(animals, sizeof(animal), 27, saveFile);
                 fwrite(board, sizeof(int), 31 * 31 * 30, saveFile);
+                fwrite(&boardSize, sizeof(int), 1, saveFile);
                 fwrite(wall, sizeof(int), 31 * 31, saveFile);
                 fwrite(catslist, sizeof(turns), 4, saveFile);
                 fwrite(&catsNumber, sizeof(int), 1, saveFile);
                 fwrite(&roundLimit, sizeof(int), 1, saveFile);
+                fwrite(&playingRound, sizeof(int), 1, saveFile);
                 fwrite(&numfish, sizeof(int), 1, saveFile);
                 fclose(saveFile);
 

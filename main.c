@@ -113,6 +113,7 @@ int catsNumber = 0;
 turns turn[4];
 int numfish=10;
 int roundLimit;
+int playingRound;
 
 
 int ________________________________________$_START_GAME_$________________________________________(){
@@ -139,6 +140,8 @@ int ________________________________________$_START_GAME_$______________________
     log.to.y = 670;
     log.icon = al_load_bitmap("log.png");
     log.is_showing = 1;
+
+    bool loaded = 0;
 
     
     while (page){
@@ -245,8 +248,9 @@ int ________________________________________$_START_GAME_$______________________
 
 
             int fileNumber;
-            int selectedSave;
+            int selectedSave = 0;
             button * savesBTN;
+            char * names;
 
             backBTN.is_showing = 1;
             startBTN.is_showing = 1;
@@ -260,22 +264,30 @@ int ________________________________________$_START_GAME_$______________________
                     char temp[20];
                     fscanf(saveNamesfile, "%d- %s", &fileNumber, &temp);
                 }while(!feof(saveNamesfile));
-            
 
                 savesBTN = (button *)malloc(fileNumber * sizeof(button));
                 savesBTN[fileNumber - 1].from.x = backBTN.from.x + 3;
-                savesBTN[fileNumber - 1].from.y = 100;
+                savesBTN[fileNumber - 1].from.y = 150;
                 savesBTN[fileNumber - 1].to.x = startBTN.to.x - 3;
-                savesBTN[fileNumber - 1].to.y = 120;
-                for(int i = fileNumber - 2;i >= 0; i++){
+                savesBTN[fileNumber - 1].to.y = 180;
+                savesBTN[fileNumber - 1].is_showing = 1;
+                for(int i = fileNumber - 2;i >= 0; i--){
                     savesBTN[i].from.x = savesBTN[fileNumber - 1].from.x;
-                    savesBTN[i].from.y = savesBTN[fileNumber - 1].from.y + 20;
+                    savesBTN[i].from.y = savesBTN[fileNumber - 1].from.y + (fileNumber - i - 1) * 30;
                     savesBTN[i].to.x = savesBTN[fileNumber - 1].to.x;
-                    savesBTN[i].to.y = savesBTN[fileNumber - 1].to.y + 20;
+                    savesBTN[i].to.y = savesBTN[fileNumber - 1].to.y + (fileNumber - i - 1) * 30;
+                    savesBTN[i].is_showing = 1;
                 }
+                
 
-            
-            
+                names = (char *)malloc(28 * fileNumber * sizeof(char));
+                rewind(saveNamesfile);
+                for(int i = 0; i < fileNumber; i++){
+                    fgets(names + 28 * i, 27, saveNamesfile);
+                    names[28 * i + strlen(names + 28 * i) - 1] = 0;
+                }
+                
+                
             }
 
             ALLEGRO_BITMAP * oldDisplay;
@@ -302,11 +314,33 @@ int ________________________________________$_START_GAME_$______________________
                         break;
                     }
                     
-                    if(check_button(startBTN, event.mouse.x, event.mouse.y)){
-                        page = firstmenu;
+                    if(check_button(startBTN, event.mouse.x, event.mouse.y) && selectedSave){
+                        char Direction[80] = "./saves/";
+                        strcat(Direction, &names[(selectedSave - 1) * 28 + 3]);
+                        strcat(Direction, ".dat");
+                        printf("%s\n", Direction);
+                        FILE * saveFile;
+                        if(!(saveFile = fopen(Direction, "rb")))printf("cant open save!\n");
+                        fread(animals, sizeof(animal), 27, saveFile);
+                        fread(board, sizeof(int), 31 * 31 * 30, saveFile);
+                        fread(&boardSize, sizeof(int), 1, saveFile);
+                        fread(wall, sizeof(int), 31 * 31, saveFile);
+                        fread(catslist, sizeof(turns), 4, saveFile);
+                        fread(&catsNumber, sizeof(int), 1, saveFile);
+                        fread(&roundLimit, sizeof(int), 1, saveFile);
+                        fread(&playingRound, sizeof(int), 1, saveFile);
+                        fread(&numfish, sizeof(int), 1, saveFile);
+                        loaded = 1;
+                        page = ingame;
                         break;
                     }
 
+                    for(int i = fileNumber - 1;i >= 0; i--){
+                        if(check_button(savesBTN[i], event.mouse.x, event.mouse.y)){
+                            selectedSave = i + 1;
+                            break;
+                        }
+                    }
                     
                     
                 }
@@ -316,7 +350,13 @@ int ________________________________________$_START_GAME_$______________________
                         show_background();
                         al_draw_filled_rectangle(0, 0, 1280, 720, al_premul_rgba(255, 255, 255, 128));
                         al_draw_filled_rectangle(backBTN.from.x + 3, 100, startBTN.to.x - 3, backBTN.from.y - 50, al_map_rgb(255, 255, 255));
-                        al_draw_text(namefont, al_map_rgb(240, 45, 58), 610, 10, ALLEGRO_ALIGN_CENTRE, "load menu");
+                        al_draw_text(namefont, al_map_rgb(240, 45, 58), 640, 10, ALLEGRO_ALIGN_CENTRE, "load menu");
+                        if(!fileNumber)al_draw_text(namefont, al_map_rgb(0, 0, 0), 640, 280, ALLEGRO_ALIGN_CENTRE, "there is no saves!");
+                        else{
+                            for(int i = fileNumber - 1; i >= 0; i--){
+                                al_draw_textf(numFont2sml, al_map_rgb(0, 0, 0), backBTN.from.x + 50, 150 + (fileNumber - i - 1) * 30, 0, "%s", names + i * 28 + 3);
+                            }
+                        }
                         show_button(backBTN);
                         show_button(startBTN);
                         oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
@@ -324,7 +364,9 @@ int ________________________________________$_START_GAME_$______________________
                     }else
                         al_draw_bitmap(oldDisplay, 0, 0, 0);
 
-
+                    if(selectedSave){
+                        al_draw_rectangle(backBTN.from.x + 3, 150 + (fileNumber - selectedSave) * 30, startBTN.to.x - 3, 180 + (fileNumber - selectedSave) * 30, al_map_rgb(0, 0, 0), 1);
+                    }
 
 
                     if(showMouse)put_mouse();
@@ -335,8 +377,10 @@ int ________________________________________$_START_GAME_$______________________
 
                 
             }
-            fclose(saveNamesfile);
-            free(savesBTN);
+            if(fileNumber){
+                fclose(saveNamesfile);
+                free(savesBTN);
+            }
 
             al_destroy_event_queue(queue);
             al_stop_timer(timer);
@@ -504,11 +548,17 @@ int ________________________________________$_START_GAME_$______________________
     
 
         if(page == ingame){
-            initwall();
-            initAnimals();
-            startSettingBoard();
+
+            
+            if(!loaded){
+                initwall();
+                initAnimals();
+                startSettingBoard();
+                playingRound = 1;
+            }else
+                loaded = 0;
+
             turns turn = none;
-            int playingRound = 1;
             
             int dice[4] = {0};
             int diceTimer = 0;
