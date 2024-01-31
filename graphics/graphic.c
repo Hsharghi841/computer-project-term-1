@@ -470,7 +470,7 @@ void show_dice(int die[4], bool reset){
 void show_scoreboard(){
     al_draw_scaled_bitmap(scoreboardBMP, 0, 0, 1280, 720, 730, 100, 528, 292, 0);
     for(int i = 0; i < 4; i++){
-        if(animals[get_cat_id(i + 1)].name[0] - '0'){
+        if(animals[get_cat_id(i + 1)].name[0]){
             if(strlen(animals[get_cat_id(i + 1)].name) < 7)
                 al_draw_textf(scoreboardFont, al_map_rgb(0, 0, 0), 800 + i * 130, 125, ALLEGRO_ALIGN_CENTER, "%s", animals[get_cat_id(i + 1)].name);        
             else
