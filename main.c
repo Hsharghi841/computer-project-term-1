@@ -1388,16 +1388,20 @@ void swap(int *a, int * b){
 
 void move(int id,direction masir[5],int tedadgam){
     int i,j,a,b,min,swich,bmin;
+    coordinates avalie,sanavie;
     printf("\n%d",id);
     for (size_t k = 0; k < tedadgam; k++)
     {
     	printf("\n*%d",masir[k]);
         if (masir[k]==Right&&animals[id].energy>0&&!animals[id].freaz)
         {
-            j=animals[id].x;
-            i=animals[id].y;
+            avalie.y=j=animals[id].x;
+            avalie.x=i=animals[id].y;
             delete_id(id,i,j);
             j++;
+            sanavie.y=j;
+            sanavie.x=i;
+            move_animation(avalie,sanavie,id);
             putOnboard(id,i,j);
             if (id>0&&id<5)
             {
@@ -1488,10 +1492,13 @@ void move(int id,direction masir[5],int tedadgam){
         }
         else if (masir[k]==Left&&animals[id].energy>0&&!animals[id].freaz)
         {
-            j=animals[id].x;
-            i=animals[id].y;
+            avalie.y=j=animals[id].x;
+            avalie.x=i=animals[id].y;
             delete_id(id,i,j);
             j--;
+            sanavie.y=j;
+            sanavie.x=i;
+            move_animation(avalie,sanavie,id);
             putOnboard(id,i,j);
             if (id>0&&id<5)
             {
@@ -1582,10 +1589,13 @@ void move(int id,direction masir[5],int tedadgam){
         }
         else if (masir[k]==Up&&animals[id].energy>0&&!animals[id].freaz)
         {
-            j=animals[id].x;
-            i=animals[id].y;
+            avalie.y=j=animals[id].x;
+            avalie.x=i=animals[id].y;
             delete_id(id,i,j);
             i--;
+            sanavie.y=j;
+            sanavie.x=i;
+            move_animation(avalie,sanavie,id);
             putOnboard(id,i,j);
             if (id>0&&id<5)
             {
@@ -1676,10 +1686,13 @@ void move(int id,direction masir[5],int tedadgam){
         }
         else if (masir[k]==Down&&animals[id].energy>0&&!animals[id].freaz)
         {
-            j=animals[id].x;
-            i=animals[id].y;
+            avalie.y=j=animals[id].x;
+            avalie.x=i=animals[id].y;
             delete_id(id,i,j);
             i++;
+            sanavie.y=j;
+            sanavie.x=i;
+            move_animation(avalie,sanavie,id);
             putOnboard(id,i,j);
             if (id>0&&id<5)
             {
@@ -2030,3 +2043,4 @@ void move_dog_mice_hosh(){
         }
     }
 }
+

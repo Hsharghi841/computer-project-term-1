@@ -42,4 +42,5 @@ void scan_from_display(char result[20]);
 enum page show_pause_menu();
 enum page wait_for_click();
 
+enum page move_animation(coordinates avalie,coordinates sanavie,int id);
 #endif
