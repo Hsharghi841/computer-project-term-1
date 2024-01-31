@@ -102,6 +102,7 @@ void war_between_cat_dog(int catid,int dogid);
 void war_between_cat1_cat2(int cat1id,int cat2id);
 void move_dog_mice();
 void set_fishes();
+void move_dog_mice_hosh();
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
@@ -113,6 +114,7 @@ int catsNumber = 0;
 turns turn[4];
 int numfish=10;
 int roundLimit;
+int difficulty=2;
 
 
 int ________________________________________$_START_GAME_$________________________________________(){
@@ -553,6 +555,19 @@ int ________________________________________$_START_GAME_$______________________
 
                             if(numfish < catsNumber)set_fishes();
 
+                            if(!difficulty)
+                                move_dog_mice();
+                            else if(!difficulty-1)
+                            {
+                                int i=rand()%2;
+                                if(!i)
+                                    move_dog_mice();
+                                else
+                                    move_dog_mice_hosh();
+                            }
+                            else
+                                move_dog_mice_hosh();
+
                             move_dog_mice();
                             for (size_t i = 0; i < catsNumber; i++)
                             {
@@ -658,6 +673,27 @@ int ________________________________________$_START_GAME_$______________________
 
                 
             }
+            // saving winner name of last game
+            for (int i = 0;i < 3; i++){
+                for (int j = i+1; j< catsNumber; j++){
+                    if (animals[get_cat_id(catslist[i])].score < animals[get_cat_id(catslist[j])].score){
+                        animal s = animals[get_cat_id(catslist[i])];
+                        animals[get_cat_id(catslist[i])] = animals[get_cat_id(catslist[j])];
+                        animals[get_cat_id(catslist[j])] = s;
+                    }
+                }
+            }
+            FILE *out;
+            out=fopen("winners in last game.txt","w");
+            if (!out)
+            {
+                printf("cant open file");
+                return 1;
+            }
+            fprintf(out,"Name of winner=%s\nScore of winner=%d\n",animals[get_cat_id(catslist[0])].name,animals[get_cat_id(catslist[0])].score);
+            for (int i = 1;i < 3; i++)
+                fprintf(out,"Name of %d=%s\nScore of %d=%d\n",i+1,animals[get_cat_id(catslist[i])].name,i+1,animals[get_cat_id(catslist[i])].score);
+            fclose(out);
             
             al_unregister_event_source(queue, al_get_mouse_event_source());
             al_unregister_event_source(queue, al_get_timer_event_source(timer));
@@ -1198,6 +1234,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1242,21 +1279,9 @@ void move(int id,direction masir[5],int tedadgam){
                     animals[id].power++;
                     board[i][j][a]=0;
                 }
-                else if(board[i][j][a]==FISH_2)
+                else if(board[i][j][a]>=FISH_2&&board[i][j][a]<=FISH_4)
                 {
-                    animals[id].energy+=2;
-                    board[i][j][a]=0;
-                    numfish--;
-                }
-                else if(board[i][j][a]==FISH_3)
-                {
-                    animals[id].energy+=3;
-                    board[i][j][a]=0;
-                    numfish--;
-                }
-                else if(board[i][j][a]==FISH_4)
-                {
-                    animals[id].energy+=4;
+                    animals[id].energy+=rand()%3+2;
                     board[i][j][a]=0;
                     numfish--;
                 }
@@ -1303,6 +1328,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1347,21 +1373,9 @@ void move(int id,direction masir[5],int tedadgam){
                     animals[id].power++;
                     board[i][j][a]=0;
                 }
-                else if(board[i][j][a]==FISH_2)
+                else if(board[i][j][a]>=FISH_2&&board[i][j][a]<=FISH_4)
                 {
-                    animals[id].energy+=2;
-                    board[i][j][a]=0;
-                    numfish--;
-                }
-                else if(board[i][j][a]==FISH_3)
-                {
-                    animals[id].energy+=3;
-                    board[i][j][a]=0;
-                    numfish--;
-                }
-                else if(board[i][j][a]==FISH_4)
-                {
-                    animals[id].energy+=4;
+                    animals[id].energy+=rand()%3+2;
                     board[i][j][a]=0;
                     numfish--;
                 }
@@ -1408,6 +1422,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1452,21 +1467,9 @@ void move(int id,direction masir[5],int tedadgam){
                     animals[id].power++;
                     board[i][j][a]=0;
                 }
-                else if(board[i][j][a]==FISH_2)
+                else if(board[i][j][a]>=FISH_2&&board[i][j][a]<=FISH_4)
                 {
-                    animals[id].energy+=2;
-                    board[i][j][a]=0;
-                    numfish--;
-                }
-                else if(board[i][j][a]==FISH_3)
-                {
-                    animals[id].energy+=3;
-                    board[i][j][a]=0;
-                    numfish--;
-                }
-                else if(board[i][j][a]==FISH_4)
-                {
-                    animals[id].energy+=4;
+                    animals[id].energy+=rand()%3+2;
                     board[i][j][a]=0;
                     numfish--;
                 }
@@ -1513,6 +1516,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1557,21 +1561,9 @@ void move(int id,direction masir[5],int tedadgam){
                     animals[id].power++;
                     board[i][j][a]=0;
                 }
-                else if(board[i][j][a]==FISH_2)
+                else if(board[i][j][a]>=FISH_2&&board[i][j][a]<=FISH_4)
                 {
-                    animals[id].energy+=2;
-                    board[i][j][a]=0;
-                    numfish--;
-                }
-                else if(board[i][j][a]==FISH_3)
-                {
-                    animals[id].energy+=3;
-                    board[i][j][a]=0;
-                    numfish--;
-                }
-                else if(board[i][j][a]==FISH_4)
-                {
-                    animals[id].energy+=4;
+                    animals[id].energy+=rand()%3+2;
                     board[i][j][a]=0;
                     numfish--;
                 }
@@ -1602,7 +1594,7 @@ void move(int id,direction masir[5],int tedadgam){
    		animals[id].freaz--;
    		if(!animals[id].freaz)
    		{
-   			animals[id].energy=5;
+   			animals[id].energy=4;
 			animals[id].power=2;	
 		}
 	}
@@ -1686,7 +1678,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
 void move_dog_mice(){
     direction direction, masir[5];
     int i,j,temp=0;
-    for (size_t a = 1; a < 23; a++)
+    for (size_t a = 22; a >0; a--)
     {
         direction=rand()%4+1;
         temp=0;
@@ -1762,4 +1754,97 @@ void printlog(){
     
 }
 
-
+void move_dog_mice_hosh(){
+    direction direction, masir[5];
+    int i,j,temp=0,minid,minfasle;
+    for (size_t a = 22; a >0; a--)
+    {
+        minfasle=500;
+        temp=0;
+        if(animals[a].on_board)
+        {
+            i=animals[a].y;
+            j=animals[a].x;
+            for (int k = 0; k< catsNumber; k++){
+			    if ((animals[get_cat_id(catslist[k])].x-j)*(animals[get_cat_id(catslist[k])].x-j)+(animals[get_cat_id(catslist[k])].y-i)*(animals[get_cat_id(catslist[k])].y-i) < minfasle){
+				    minid=get_cat_id(catslist[k]);
+			    }
+		    }
+            if(a>4)
+            {
+                if (animals[minid].y>i&&i!=0)
+                {
+                    direction=1;
+                }
+                else if(animals[minid].y<=i&&i!=boardSize-1)
+                    direction=3;
+                else if(animals[minid].x<=j&&j!=boardSize-1)
+                    direction=2;
+                else if(animals[minid].x>j&&j!=0)
+                    direction=4;
+                else
+                	direction=rand()%4+1;
+            }
+            else
+            {
+                if (animals[minid].y>i&&i!=boardSize-1)
+                {
+                    direction=3;
+                }
+                else if(animals[minid].y<=i&&i!=0)
+                    direction=1;
+                else if(animals[minid].x<=j&&j!=0)
+                    direction=4;
+                else if(animals[minid].x>j&&j!=boardSize-1)
+                    direction=2;
+                else
+                	direction=rand()%4+1;
+            }
+            
+            for (size_t b = 0; b < animals[a].energy; b++)
+            {
+                if (direction==1)
+                {
+                    if(wall[i-temp-1][j]!=1&&wall[i][j+temp]!=3&&i-temp>0)
+                    {
+                        masir[b]=Up;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==2)
+                {
+                    if(wall[i][j+temp]!=2&&wall[i][j+temp]!=3&&j+temp<boardSize-1)
+                    {
+                        masir[b]=Right;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==3)
+                {
+                    if(wall[i+temp][j]!=1&&wall[i][j+temp]!=3&&i+temp<boardSize-1)
+                    {
+                        masir[b]=Down;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==4)
+                {
+                    if(wall[i][j-temp-1]!=2&&wall[i][j+temp]!=3&&j-temp>0)
+                    {
+                        masir[b]=Left;
+                        temp++;
+                    }
+                    else
+                        break;
+                }  
+            }
+            move(a,masir,temp);
+        }
+    }
+}
