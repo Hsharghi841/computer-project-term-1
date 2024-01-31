@@ -38,5 +38,5 @@ void show_round(int round);
 void show_name_of_game();
 void show_starting_menu();
 void scan_from_display(char result[20]);
-
+enum page move_animation(coordinates avalie,coordinates sanavie,int id);
 #endif

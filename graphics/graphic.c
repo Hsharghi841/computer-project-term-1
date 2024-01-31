@@ -46,6 +46,8 @@ extern enum direction {None , Up, Right, Down, Left};
 
 extern enum turns {none, cat1, cat2, cat3, cat4};
 
+extern enum page {endofGame, firstmenu, ingame, gameStarter};
+
 #include "../graphics/graphic.h"
 
 
@@ -574,7 +576,97 @@ void scan_from_display(char result[20]){
 
 }
 
+enum page move_animation(coordinates avalie,coordinates sanavie,int id)
+{
+    enum page page;
+    bool showMouse = 1;
 
+    ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
+    al_start_timer(timer);
+            
+    ALLEGRO_EVENT event;
+    ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+    al_register_event_source(queue, al_get_mouse_event_source());
+    al_register_event_source(queue, al_get_timer_event_source(timer));
+    al_register_event_source(queue, al_get_display_event_source(display));
+            
+    ALLEGRO_BITMAP * oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
+
+    while (1){
+    al_wait_for_event(queue,&event);
+
+    if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
+         showMouse = 0;
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
+            showMouse = 1;
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+
+        }
+
+        if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+            page = endofGame;
+            break;
+        }
+
+        if(event.type == ALLEGRO_EVENT_TIMER){
+                    //هرچی می  خوای  این جا بکش
+            int x,y,i,j;
+            x=y=700 /boardSize;
+            int width, length;
+            width = length = 700 / boardSize;
+            al_draw_bitmap(oldDisplay, 0, 0, 0);
+            i=avalie.x*(700/boardSize)+10;
+            j=avalie.y*(700/boardSize)+10;
+            for ( i = avalie.x*(700/boardSize)+10; i < sanavie.x*(700/boardSize)+10; i++)
+            {
+                al_draw_filled_rectangle(avalie.x*(700/boardSize)+10,avalie.y*(700/boardSize)+10,avalie.x*(700/boardSize)+10+x-1,avalie.y*(700/boardSize)+10+y, al_map_rgb(204, 191, 123));
+                al_draw_filled_rectangle(sanavie.x*(700/boardSize)+10,sanavie.y*(700/boardSize)+10,sanavie.x*(700/boardSize)+10+x-1,sanavie.y*(700/boardSize)+10+y, al_map_rgb(204, 191, 123));
+                al_draw_rectangle(avalie.x*(700/boardSize)+10,avalie.y*(700/boardSize)+10,avalie.x*(700/boardSize)+10+x-1,avalie.y*(700/boardSize)+10+y, al_map_rgb(158,153,101),60 / boardSize);
+                al_draw_rectangle(sanavie.x*(700/boardSize)+10,sanavie.y*(700/boardSize)+10,sanavie.x*(700/boardSize)+10+x-1,sanavie.y*(700/boardSize)+10+y, al_map_rgb(158,153,101),60 / boardSize);
+                show_walls();
+                al_draw_scaled_bitmap(anipic[id],0,0,512,512,i,j,width,length,0);
+            }
+            for ( i = avalie.x*(700/boardSize)+10; i > sanavie.x*(700/boardSize)+10; i--)
+            {
+                al_draw_filled_rectangle(avalie.x*(700/boardSize)+10,avalie.y*(700/boardSize)+10,avalie.x*(700/boardSize)+10+x-1,avalie.y*(700/boardSize)+10+y, al_map_rgb(204, 191, 123));
+                al_draw_filled_rectangle(sanavie.x*(700/boardSize)+10,sanavie.y*(700/boardSize)+10,sanavie.x*(700/boardSize)+10+x-1,sanavie.y*(700/boardSize)+10+y, al_map_rgb(204, 191, 123));
+                al_draw_rectangle(avalie.x*(700/boardSize)+10,avalie.y*(700/boardSize)+10,avalie.x*(700/boardSize)+10+x-1,avalie.y*(700/boardSize)+10+y, al_map_rgb(158,153,101),60 / boardSize);
+                al_draw_rectangle(sanavie.x*(700/boardSize)+10,sanavie.y*(700/boardSize)+10,sanavie.x*(700/boardSize)+10+x-1,sanavie.y*(700/boardSize)+10+y, al_map_rgb(158,153,101),60 / boardSize);
+                show_walls();
+                al_draw_scaled_bitmap(anipic[id],0,0,512,512,i,j,width,length,0);
+            }
+            j=avalie.x*(700/boardSize)+10;
+            for ( i = avalie.y*(700/boardSize)+10; i < sanavie.y*(700/boardSize)+10; i++)
+            {
+                al_draw_filled_rectangle(avalie.x*(700/boardSize)+10,avalie.y*(700/boardSize)+10,avalie.x*(700/boardSize)+10+x-1,avalie.y*(700/boardSize)+10+y, al_map_rgb(204, 191, 123));
+                al_draw_filled_rectangle(sanavie.x*(700/boardSize)+10,sanavie.y*(700/boardSize)+10,sanavie.x*(700/boardSize)+10+x-1,sanavie.y*(700/boardSize)+10+y, al_map_rgb(204, 191, 123));
+                al_draw_rectangle(avalie.x*(700/boardSize)+10,avalie.y*(700/boardSize)+10,avalie.x*(700/boardSize)+10+x-1,avalie.y*(700/boardSize)+10+y, al_map_rgb(158,153,101),60 / boardSize);
+                al_draw_rectangle(sanavie.x*(700/boardSize)+10,sanavie.y*(700/boardSize)+10,sanavie.x*(700/boardSize)+10+x-1,sanavie.y*(700/boardSize)+10+y, al_map_rgb(158,153,101),60 / boardSize);
+                show_walls();
+                al_draw_scaled_bitmap(anipic[id],0,0,512,512,i,j,width,length,0);
+            }
+            for ( i = avalie.y*(700/boardSize)+10; i > sanavie.y*(700/boardSize)+10; i--)
+            {
+                al_draw_filled_rectangle(avalie.x*(700/boardSize)+10,avalie.y*(700/boardSize)+10,avalie.x*(700/boardSize)+10+x-1,avalie.y*(700/boardSize)+10+y, al_map_rgb(204, 191, 123));
+                al_draw_filled_rectangle(sanavie.x*(700/boardSize)+10,sanavie.y*(700/boardSize)+10,sanavie.x*(700/boardSize)+10+x-1,sanavie.y*(700/boardSize)+10+y, al_map_rgb(204, 191, 123));
+                al_draw_rectangle(avalie.x*(700/boardSize)+10,avalie.y*(700/boardSize)+10,avalie.x*(700/boardSize)+10+x-1,avalie.y*(700/boardSize)+10+y, al_map_rgb(158,153,101),60 / boardSize);
+                al_draw_rectangle(sanavie.x*(700/boardSize)+10,sanavie.y*(700/boardSize)+10,sanavie.x*(700/boardSize)+10+x-1,sanavie.y*(700/boardSize)+10+y, al_map_rgb(158,153,101),60 / boardSize);
+                show_walls();
+                al_draw_scaled_bitmap(anipic[id],0,0,512,512,i,j,width,length,0);
+            }
+                if(showMouse)put_mouse();
+                al_flip_display();
+        }
+            al_destroy_event_queue(queue);
+            al_stop_timer(timer);
+            al_destroy_timer(timer);
+            return page;
+	}
+}
 
 
 
