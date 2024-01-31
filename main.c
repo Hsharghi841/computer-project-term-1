@@ -100,6 +100,7 @@ void war_between_cat_dog(int catid,int dogid);
 void war_between_cat1_cat2(int cat1id,int cat2id);
 void move_dog_mice();
 void set_fishes();
+void move_dog_mice_hosh();
 
 // 1 to 4 for dogs, 5 to 22 for mice, 23 to 26 for cats
 animal animals[27];
@@ -110,6 +111,7 @@ turns catslist[4];
 int catsNumber = 0;
 turns turn[4];
 int numfish=10;
+int difficulty=2;
 
 
 int ________________________________________$_START_GAME_$________________________________________(){
@@ -301,8 +303,18 @@ int ________________________________________$_START_GAME_$______________________
                     needUpdateRoundshowing = 1;
 
                     if(numfish < catsNumber)set_fishes();
-
-                    move_dog_mice();
+					if(!difficulty)
+						move_dog_mice();
+                    else if(!difficulty-1)
+                    {
+                        int i=rand()%2;
+                        if(!i)
+                            move_dog_mice();
+                        else
+                            move_dog_mice_hosh();
+                    }
+                    else
+                        move_dog_mice_hosh();
                     for (size_t i = 0; i < catsNumber; i++)
                     {
                         if (!animals[get_cat_id(catslist[i])].freaz)
@@ -944,6 +956,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1037,6 +1050,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1130,6 +1144,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1223,6 +1238,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
+                        printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1318,8 +1334,6 @@ void delete_id(int id,int i,int j)
     board[i][j][b]=0;
     board[i][j][0]--;
     animals[id].on_board=0;
-    if(id>4&&id<23)
-        printf("8888");
 }
 
 void war_between_cat_dog(int catid,int dogid)
@@ -1386,7 +1400,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
 void move_dog_mice(){
     direction direction, masir[5];
     int i,j,temp=0;
-    for (size_t a = 22; a >0; a++)
+    for (size_t a = 22; a >0; a--)
     {
         direction=rand()%4+1;
         temp=0;
@@ -1394,6 +1408,101 @@ void move_dog_mice(){
         {
             i=animals[a].y;
             j=animals[a].x;
+            for (size_t b = 0; b < animals[a].energy; b++)
+            {
+                if (direction==1)
+                {
+                    if(wall[i-temp-1][j]!=1&&wall[i][j+temp]!=3&&i-temp>0)
+                    {
+                        masir[b]=Up;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==2)
+                {
+                    if(wall[i][j+temp]!=2&&wall[i][j+temp]!=3&&j+temp<boardSize-1)
+                    {
+                        masir[b]=Right;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==3)
+                {
+                    if(wall[i+temp][j]!=1&&wall[i][j+temp]!=3&&i+temp<boardSize-1)
+                    {
+                        masir[b]=Down;
+                        temp++;
+                    }
+                    else
+                        break;
+                }
+                else if (direction==4)
+                {
+                    if(wall[i][j-temp-1]!=2&&wall[i][j+temp]!=3&&j-temp>0)
+                    {
+                        masir[b]=Left;
+                        temp++;
+                    }
+                    else
+                        break;
+                }  
+            }
+            move(a,masir,temp);
+        }
+    }
+}
+
+void move_dog_mice_hosh(){
+    direction direction, masir[5];
+    int i,j,temp=0,minid,minfasle;
+    for (size_t a = 22; a >0; a--)
+    {
+        minfasle=500;
+        temp=0;
+        if(animals[a].on_board)
+        {
+            i=animals[a].y;
+            j=animals[a].x;
+            for (int k = 0; k< catsNumber; k++){
+			    if ((animals[get_cat_id(catslist[k])].x-j)*(animals[get_cat_id(catslist[k])].x-j)+(animals[get_cat_id(catslist[k])].y-i)*(animals[get_cat_id(catslist[k])].y-i) < minfasle){
+				    minid=get_cat_id(catslist[k]);
+			    }
+		    }
+            if(a>4)
+            {
+                if (animals[minid].y>i&&i!=0)
+                {
+                    direction=1;
+                }
+                else if(animals[minid].y<=i&&i!=boardSize-1)
+                    direction=3;
+                else if(animals[minid].x<=j&&j!=boardSize-1)
+                    direction=2;
+                else if(animals[minid].x>j&&j!=0)
+                    direction=4;
+                else
+                	direction=rand()%4+1;
+            }
+            else
+            {
+                if (animals[minid].y>i&&i!=boardSize-1)
+                {
+                    direction=3;
+                }
+                else if(animals[minid].y<=i&&i!=0)
+                    direction=1;
+                else if(animals[minid].x<=j&&j!=0)
+                    direction=4;
+                else if(animals[minid].x>j&&j!=boardSize-1)
+                    direction=2;
+                else
+                	direction=rand()%4+1;
+            }
+            
             for (size_t b = 0; b < animals[a].energy; b++)
             {
                 if (direction==1)
