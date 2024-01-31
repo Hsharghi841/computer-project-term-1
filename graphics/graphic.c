@@ -46,6 +46,8 @@ extern enum direction {None , Up, Right, Down, Left};
 
 extern enum turns {none, cat1, cat2, cat3, cat4};
 
+extern enum page {endofGame, firstmenu, ingame, gameStarter, loadmenu};
+
 #include "../graphics/graphic.h"
 
 
@@ -54,7 +56,7 @@ ALLEGRO_DISPLAY * display;
 ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif, * scoreboardBMP, * playerSelectionBMP , * playerFreazeBMP;
 ALLEGRO_BITMAP * dice[7],*anipic[35];
 
-ALLEGRO_FONT * scoreboardFont, * numFont, * numFont2, * scoreboardFontsml, * namefont, * menuFont;
+ALLEGRO_FONT * scoreboardFont, * numFont, * numFont2, * numFont2sml, * scoreboardFontsml, * namefont, * menuFont;
 
 ALLEGRO_MOUSE_STATE msestate;
 
@@ -62,16 +64,18 @@ ALLEGRO_SAMPLE * selection_fail_audio;
 ALLEGRO_SAMPLE * selection_audio;
 ALLEGRO_SAMPLE_ID isPlayingSampleId;
 
-button diceThrowBTN, playBTN, optionsBTN, loadBTN, exitBTN, backBTN, changeBTN, startBTN;
+button diceThrowBTN, playBTN, optionsBTN, loadBTN, exitBTN, backBTN, changeBTN, startBTN, pauseBTN, resumeBTN, saveBTN, mainMenuBTN;
 
 
 extern animal animals[27];
+extern int board[31][31][30];
 extern int boardSize;
 extern int wall[31][31];
 extern turns catslist[4];
 extern int catsNumber;
 extern int roundLimit;
-
+extern int playingRound;
+extern int numfish;
 
 int allegroINIT(){
 	
@@ -85,6 +89,7 @@ int allegroINIT(){
 	scoreboardFontsml = al_load_ttf_font("fonts/font.ttf", 20, 0);
 	numFont = al_load_ttf_font("fonts/number font.ttf", 30, 0);
 	numFont2 = al_load_ttf_font("fonts/number font 2.ttf", 30, 0);
+	numFont2sml = al_load_ttf_font("fonts/number font 2.ttf", 25, 0);
     namefont = al_load_ttf_font("fonts/font.ttf", 100, 0);
     menuFont = al_load_ttf_font("fonts/menu font.ttf", 40, 0);
 	
@@ -187,6 +192,36 @@ int allegroINIT(){
     changeBTN.to.x = 1090;
     changeBTN.to.y = 145 + height;
     changeBTN.icon = al_load_bitmap("buttons/change.png");
+
+    height = 90;
+    length = height * 4.2;
+    resumeBTN.from.x = 640 - length / 2;
+    resumeBTN.from.y = 300 - height / 2;
+    resumeBTN.to.x = 640 + length / 2;
+    resumeBTN.to.y = 300 + height / 2;
+    resumeBTN.icon = al_load_bitmap("buttons/resume.png");
+
+    saveBTN.from.x = 640 - length / 2;
+    saveBTN.from.y = 400 - height / 2;
+    saveBTN.to.x = 640 + length / 2;
+    saveBTN.to.y = 400 + height / 2;
+    saveBTN.icon = al_load_bitmap("buttons/save.png");
+    
+    mainMenuBTN.from.x = 640 - length / 2;
+    mainMenuBTN.from.y = 500 - height / 2;
+    mainMenuBTN.to.x = 640 + length / 2;
+    mainMenuBTN.to.y = 500 + height / 2;
+    mainMenuBTN.icon = al_load_bitmap("buttons/main menu.png");
+
+
+    height = 100;
+    length = height;
+    pauseBTN.from.x = 1120;
+    pauseBTN.from.y = 570;
+    pauseBTN.to.x = 1120 + length;
+    pauseBTN.to.y = 570 + height;
+    pauseBTN.icon = al_load_bitmap("buttons/pause.png");
+
 
 
 
@@ -408,6 +443,11 @@ void show_background(){
     al_draw_scaled_bitmap(background, 0, 0, 1920, 1080, 0, 0, 1280, 720, 0);
 }
 
+int check_button(button b, int x, int y){
+    return b.is_showing && (((b.from.x <= x && x <= b.to.x) && (b.from.y <= y && y <= b.to.y)) || 
+            ((b.to.x <= x && x <= b.from.x) && (b.to.y <= y && y <= b.from.y)));
+}
+
 void show_button(button btn){
     al_draw_scaled_bitmap(btn.icon, 0, 0, al_get_bitmap_width(btn.icon), al_get_bitmap_height(btn.icon), btn.from.x, btn.from.y, btn.to.x - btn.from.x, btn.to.y - btn.from.y, 0);
 }
@@ -457,7 +497,7 @@ void show_round(int round){
 }
 
 void show_name_of_game(){
-    al_draw_text(namefont, al_map_rgb(240, 45, 58), 610, 20, ALLEGRO_ALIGN_CENTRE, "Mr. Clobber's backyard");
+    al_draw_text(namefont, al_map_rgb(240, 45, 58), 640, 20, ALLEGRO_ALIGN_CENTRE, "Mr. Clobber's backyard");
 }
 
 void show_starting_menu(){
@@ -501,9 +541,12 @@ void scan_from_display(char result[20]){
     
     al_draw_filled_rectangle(0, 0, 1280, 720, al_premul_rgba(51, 53, 51, 128));
     al_draw_filled_rectangle(300, 330, 980, 390, al_map_rgb(255, 255, 255));
+    al_draw_text(numFont2, al_map_rgb(0, 0, 0), 640, 340, ALLEGRO_ALIGN_CENTRE, result);
     al_flip_display();
-    result[0] = 0;
-    int len = 0;
+    // result[0] = 0;
+    int len = strlen(result);
+    char strcopy[20];
+    strcpy(strcopy, result);
     bool showMouse = 1;
 
     ALLEGRO_EVENT event;
@@ -511,7 +554,6 @@ void scan_from_display(char result[20]){
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_display_event_source(display));
 
-    ALLEGRO_BITMAP * oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
 
     while (1){
         al_wait_for_event(queue,&event);
@@ -526,7 +568,7 @@ void scan_from_display(char result[20]){
             }
 
             if(event.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
-                result[0] = 0;
+                strcpy(result, strcopy);
                 return;
             }
 
@@ -575,7 +617,213 @@ void scan_from_display(char result[20]){
 }
 
 
+enum page show_pause_menu(){
+    bool showMouse = 1;
+    enum page result;
+    ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
+    al_start_timer(timer);
+    
+    ALLEGRO_EVENT event;
+    ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+    al_register_event_source(queue, al_get_mouse_event_source());
+    al_register_event_source(queue, al_get_timer_event_source(timer));
+    al_register_event_source(queue, al_get_display_event_source(display));
 
+    
+    al_draw_filled_rectangle(0, 0, 1280, 720, al_premul_rgba(51, 53, 51, 128));
+    resumeBTN.is_showing = 1;
+    show_button(resumeBTN);
+    saveBTN.is_showing = 1;
+    show_button(saveBTN);
+    mainMenuBTN.is_showing = 1;
+    show_button(mainMenuBTN);
+    
+    ALLEGRO_BITMAP * oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
+
+    while (1){
+        al_wait_for_event(queue,&event);
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
+            showMouse = 0;
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
+            showMouse = 1;
+        }
+
+        if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+            result = endofGame;
+            break;
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+
+            if(check_button(resumeBTN, event.mouse.x, event.mouse.y)){
+                result = ingame;
+                break;
+            }
+
+            if(check_button(saveBTN, event.mouse.x, event.mouse.y)){
+                char saveName[28];
+                char Direction[80] = "./saves/";
+                char number[8] = {0};
+                strcpy(saveName, "name of file");
+                scan_from_display(saveName);
+                strcat(Direction, saveName);
+                strcat(Direction, ".dat");
+                FILE * saveFile = fopen(Direction, "r+b");
+                int fileCount;
+                if(saveFile){
+                    
+                    fclose(saveFile);
+                    Direction[strlen(Direction) - 4] = 0;
+                    fileCount = 2;
+                    sprintf(number, "(%d)", fileCount);
+                    strcat(Direction, number);
+                    strcat(Direction, ".dat");
+                    saveFile = fopen(Direction, "r+b");
+                    while (saveFile){
+                        fclose(saveFile);
+                        fileCount++;
+                        int i;
+                        for(i = strlen(Direction) - 1; Direction[i] != '('; i--);
+                        Direction[i] = 0;
+                        sprintf(number, "(%d)", fileCount);
+                        strcat(Direction, number);
+                        strcat(Direction, ".dat");
+                        saveFile = fopen(Direction, "r+b");
+                    }
+                    
+                }
+                
+                {
+                    FILE * saveNamesfile = fopen("./saves/save list.txt", "r+t");
+                    if(!saveNamesfile){
+                        saveNamesfile = fopen("./saves/save list.txt", "w+t");
+                        fprintf(saveNamesfile, "1- %s\n", saveName);
+                    }else{
+                        int n;
+                        do{
+                            char temp[20];
+                            fscanf(saveNamesfile, "%d- %s", &n, &temp);
+                        }while(!feof(saveNamesfile));
+                        n++;
+                        strcat(saveName, number);
+                        fprintf(saveNamesfile, "%d- %s\n", n, saveName);
+                        
+                        
+                    }
+                    fclose(saveNamesfile);
+                }
+
+                saveFile = fopen(Direction, "wb");
+                fwrite(animals, sizeof(animal), 27, saveFile);
+                fwrite(board, sizeof(int), 31 * 31 * 30, saveFile);
+                fwrite(&boardSize, sizeof(int), 1, saveFile);
+                fwrite(wall, sizeof(int), 31 * 31, saveFile);
+                fwrite(catslist, sizeof(turns), 4, saveFile);
+                fwrite(&catsNumber, sizeof(int), 1, saveFile);
+                fwrite(&roundLimit, sizeof(int), 1, saveFile);
+                fwrite(&playingRound, sizeof(int), 1, saveFile);
+                fwrite(&numfish, sizeof(int), 1, saveFile);
+                fclose(saveFile);
+
+                result = ingame;
+                break;
+                
+            }
+
+            if(check_button(mainMenuBTN, event.mouse.x, event.mouse.y)){
+                result = firstmenu;
+                break;
+            }
+
+        }
+
+        if(event.type == ALLEGRO_EVENT_TIMER){
+            
+            al_draw_bitmap(oldDisplay, 0, 0, 0);
+
+
+
+
+            if(showMouse)put_mouse();
+
+            al_flip_display();
+        }
+
+
+        
+    }
+    al_destroy_event_queue(queue);
+    al_stop_timer(timer);
+    al_destroy_timer(timer);
+
+    playBTN.is_showing = 0;
+    loadBTN.is_showing = 0;
+    optionsBTN.is_showing = 0;
+    exitBTN.is_showing = 0;
+
+    return result;
+}
+
+enum page wait_for_click(){
+    bool showMouse = 1;
+    enum page result;
+
+    ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
+    al_start_timer(timer);
+    
+    ALLEGRO_EVENT event;
+    ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+    al_register_event_source(queue, al_get_mouse_event_source());
+    al_register_event_source(queue, al_get_timer_event_source(timer));
+    al_register_event_source(queue, al_get_display_event_source(display));
+
+
+    ALLEGRO_BITMAP * oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
+
+
+    while (1){
+        al_wait_for_event(queue,&event);
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
+            showMouse = 0;
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
+            showMouse = 1;
+        }
+
+        if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+            result = endofGame;
+            break;
+        }
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+            result = ingame;
+            break;
+        }
+
+        if(event.type == ALLEGRO_EVENT_TIMER){
+            
+            al_draw_bitmap(oldDisplay, 0, 0, 0);
+
+
+
+
+            if(showMouse)put_mouse();
+
+            al_flip_display();
+        }
+
+    }
+
+    al_destroy_event_queue(queue);
+    al_stop_timer(timer);
+    al_destroy_timer(timer);
+
+}
 
 
 
