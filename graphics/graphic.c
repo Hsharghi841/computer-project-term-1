@@ -56,7 +56,7 @@ ALLEGRO_DISPLAY * display;
 ALLEGRO_BITMAP * cursor, * selsction, * selsctionHavel, * background, * mygif, * scoreboardBMP, * playerSelectionBMP , * playerFreazeBMP;
 ALLEGRO_BITMAP * dice[7],*anipic[35];
 
-ALLEGRO_FONT * scoreboardFont, * numFont, * numFont2, * scoreboardFontsml, * namefont, * menuFont;
+ALLEGRO_FONT * scoreboardFont, * numFont, * numFont2, * numFont2sml, * scoreboardFontsml, * namefont, * menuFont;
 
 ALLEGRO_MOUSE_STATE msestate;
 
@@ -88,6 +88,7 @@ int allegroINIT(){
 	scoreboardFontsml = al_load_ttf_font("fonts/font.ttf", 20, 0);
 	numFont = al_load_ttf_font("fonts/number font.ttf", 30, 0);
 	numFont2 = al_load_ttf_font("fonts/number font 2.ttf", 30, 0);
+	numFont2sml = al_load_ttf_font("fonts/number font 2.ttf", 20, 0);
     namefont = al_load_ttf_font("fonts/font.ttf", 100, 0);
     menuFont = al_load_ttf_font("fonts/menu font.ttf", 40, 0);
 	

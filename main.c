@@ -75,6 +75,7 @@ extern ALLEGRO_DISPLAY * display;
 extern ALLEGRO_SAMPLE * selection_fail_audio;
 extern ALLEGRO_SAMPLE_ID isPlayingSampleId;
 extern ALLEGRO_SAMPLE * selection_audio;
+extern ALLEGRO_FONT * namefont, * numFont2sml;
 
 //functions:
 
@@ -190,6 +191,11 @@ int ________________________________________$_START_GAME_$______________________
                         page = gameStarter;
                         break;
                     }
+
+                    if(check_button(loadBTN, event.mouse.x, event.mouse.y)){
+                        page = loadmenu;
+                        break;
+                    }
                 }
 
                 if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
@@ -238,10 +244,39 @@ int ________________________________________$_START_GAME_$______________________
             al_register_event_source(queue, al_get_display_event_source(display));
 
 
+            int fileNumber;
+            int selectedSave;
+            button * savesBTN;
 
             backBTN.is_showing = 1;
+            startBTN.is_showing = 1;
+
+        
+            FILE * saveNamesfile = fopen("./saves/save list.txt", "r+t");
+            if(!saveNamesfile){
+                fileNumber = 0;
+            }else{
+                do{
+                    char temp[20];
+                    fscanf(saveNamesfile, "%d- %s", &fileNumber, &temp);
+                }while(!feof(saveNamesfile));
             
 
+                savesBTN = (button *)malloc(fileNumber * sizeof(button));
+                savesBTN[fileNumber - 1].from.x = backBTN.from.x + 3;
+                savesBTN[fileNumber - 1].from.y = 100;
+                savesBTN[fileNumber - 1].to.x = startBTN.to.x - 3;
+                savesBTN[fileNumber - 1].to.y = 120;
+                for(int i = fileNumber - 2;i >= 0; i++){
+                    savesBTN[i].from.x = savesBTN[fileNumber - 1].from.x;
+                    savesBTN[i].from.y = savesBTN[fileNumber - 1].from.y + 20;
+                    savesBTN[i].to.x = savesBTN[fileNumber - 1].to.x;
+                    savesBTN[i].to.y = savesBTN[fileNumber - 1].to.y + 20;
+                }
+
+            
+            
+            }
 
             ALLEGRO_BITMAP * oldDisplay;
             
@@ -280,7 +315,8 @@ int ________________________________________$_START_GAME_$______________________
                     if(needUpdateDisplay){
                         show_background();
                         al_draw_filled_rectangle(0, 0, 1280, 720, al_premul_rgba(255, 255, 255, 128));
-                        
+                        al_draw_filled_rectangle(backBTN.from.x + 3, 100, startBTN.to.x - 3, backBTN.from.y - 50, al_map_rgb(255, 255, 255));
+                        al_draw_text(namefont, al_map_rgb(240, 45, 58), 610, 10, ALLEGRO_ALIGN_CENTRE, "load menu");
                         show_button(backBTN);
                         show_button(startBTN);
                         oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
@@ -299,6 +335,8 @@ int ________________________________________$_START_GAME_$______________________
 
                 
             }
+            fclose(saveNamesfile);
+            free(savesBTN);
 
             al_destroy_event_queue(queue);
             al_stop_timer(timer);
