@@ -662,47 +662,66 @@ enum page show_pause_menu(){
             }
 
             if(check_button(saveBTN, event.mouse.x, event.mouse.y)){
-                char saveName[20];
+                char saveName[28];
                 char Direction[80] = "./saves/";
+                char number[8] = {0};
                 strcpy(saveName, "name of file");
                 scan_from_display(saveName);
-                FILE * saveNames = fopen("./saves/save list.txt", "r+t");
-                if(!saveName){
-                    saveNames = fopen("./saves/save list.txt", "w+t");
-                    fprintf(saveName, "1- ");
-                }
-                fseek(saveName, 0, SEEK_END);
-                char ch;
-                do{
-                    fseek(saveName, -2, SEEK_CUR);
-                    fscanf(saveName, "%c", &ch);
-                }while (ch != '\n');
-                
-                int n;
-                fscanf(saveName, "%d", &n);
-                n++;
-                fseek(saveName, 0, SEEK_END);
-                fprintf(saveNames, "\n%d- %s", n, saveName);
-                fclose(saveNames);
-
                 strcat(Direction, saveName);
                 strcat(Direction, ".dat");
                 FILE * saveFile = fopen(Direction, "r+b");
-                if(!saveFile){
-                    saveFile = fopen(Direction, "wb");
-                }else{
+                int fileCount;
+                if(saveFile){
+                    
                     fclose(saveFile);
                     Direction[strlen(Direction) - 4] = 0;
-                    strcat(Direction, " (2).dat");
-                    saveFile = fopen()
+                    fileCount = 2;
+                    sprintf(number, "(%d)", fileCount);
+                    strcat(Direction, number);
+                    strcat(Direction, ".dat");
+                    saveFile = fopen(Direction, "r+b");
+                    while (saveFile){
+                        fclose(saveFile);
+                        fileCount++;
+                        int i;
+                        for(i = strlen(Direction) - 1; Direction[i] != '('; i--);
+                        Direction[i] = 0;
+                        sprintf(number, "(%d)", fileCount);
+                        strcat(Direction, number);
+                        strcat(Direction, ".dat");
+                        saveFile = fopen(Direction, "r+b");
+                    }
+                    
                 }
+                
+                {
+                    FILE * saveNamesfile = fopen("./saves/save list.txt", "r+t");
+                    if(!saveNamesfile){
+                        saveNamesfile = fopen("./saves/save list.txt", "w+t");
+                        fprintf(saveNamesfile, "1- %s\n", saveName);
+                    }else{
+                        int n;
+                        do{
+                            char temp[20];
+                            fscanf(saveNamesfile, "%d- %s", &n, &temp);
+                        }while(!feof(saveNamesfile));
+                        n++;
+                        strcat(saveName, number);
+                        fprintf(saveNamesfile, "%d- %s\n", n, saveName);
+                        
+                        
+                    }
+                    fclose(saveNamesfile);
+                }
+
+                saveFile = fopen(Direction, "wb");
                 fwrite(animals, sizeof(animal), 27, saveFile);
                 fwrite(board, sizeof(int), 31 * 31 * 30, saveFile);
                 fwrite(wall, sizeof(int), 31 * 31, saveFile);
-                fwrite(catslist, sizeof(catslist[0]), 4, saveFile);
-                fwrite(catsNumber, sizeof(int), 1, saveFile);
-                fwrite(roundLimit, sizeof(int), 1, saveFile);
-                fwrite(numfish, sizeof(int), 1, saveFile);
+                fwrite(catslist, sizeof(turns), 4, saveFile);
+                fwrite(&catsNumber, sizeof(int), 1, saveFile);
+                fwrite(&roundLimit, sizeof(int), 1, saveFile);
+                fwrite(&numfish, sizeof(int), 1, saveFile);
                 fclose(saveFile);
 
                 result = ingame;

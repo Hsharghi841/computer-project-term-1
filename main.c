@@ -238,6 +238,8 @@ int ________________________________________$_START_GAME_$______________________
             al_register_event_source(queue, al_get_display_event_source(display));
 
 
+
+            backBTN.is_showing = 1;
             
 
 
@@ -265,7 +267,10 @@ int ________________________________________$_START_GAME_$______________________
                         break;
                     }
                     
-                    
+                    if(check_button(startBTN, event.mouse.x, event.mouse.y)){
+                        page = firstmenu;
+                        break;
+                    }
 
                     
                     
@@ -275,10 +280,8 @@ int ________________________________________$_START_GAME_$______________________
                     if(needUpdateDisplay){
                         show_background();
                         al_draw_filled_rectangle(0, 0, 1280, 720, al_premul_rgba(255, 255, 255, 128));
-                        show_starting_menu();
+                        
                         show_button(backBTN);
-                        show_button(boardSizeChange);
-                        show_button(roundLimitChange);
                         show_button(startBTN);
                         oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
                         needUpdateDisplay = 0;
@@ -1833,9 +1836,10 @@ void move_dog_mice(){
 }
 
 void printlog(){
-    printf("catnumber : %d { ", catsNumber);
+    printf("catnumber : %d { \n", catsNumber);
     for (int i = 0; i < catsNumber; i++){
-        printf("%d ", catslist[i]);
+        printf("%d : ", catslist[i]);
+        printf("%s\tfreaze = %d\n", animals[get_cat_id(catslist[i])].name, animals[get_cat_id(catslist[i])].freaz);
     }
     printf("}\n");
     printf("board : \n\n");
