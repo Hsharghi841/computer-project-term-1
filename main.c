@@ -50,7 +50,7 @@ struct button {
 };
 typedef struct button button;
 
-extern button diceThrowBTN, playBTN, optionsBTN, loadBTN, exitBTN, backBTN, changeBTN, startBTN;
+extern button diceThrowBTN, playBTN, optionsBTN, loadBTN, exitBTN, backBTN, changeBTN, startBTN, pauseBTN;
 
 
 enum direction {None , Up, Right, Down, Left};
@@ -60,7 +60,7 @@ typedef enum direction direction;
 enum turns {none, cat1, cat2, cat3, cat4};
 typedef enum turns turns;
 
-enum {endofGame, firstmenu, ingame, gameStarter} page = firstmenu;
+enum page {endofGame, firstmenu, ingame, gameStarter, loadmenu} page = firstmenu;
 
 
 #include <stdio.h>
@@ -91,7 +91,6 @@ direction find_direction(int x, int y, int xboard, int yboard);
 int isEqualCoordinates(coordinates a, coordinates b);
 int check_wall(coordinates a, coordinates b);
 int check_wall2(int x, int y, coordinates b);
-int check_button(button b, int x, int y);
 int throw_next_die(int dice[4], bool needThrow[4]);
 int is_dice_repeated(int dice[4], bool repeatedDice[4]);
 void swap(int *a, int * b);
@@ -224,6 +223,86 @@ int ________________________________________$_START_GAME_$______________________
         }
         
 
+        if(page == loadmenu){
+
+            bool showMouse = 1;
+            bool needUpdateDisplay = 1;
+
+            ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
+            al_start_timer(timer);
+            
+            ALLEGRO_EVENT event;
+            ALLEGRO_EVENT_QUEUE * queue = al_create_event_queue();
+            al_register_event_source(queue, al_get_mouse_event_source());
+            al_register_event_source(queue, al_get_timer_event_source(timer));
+            al_register_event_source(queue, al_get_display_event_source(display));
+
+
+            
+
+
+            ALLEGRO_BITMAP * oldDisplay;
+            
+            while (page == loadmenu){
+                al_wait_for_event(queue,&event);
+
+                if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
+                    showMouse = 0;
+                }
+
+                if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
+                    showMouse = 1;
+                }
+
+                if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+                    page = endofGame;
+                    break;
+                }
+                
+                if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+                    if(check_button(backBTN, event.mouse.x, event.mouse.y)){
+                        page = firstmenu;
+                        break;
+                    }
+                    
+                    
+
+                    
+                    
+                }
+
+                if(event.type == ALLEGRO_EVENT_TIMER){
+                    if(needUpdateDisplay){
+                        show_background();
+                        al_draw_filled_rectangle(0, 0, 1280, 720, al_premul_rgba(255, 255, 255, 128));
+                        show_starting_menu();
+                        show_button(backBTN);
+                        show_button(boardSizeChange);
+                        show_button(roundLimitChange);
+                        show_button(startBTN);
+                        oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
+                        needUpdateDisplay = 0;
+                    }else
+                        al_draw_bitmap(oldDisplay, 0, 0, 0);
+
+
+
+
+                    if(showMouse)put_mouse();
+
+                    al_flip_display();
+                }
+
+
+                
+            }
+
+            al_destroy_event_queue(queue);
+            al_stop_timer(timer);
+            al_destroy_timer(timer);
+        }
+
+
         if(page == gameStarter){
 
             bool showMouse = 1;
@@ -291,7 +370,7 @@ int ________________________________________$_START_GAME_$______________________
                     
                     if(check_button(boardSizeChange, event.mouse.x, event.mouse.y)){
                         
-                        char str[20];
+                        char str[20] = {0};
                         scan_from_display(str);
                         int temp = atoi(str);
                         if(temp <= 31 && temp >= 15)
@@ -304,7 +383,7 @@ int ________________________________________$_START_GAME_$______________________
 
                     if(check_button(roundLimitChange, event.mouse.x, event.mouse.y)){
                         
-                        char str[20];
+                        char str[20] = {0};
                         scan_from_display(str);
                         int temp = atoi(str);
                         if(temp <= 30 && temp >= 2)
@@ -342,6 +421,7 @@ int ________________________________________$_START_GAME_$______________________
                                 catslist[catsNumber++] = i + 1;
                             }
                         }
+                        if(!catsNumber)continue;
 
                         page = ingame;
                         break;
@@ -397,6 +477,7 @@ int ________________________________________$_START_GAME_$______________________
             }
             bool throwingDice = 0;
             diceThrowBTN.is_showing = 1;
+            pauseBTN.is_showing = 1;
 
             ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
             al_start_timer(timer);
@@ -427,7 +508,7 @@ int ________________________________________$_START_GAME_$______________________
             int nmoves = 0;
 
             while(page == ingame){
-                al_wait_for_event(queue,&event);
+                al_wait_for_event(queue, &event);
 
 
                 if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
@@ -437,7 +518,6 @@ int ________________________________________$_START_GAME_$______________________
                 if(event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY){
                     showMouse = 1;
                 }
-
 
                 if(event.type == ALLEGRO_EVENT_MOUSE_AXES){
                     if(turn && is_mouse_on_Board(event.mouse.x, event.mouse.y)){
@@ -530,6 +610,15 @@ int ________________________________________$_START_GAME_$______________________
                         printlog();
                     }
 
+                    if(check_button(pauseBTN, event.mouse.x, event.mouse.y)){
+                        page = show_pause_menu();
+                        // oldBoardDisplay = NULL;
+                        // needUpdateBoardDisplay = 1;
+                        // needUpdateScoreboard = 1;
+                        // needUpdateRoundshowing = 1;
+                    }
+
+
                 }
 
                 if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
@@ -542,7 +631,11 @@ int ________________________________________$_START_GAME_$______________________
                         needUpdateScoreboard = 1;
                         nmoves = 0;
                         nselection = 0;
-                        turn = next_turn();
+                        do{
+                            turn = next_turn();
+                        }while(turn && animals[get_cat_id(turn)].freaz--);
+                        animals[get_cat_id(turn)].freaz++;
+                        
                         if(!turn){
 
                             if(++playingRound > roundLimit){
@@ -583,6 +676,7 @@ int ________________________________________$_START_GAME_$______________________
                         else 
                             show_background();
                         show_button(log);
+                        show_button(pauseBTN);
                         show_board();
                         show_components();
                         if(turn)show_animal(get_cat_id(turn));
@@ -617,7 +711,10 @@ int ________________________________________$_START_GAME_$______________________
                         if(!throwingDice){
                             set_turns(dice);
                             if(!is_dice_repeated(dice, needThrowdie)){
-                                turn = next_turn();
+                                do{
+                                    turn = next_turn();
+                                }while(turn && animals[get_cat_id(turn)].freaz--);
+                                animals[get_cat_id(turn)].freaz++;
                                 needUpdateScoreboard = 1;
                                 needUpdateBoardDisplay = 1;
                                 diceThrowBTN.is_showing = 0;
@@ -659,18 +756,16 @@ int ________________________________________$_START_GAME_$______________________
                 
             }
             
-            al_unregister_event_source(queue, al_get_mouse_event_source());
-            al_unregister_event_source(queue, al_get_timer_event_source(timer));
-            al_unregister_event_source(queue, al_get_display_event_source(display));
+            
             al_destroy_timer(timer);
+            al_destroy_event_queue(queue);
+            show_background();
             show_board();
             show_components();
             show_walls();
             show_scoreboard();
             al_flip_display();
-            if(page)
-                al_wait_for_event(queue, &event);
-            al_destroy_event_queue(queue);
+            if(page)if(page = wait_for_click())page = firstmenu;
             
         }
 
@@ -1096,11 +1191,6 @@ int check_wall2(int x, int y, coordinates b){
         return 0;
     }
     return 1;
-}
-
-int check_button(button b, int x, int y){
-    return b.is_showing && (((b.from.x <= x && x <= b.to.x) && (b.from.y <= y && y <= b.to.y)) || 
-            ((b.to.x <= x && x <= b.from.x) && (b.to.y <= y && y <= b.from.y)));
 }
 
 int throw_next_die(int dice[4], bool needThrow[4]){

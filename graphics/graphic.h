@@ -31,6 +31,7 @@ void show_background();
 void show_dice(int die[4], bool reset);
 
 void show_button(button btn);
+int check_button(button b, int x, int y);
 void show_scoreboard();
 void show_turn(turns turn);
 void show_round(int round);
@@ -38,5 +39,7 @@ void show_round(int round);
 void show_name_of_game();
 void show_starting_menu();
 void scan_from_display(char result[20]);
+enum page show_pause_menu();
+enum page wait_for_click();
 
 #endif
