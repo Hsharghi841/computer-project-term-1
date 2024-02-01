@@ -739,6 +739,7 @@ enum page show_pause_menu(){
                 fwrite(&catsNumber, sizeof(int), 1, saveFile);
                 fwrite(&roundLimit, sizeof(int), 1, saveFile);
                 fwrite(&playingRound, sizeof(int), 1, saveFile);
+                fwrite(&difficulty, sizeof(int), 1, saveFile);
                 fwrite(&numfish, sizeof(int), 1, saveFile);
                 fclose(saveFile);
 

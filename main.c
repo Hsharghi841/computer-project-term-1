@@ -331,6 +331,7 @@ int ________________________________________$_START_GAME_$______________________
                         fread(&catsNumber, sizeof(int), 1, saveFile);
                         fread(&roundLimit, sizeof(int), 1, saveFile);
                         fread(&playingRound, sizeof(int), 1, saveFile);
+                        fread(&difficulty, sizeof(int), 1, saveFile);
                         fread(&numfish, sizeof(int), 1, saveFile);
                         loaded = 1;
                         page = ingame;
