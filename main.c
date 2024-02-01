@@ -1897,6 +1897,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
 
 void move_dog_mice(){
     direction direction, masir[5];
+    coordinates av,s;
     int i,j,temp=0;
     for (size_t a = 22; a >0; a--)
     {
@@ -1904,13 +1905,15 @@ void move_dog_mice(){
         temp=0;
         if(animals[a].on_board)
         {
-            i=animals[a].y;
-            j=animals[a].x;
+            av.y=i=animals[a].y;
+            av.x=j=animals[a].x;
             for (size_t b = 0; b < animals[a].energy; b++)
             {
                 if (direction==1)
                 {
-                    if(wall[i-temp-1][j]!=1&&wall[i-temp-1][j]!=3&&i-temp>0)
+                    s.y=i-temp-1;
+                    s.x=j;
+                    if(check_wall(av,s)&&i-temp>0)
                     {
                         masir[b]=Up;
                         temp++;
@@ -1920,7 +1923,9 @@ void move_dog_mice(){
                 }
                 else if (direction==2)
                 {
-                    if(wall[i][j+temp]!=2&&wall[i][j+temp]!=3&&j+temp<boardSize-1)
+                    s.y=i;
+                    s.x=j+temp+1;
+                    if(check_wall(av,s)&&j+temp<boardSize-1)
                     {
                         masir[b]=Right;
                         temp++;
@@ -1930,7 +1935,9 @@ void move_dog_mice(){
                 }
                 else if (direction==3)
                 {
-                    if(wall[i+temp][j]!=1&&wall[i+temp][j]!=3&&i+temp<boardSize-1)
+                    s.y=i+temp+1;
+                    s.x=j;
+                    if(check_wall(av,s)&&i+temp<boardSize-1)
                     {
                         masir[b]=Down;
                         temp++;
@@ -1940,7 +1947,9 @@ void move_dog_mice(){
                 }
                 else if (direction==4)
                 {
-                    if(wall[i][j-temp-1]!=2&&wall[i][j-temp-1]!=3&&j-temp>0)
+                    s.y=i;
+                    s.x=j-temp-1;
+                    if(check_wall(av,s)&&j-temp>0)
                     {
                         masir[b]=Left;
                         temp++;
@@ -1985,6 +1994,7 @@ void printlog(){
 
 void move_dog_mice_hosh(){
     direction direction, masir[5];
+    coordinates av,s;
     int i,j,temp=0,minid,minfasle;
     for (size_t a = 22; a > 0; a--)
     {
@@ -1992,8 +2002,8 @@ void move_dog_mice_hosh(){
         temp=0;
         if(animals[a].on_board)
         {
-            i=animals[a].y;
-            j=animals[a].x;
+            av.y=i=animals[a].y;
+            av.x=j=animals[a].x;
             for (int k = 0; k< catsNumber; k++){
 			    if ((animals[get_cat_id(catslist[k])].x-j)*(animals[get_cat_id(catslist[k])].x-j)+(animals[get_cat_id(catslist[k])].y-i)*(animals[get_cat_id(catslist[k])].y-i) < minfasle){
 				    minid=get_cat_id(catslist[k]);
@@ -2034,7 +2044,9 @@ void move_dog_mice_hosh(){
             {
                 if (direction==1)
                 {
-                    if(wall[i-temp-1][j]!=1&&wall[i-temp-1][j]!=3&&i-temp>0)
+                    s.y=i-temp-1;
+                    s.x=j;
+                    if(check_wall(av,s)&&i-temp>0)
                     {
                         masir[b]=Up;
                         temp++;
@@ -2044,7 +2056,9 @@ void move_dog_mice_hosh(){
                 }
                 else if (direction==2)
                 {
-                    if(wall[i][j+temp]!=2&&wall[i][j+temp]!=3&&j+temp<boardSize-1)
+                    s.y=i;
+                    s.x=j+temp+1;
+                    if(check_wall(av,s)&&j+temp<boardSize-1)
                     {
                         masir[b]=Right;
                         temp++;
@@ -2054,7 +2068,9 @@ void move_dog_mice_hosh(){
                 }
                 else if (direction==3)
                 {
-                    if(wall[i+temp][j]!=1&&wall[i+temp][j]!=3&&i+temp<boardSize-1)
+                    s.y=i+temp+1;
+                    s.x=j;
+                    if(check_wall(av,s)&&i+temp<boardSize-1)
                     {
                         masir[b]=Down;
                         temp++;
@@ -2064,7 +2080,9 @@ void move_dog_mice_hosh(){
                 }
                 else if (direction==4)
                 {
-                    if(wall[i][j-temp-1]!=2&&wall[i][j-temp-1]!=3&&j-temp>0)
+                    s.y=i;
+                    s.x=j-temp-1;
+                    if(check_wall(av,s)&&j-temp>0)
                     {
                         masir[b]=Left;
                         temp++;
