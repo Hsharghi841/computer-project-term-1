@@ -1,6 +1,6 @@
-Name of winner=sd
-Score of winner=5
-Name of 2=fg
-Score of 2=2
-Name of 3=df
+Name of winner=simin
+Score of winner=2
+Name of 2=hadi
+Score of 2=0
+Name of 3=saman
 Score of 3=0

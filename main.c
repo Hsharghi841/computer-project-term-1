@@ -1737,7 +1737,7 @@ void move(int id,direction masir[5],int tedadgam){
                         animals[board[i][j][a]].score+=animals[id].score;
                         animals[board[i][j][a]].id_mic[0]++;
                         animals[board[i][j][a]].id_mic[animals[board[i][j][a]].id_mic[0]]=id;
-                        printf("888888");
+                        //printf("888888");
                         delete_id(id,i,j);
                     }
             }
@@ -1808,13 +1808,14 @@ void move(int id,direction masir[5],int tedadgam){
                 }
             }
         }
-        printf("\n#%d %d",animals[id].score,animals[id].id_mic[0]);
+     //   printf("\n#%d %d",animals[id].score,animals[id].id_mic[0]);
     }
     if(animals[id].freaz)
    	{
    		animals[id].freaz--;
    		if(!animals[id].freaz)
    		{
+   			printf("8");
    			animals[id].energy=4;
 			animals[id].power=2;	
 		}
@@ -1868,7 +1869,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
         for ( b = 1; b < animals[cat2id].id_mic[0]+1; b++)
         {
             animals[cat1id].id_mic[0]++;
-            animals[cat2id].id_mic[animals[cat1id].id_mic[0]]=animals[cat2id].id_mic[b];
+            animals[cat1id].id_mic[animals[cat1id].id_mic[0]]=animals[cat2id].id_mic[b];
             animals[cat2id].id_mic[b]=0;
         }
         animals[cat2id].id_mic[0]=0;
@@ -1884,7 +1885,7 @@ void war_between_cat1_cat2(int cat1id,int cat2id)
         for ( b = 1; b < animals[cat1id].id_mic[0]+1; b++)
         {
             animals[cat2id].id_mic[0]++;
-            animals[cat1id].id_mic[animals[cat2id].id_mic[0]]=animals[cat1id].id_mic[b];
+            animals[cat2id].id_mic[animals[cat2id].id_mic[0]]=animals[cat1id].id_mic[b];
             animals[cat1id].id_mic[b]=0;
         }
         animals[cat1id].id_mic[0]=0;
@@ -1912,6 +1913,7 @@ void move_dog_mice(){
             {
                 if (direction==1)
                 {
+                	av.y=i-temp;
                     s.y=i-temp-1;
                     s.x=j;
                     if(check_wall(av,s)&&i-temp>0)
@@ -1925,6 +1927,7 @@ void move_dog_mice(){
                 else if (direction==2)
                 {
                     s.y=i;
+                    av.x=j+temp;
                     s.x=j+temp+1;
                     if(check_wall(av,s)&&j+temp<boardSize-1)
                     {
@@ -1936,6 +1939,7 @@ void move_dog_mice(){
                 }
                 else if (direction==3)
                 {
+                	av.y=i+temp;
                     s.y=i+temp+1;
                     s.x=j;
                     if(check_wall(av,s)&&i+temp<boardSize-1)
@@ -1949,6 +1953,7 @@ void move_dog_mice(){
                 else if (direction==4)
                 {
                     s.y=i;
+                    av.x=j+temp;
                     s.x=j-temp-1;
                     if(check_wall(av,s)&&j-temp>0)
                     {
@@ -2045,6 +2050,7 @@ void move_dog_mice_hosh(){
             {
                 if (direction==1)
                 {
+                	av.y=i-temp;
                     s.y=i-temp-1;
                     s.x=j;
                     if(check_wall(av,s)&&i-temp>0)
@@ -2058,6 +2064,7 @@ void move_dog_mice_hosh(){
                 else if (direction==2)
                 {
                     s.y=i;
+                    av.x=j+temp;
                     s.x=j+temp+1;
                     if(check_wall(av,s)&&j+temp<boardSize-1)
                     {
@@ -2069,6 +2076,7 @@ void move_dog_mice_hosh(){
                 }
                 else if (direction==3)
                 {
+                	av.y=i+temp;
                     s.y=i+temp+1;
                     s.x=j;
                     if(check_wall(av,s)&&i+temp<boardSize-1)
@@ -2082,6 +2090,7 @@ void move_dog_mice_hosh(){
                 else if (direction==4)
                 {
                     s.y=i;
+                    av.x=j+temp;
                     s.x=j-temp-1;
                     if(check_wall(av,s)&&j-temp>0)
                     {
