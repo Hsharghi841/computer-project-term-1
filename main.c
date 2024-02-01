@@ -719,6 +719,19 @@ int ________________________________________$_START_GAME_$______________________
                     if(selecting){
                         selecting = 0;
                         // move function
+
+                        show_background();
+                        show_button(log);
+                        show_button(pauseBTN);
+                        show_board();
+                        show_components();
+                        if(turn)show_animal(get_cat_id(turn));
+                        show_walls();
+                        show_scoreboard();
+                        show_turn(turn);
+                        show_round(playingRound);
+                        show_dice(dice, 0);
+
                         move(get_cat_id(turn), moves, nmoves);
                         needUpdateBoardDisplay = 1;
                         needUpdateScoreboard = 1;
@@ -752,7 +765,7 @@ int ________________________________________$_START_GAME_$______________________
                             else
                                 move_dog_mice_hosh();
 
-                            move_dog_mice();
+                            
                             for (size_t i = 0; i < catsNumber; i++)
                             {
                                 if (!animals[get_cat_id(catslist[i])].freaz)
@@ -1161,22 +1174,6 @@ void set_fishes(){
     sortObject(fishes, numfish);
 }
 
-int show_components(){
-    for (size_t i = 0; i < boardSize; i++)
-        for (size_t j = 0; j < boardSize; j++)
-        {
-            if(board[i][j][0]){
-                for(int k = 2; k <= board[i][j][0] + 1; k++){
-                    show_animal(board[i][j][k]);
-                }
-            }
-
-            if(board[i][j][1] && board[i][j][1] != TRAP){
-                show_object(board[i][j][1], j, i);
-            }
-        }
-}
-
 turns next_turn(){
     static int nturn = -1;
     nturn++;
@@ -1395,12 +1392,12 @@ void move(int id,direction masir[5],int tedadgam){
     	printf("\n*%d",masir[k]);
         if (masir[k]==Right&&animals[id].energy>0&&!animals[id].freaz)
         {
-            avalie.y=j=animals[id].x;
-            avalie.x=i=animals[id].y;
+            avalie.y=i=animals[id].y;
+            avalie.x=j=animals[id].x;
             delete_id(id,i,j);
             j++;
-            sanavie.y=j;
-            sanavie.x=i;
+            sanavie.y=i;
+            sanavie.x=j;
             move_animation(avalie,sanavie,id);
             putOnboard(id,i,j);
             if (id>0&&id<5)
@@ -1492,12 +1489,12 @@ void move(int id,direction masir[5],int tedadgam){
         }
         else if (masir[k]==Left&&animals[id].energy>0&&!animals[id].freaz)
         {
-            avalie.y=j=animals[id].x;
-            avalie.x=i=animals[id].y;
+            avalie.y=i=animals[id].y;
+            avalie.x=j=animals[id].x;
             delete_id(id,i,j);
             j--;
-            sanavie.y=j;
-            sanavie.x=i;
+            sanavie.y=i;
+            sanavie.x=j;
             move_animation(avalie,sanavie,id);
             putOnboard(id,i,j);
             if (id>0&&id<5)
@@ -1589,12 +1586,12 @@ void move(int id,direction masir[5],int tedadgam){
         }
         else if (masir[k]==Up&&animals[id].energy>0&&!animals[id].freaz)
         {
-            avalie.y=j=animals[id].x;
-            avalie.x=i=animals[id].y;
+            avalie.y=i=animals[id].y;
+            avalie.x=j=animals[id].x;
             delete_id(id,i,j);
             i--;
-            sanavie.y=j;
-            sanavie.x=i;
+            sanavie.y=i;
+            sanavie.x=j;
             move_animation(avalie,sanavie,id);
             putOnboard(id,i,j);
             if (id>0&&id<5)
@@ -1686,12 +1683,12 @@ void move(int id,direction masir[5],int tedadgam){
         }
         else if (masir[k]==Down&&animals[id].energy>0&&!animals[id].freaz)
         {
-            avalie.y=j=animals[id].x;
-            avalie.x=i=animals[id].y;
+            avalie.y=i=animals[id].y;
+            avalie.x=j=animals[id].x;
             delete_id(id,i,j);
             i++;
-            sanavie.y=j;
-            sanavie.x=i;
+            sanavie.y=i;
+            sanavie.x=j;
             move_animation(avalie,sanavie,id);
             putOnboard(id,i,j);
             if (id>0&&id<5)
@@ -1952,7 +1949,7 @@ void printlog(){
 void move_dog_mice_hosh(){
     direction direction, masir[5];
     int i,j,temp=0,minid,minfasle;
-    for (size_t a = 22; a >0; a--)
+    for (size_t a = 22; a > 0; a--)
     {
         minfasle=500;
         temp=0;

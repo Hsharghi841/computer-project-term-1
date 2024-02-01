@@ -20,6 +20,7 @@ void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2, float thickn
 void show_walls();
 int show_animal(int id);
 int show_object(int id, int x, int y);
+int show_components();
 int is_mouse_on_Board(int x, int y);
 int is_mouse_nextto(int x, int y, int xboard, int yboard);
 void find_cordinate_on_board(int x, int y, int *xBoard, int *yBoard);

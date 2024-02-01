@@ -394,6 +394,22 @@ int show_object(int id, int x, int y){
     
 }
 
+int show_components(){
+    for (size_t i = 0; i < boardSize; i++)
+        for (size_t j = 0; j < boardSize; j++)
+        {
+            if(board[i][j][0]){
+                for(int k = 2; k <= board[i][j][0] + 1; k++){
+                    show_animal(board[i][j][k]);
+                }
+            }
+
+            if(board[i][j][1] && board[i][j][1] != 27){
+                show_object(board[i][j][1], j, i);
+            }
+        }
+}
+
 int show_slection_hover(int x, int y){
     int length, width;
     length = width = 700 /boardSize;
@@ -830,12 +846,13 @@ enum page move_animation(coordinates avalie,coordinates sanavie,int id)
     bool showMouse = 1;
 
     int length, height;
-    length = height = 700 /boardSize;
+    length = height = 700 / boardSize;
 
     float dx = (sanavie.x - avalie.x) * length;
     float dy = (sanavie.y - avalie.y) * height;
     float x = avalie.x * length + 10;
     float y = avalie.y * height + 10;
+
 
     ALLEGRO_TIMER * timer = al_create_timer(1.0 / 60);
     al_start_timer(timer);
@@ -846,10 +863,22 @@ enum page move_animation(coordinates avalie,coordinates sanavie,int id)
     al_register_event_source(queue, al_get_timer_event_source(timer));
     al_register_event_source(queue, al_get_display_event_source(display));
 
+    show_background();
+    show_button(pauseBTN);
+    show_board();
+    show_components();
+    show_walls();
+    show_scoreboard();
+    show_round(playingRound);
+    show_dice(dice, 0);
+
+    
     ALLEGRO_BITMAP * oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
 
+
     while (1){
-    al_wait_for_event(queue,&event);
+
+        al_wait_for_event(queue,&event);
 
         if(event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY){
             showMouse = 0;
@@ -874,29 +903,52 @@ enum page move_animation(coordinates avalie,coordinates sanavie,int id)
             
             
             
-            al_draw_filled_rectangle(((x - 10) / length) * length + 10, ((y - 10) / height) * height + 10,(((x - 10) / length) + 1) * length + 10, (((y - 10) / height) + 1) * height + 10, al_map_rgb(204, 191, 123));
+            al_draw_filled_rectangle(((int)(x - 10) / length) * length + 10, ((int)(y - 10) / height) * height + 10,(((int)(x - 10) / length) + 1) * length + 10, (((int)(y - 10) / height) + 1) * height + 10, al_map_rgb(204, 191, 123));
             al_draw_filled_rectangle(sanavie.x*(length)+10,sanavie.y*(height)+10,(sanavie.x + 1)*length+10,(sanavie.y + 1)*(height)+10, al_map_rgb(204, 191, 123));
-            al_draw_rectangle(((x - 10) / length) * length + 10, ((y - 10) / height) * height + 10,(((x - 10) / length) + 1) * length + 10, (((y - 10) / height) + 1) * height + 10, al_map_rgb(158,153,101),60 / boardSize);
+            al_draw_rectangle(((int)(x - 10) / length) * length + 10, ((int)(y - 10) / height) * height + 10,(((int)(x - 10) / length) + 1) * length + 10, (((int)(y - 10) / height) + 1) * height + 10, al_map_rgb(158,153,101),60 / boardSize);
             al_draw_rectangle(sanavie.x*(length)+10,sanavie.y*(height)+10,(sanavie.x + 1)*length+10,(sanavie.y + 1)*(height)+10, al_map_rgb(158,153,101),60 / boardSize);
-            show_walls();
+            int x1 = avalie.x, y1 = avalie.y;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            x1--;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            x1--;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            x1++;
+            y1--;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            y1 += 2;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            x1++;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            y1 -= 2;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            y1--;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            x1++;
+            y1++;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            y1++;
+            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
             al_draw_scaled_bitmap(anipic[id],0,0,512,512,x, y,length,height,0);
 
-            x += dx / 60;
-            y += dy / 60;
+            x += dx / 30;
+            y += dy / 30;
 
-            if(x >= sanavie.x && y >= sanavie.y)break;
             
+            if(1 > (x - (sanavie.x * length + 10)) && -1 < (x - (sanavie.x * length + 10)) && 1 > (y - (sanavie.y * height + 10)) && -1 < (y - (sanavie.y * height + 10))){
+                break;
+            }
             
             if(showMouse)put_mouse();
             al_flip_display();
         }
 
 
-        al_destroy_event_queue(queue);
-        al_stop_timer(timer);
-        al_destroy_timer(timer);
-        return page;
 	}
+    al_destroy_event_queue(queue);
+    al_stop_timer(timer);
+    al_destroy_timer(timer);
+    return page;
 }
 
 
