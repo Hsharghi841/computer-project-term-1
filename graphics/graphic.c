@@ -76,6 +76,7 @@ extern int catsNumber;
 extern int roundLimit;
 extern int playingRound;
 extern int numfish;
+extern int difficulty;
 
 int allegroINIT(){
 	
@@ -540,6 +541,13 @@ void show_starting_menu(){
     al_draw_filled_rectangle(600, 480, 850, 480 + al_get_font_line_height(numFont2), al_map_rgb(255, 255, 255));
     al_draw_rectangle(600, 480, 850, 480 + al_get_font_line_height(numFont2), al_map_rgb(51, 53, 51), 1);
     al_draw_text(scoreboardFont, al_map_rgb(67, 40, 24), 725, 488, ALLEGRO_ALIGN_CENTRE, animals[get_cat_id(cat4)].name);
+
+    al_draw_text(numFont2, al_map_rgb(0, 0, 0), 985, 301, ALLEGRO_ALIGN_CENTRE, "difficulty");
+    al_draw_line(890, 350, 1080, 350, al_map_rgb(0, 0, 0), 2);
+    al_draw_text(numFont2, al_map_rgb(0, 0, 0), 985, 361, ALLEGRO_ALIGN_CENTRE, "easy");
+    al_draw_text(numFont2, al_map_rgb(0, 0, 0), 985, 424, ALLEGRO_ALIGN_CENTRE, "medium");
+    al_draw_text(numFont2, al_map_rgb(0, 0, 0), 985, 484, ALLEGRO_ALIGN_CENTRE, "hard");
+
 
 }
 

@@ -114,8 +114,8 @@ int catsNumber = 0;
 turns turn[4];
 int numfish=10;
 int roundLimit;
-int difficulty=1;
 int playingRound;
+int difficulty=1;
 
 
 int ________________________________________$_START_GAME_$________________________________________(){
@@ -430,6 +430,17 @@ int ________________________________________$_START_GAME_$______________________
             name4.from.y += 60;
             name4.to.y += 60;
 
+            button hardBTN, mediumBTN, easyBTN;
+            easyBTN.from.x = 890;
+            easyBTN.from.y = 361;
+            easyBTN.to.x = 1080;
+            easyBTN.to.y = 403;
+            mediumBTN = easyBTN;
+            mediumBTN.from.y += 60;
+            mediumBTN.to.y += 60;
+            hardBTN = mediumBTN;
+            hardBTN.from.y += 60;
+            hardBTN.to.y += 60;
 
             ALLEGRO_BITMAP * oldDisplay;
             
@@ -514,6 +525,21 @@ int ________________________________________$_START_GAME_$______________________
                         break;
                         
                     }
+
+                    if(check_button(easyBTN, event.mouse.x, event.mouse.y)){
+                        difficulty = 1;
+                        needUpdateDisplay = 1;
+                    }
+
+                    if(check_button(mediumBTN, event.mouse.x, event.mouse.y)){
+                        difficulty = 2;
+                        needUpdateDisplay = 1;
+                    }
+
+                    if(check_button(hardBTN, event.mouse.x, event.mouse.y)){
+                        difficulty = 3;
+                        needUpdateDisplay = 1;
+                    }
                     
                 }
 
@@ -525,7 +551,12 @@ int ________________________________________$_START_GAME_$______________________
                         show_button(backBTN);
                         show_button(boardSizeChange);
                         show_button(roundLimitChange);
+                        
+
                         show_button(startBTN);
+                        al_draw_rectangle(easyBTN.from.x, easyBTN.from.y + (difficulty - 1) * 60, easyBTN.to.x, easyBTN.to.y + (difficulty - 1) * 60, al_map_rgb(0, 0, 0), 1);
+
+
                         oldDisplay = al_clone_bitmap(al_get_backbuffer(display));
                         needUpdateDisplay = 0;
                     }else
