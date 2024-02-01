@@ -1910,7 +1910,7 @@ void move_dog_mice(){
             {
                 if (direction==1)
                 {
-                    if(wall[i-temp-1][j]!=1&&wall[i][j+temp]!=3&&i-temp>0)
+                    if(wall[i-temp-1][j]!=1&&wall[i-temp-1][j]!=3&&i-temp>0)
                     {
                         masir[b]=Up;
                         temp++;
@@ -1930,7 +1930,7 @@ void move_dog_mice(){
                 }
                 else if (direction==3)
                 {
-                    if(wall[i+temp][j]!=1&&wall[i][j+temp]!=3&&i+temp<boardSize-1)
+                    if(wall[i+temp][j]!=1&&wall[i+temp][j]!=3&&i+temp<boardSize-1)
                     {
                         masir[b]=Down;
                         temp++;
@@ -1940,7 +1940,7 @@ void move_dog_mice(){
                 }
                 else if (direction==4)
                 {
-                    if(wall[i][j-temp-1]!=2&&wall[i][j+temp]!=3&&j-temp>0)
+                    if(wall[i][j-temp-1]!=2&&wall[i][j-temp-1]!=3&&j-temp>0)
                     {
                         masir[b]=Left;
                         temp++;
@@ -2034,7 +2034,7 @@ void move_dog_mice_hosh(){
             {
                 if (direction==1)
                 {
-                    if(wall[i-temp-1][j]!=1&&wall[i][j+temp]!=3&&i-temp>0)
+                    if(wall[i-temp-1][j]!=1&&wall[i-temp-1][j]!=3&&i-temp>0)
                     {
                         masir[b]=Up;
                         temp++;
@@ -2054,7 +2054,7 @@ void move_dog_mice_hosh(){
                 }
                 else if (direction==3)
                 {
-                    if(wall[i+temp][j]!=1&&wall[i][j+temp]!=3&&i+temp<boardSize-1)
+                    if(wall[i+temp][j]!=1&&wall[i+temp][j]!=3&&i+temp<boardSize-1)
                     {
                         masir[b]=Down;
                         temp++;
@@ -2064,7 +2064,7 @@ void move_dog_mice_hosh(){
                 }
                 else if (direction==4)
                 {
-                    if(wall[i][j-temp-1]!=2&&wall[i][j+temp]!=3&&j-temp>0)
+                    if(wall[i][j-temp-1]!=2&&wall[i][j-temp-1]!=3&&j-temp>0)
                     {
                         masir[b]=Left;
                         temp++;
