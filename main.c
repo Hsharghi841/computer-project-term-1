@@ -320,7 +320,7 @@ int ________________________________________$_START_GAME_$______________________
                         char Direction[80] = "./saves/";
                         strcat(Direction, &names[(selectedSave - 1) * 28 + 3]);
                         strcat(Direction, ".dat");
-                        printf("%s\n", Direction);
+                        // printf("%s\n", Direction);
                         FILE * saveFile;
                         if(!(saveFile = fopen(Direction, "rb")))printf("cant open save!\n");
                         fread(animals, sizeof(animal), 27, saveFile);
@@ -617,7 +617,6 @@ int ________________________________________$_START_GAME_$______________________
                         coordinates onBoard;
                         find_cordinate_on_board(event.mouse.x, event.mouse.y, &onBoard.x, &onBoard.y);
                         if(needShowSelectionHover = (is_mouse_nextto(event.mouse.x, event.mouse.y, animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y) && check_wall2(animals[get_cat_id(turn)].x, animals[get_cat_id(turn)].y, onBoard)) && !selecting){
-                            
                             mx = event.mouse.x;
                             my = event.mouse.y;
                             if(mouseButtonDown){
@@ -632,7 +631,7 @@ int ________________________________________$_START_GAME_$______________________
                             }
                         }
                         if(selecting && !isEqualCoordinates(selectionlist[nselection - 1], onBoard)){
-                            if(nselection > 1 && selectionlist[nselection - 2].x == onBoard.x && selectionlist[nselection - 2].y == onBoard.y){
+                            if(nselection > 1 && isEqualCoordinates(selectionlist[nselection - 2], onBoard)){
                                 nselection--;
                                 nmoves--;
                             }
@@ -803,7 +802,6 @@ int ________________________________________$_START_GAME_$______________________
                         oldBoardDisplay = al_clone_bitmap(al_get_backbuffer(display));
                         needUpdateBoardDisplay = 0;
                     }
-
                     if(needUpdateScoreboard){
                         if(oldBoardDisplay)
                             al_draw_bitmap(oldBoardDisplay, 0, 0, 0);
@@ -1279,16 +1277,16 @@ int check_wall(coordinates a, coordinates b){
     switch (find_direction(b.x, b.y, a.x, a.y))
     {
     case Down:
-        if(wall[a.x][a.y] / 2 == 1)return 0;
+        if(wall[a.y][a.x] / 2 == 1)return 0;
         break;
     case Right:
-        if(wall[a.x][a.y] % 2 == 1)return 0;
+        if(wall[a.y][a.x] % 2 == 1)return 0;
         break;
     case Left:
-        if(wall[b.x][b.y] % 2 == 1)return 0;
+        if(wall[b.y][b.x] % 2 == 1)return 0;
         break;
     case Up:
-        if(wall[b.x][b.y] / 2 == 1)return 0;
+        if(wall[b.y][b.x] / 2 == 1)return 0;
         break;
     default:
         return 0;
@@ -1300,16 +1298,16 @@ int check_wall2(int x, int y, coordinates b){
     switch (find_direction(b.x, b.y, x, y))
     {
     case Down:
-        if(wall[x][y] / 2 == 1)return 0;
+        if(wall[y][x] / 2 == 1)return 0;
         break;
     case Right:
-        if(wall[x][y] % 2 == 1)return 0;
+        if(wall[y][x] % 2 == 1)return 0;
         break;
     case Left:
-        if(wall[b.x][b.y] % 2 == 1)return 0;
+        if(wall[b.y][b.x] % 2 == 1)return 0;
         break;
     case Up:
-        if(wall[b.x][b.y] / 2 == 1)return 0;
+        if(wall[b.y][b.x] / 2 == 1)return 0;
         break;
     default:
         return 0;
@@ -1943,6 +1941,14 @@ void printlog(){
         }
         printf("\n");
     }
+    printf("\n");
+    for (int i = 0; i < boardSize; i++){
+        for (int j = 0; j < boardSize; j++){
+            printf("%3d", wall[i][j]);
+        }
+        printf("\n");
+    }
+
     
 }
 

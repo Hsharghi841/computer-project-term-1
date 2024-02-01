@@ -1,7 +1,7 @@
 [Project]
 filename=computer project term 1.dev
 name=computer project term 1
-Type=1
+Type=0
 Ver=2
 ObjFiles=
 Includes=.\allegro\include

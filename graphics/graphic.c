@@ -339,28 +339,19 @@ void show_board(){
     
 }
 
-void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2, float thickness)
-{
-    if (wall[i][j]==1&&i!=boardSize-1)
-    {
-        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(46, 64, 28));
+void show_wall(int x, int y, float thickness){
+    int height, length;
+    height = length = 700 / boardSize;
+
+    if(y == boardSize - 1)wall[y][x] %= 2;
+    if(x == boardSize - 1)wall[y][x] = wall[y][x] / 2 * 2;
+
+    if(wall[y][x] / 2){
+        al_draw_filled_rectangle((x) * length + 10, (y + 1) * height - thickness / 2 + 10, (x + 1) * length + 10, (y + 1) * height + thickness / 2 + 10, al_map_rgb(46, 64, 28));
     }
-    if (wall[i][j]==2&&j!=boardSize-1)
-    {
-        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(46, 64, 28));
-    }
-    if (wall[i][j]==3&&j!=boardSize-1&&i!=boardSize-1)
-    {
-        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(46, 64, 28));
-        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(46, 64, 28));
-    }
-    if (i==boardSize-1&&wall[i][j]&&j!=boardSize-1)
-    {
-        al_draw_filled_rectangle(x2, y2 - thickness / 2, x, y + thickness / 2, al_map_rgb(46, 64, 28));
-    }
-    if(j==boardSize-1&&wall[i][j]&&i!=boardSize-1)
-    {
-        al_draw_filled_rectangle(x1 - thickness / 2, y1, x + thickness / 2, y, al_map_rgb(46, 64, 28));
+
+    if(wall[y][x] % 2){
+        al_draw_filled_rectangle((x + 1) * length - thickness / 2 + 10, (y) * height + 10, (x + 1) * length  + thickness / 2 + 10, (y + 1) * height + 10, al_map_rgb(46, 64, 28));
     }
 }
 
@@ -369,7 +360,7 @@ void show_walls(){
 	x = y = 700 / boardSize;
     for (int i = 10; (i-10)/x < boardSize; i+=x)
         for (int j = 10; (j-10)/y < boardSize; j+=y){
-           	show_wall(((i-10)/x),((j-10)/y),i+x,j+y,i+x,j,i,j+y, 60 / boardSize);
+           	show_wall(((j-10)/x),((i-10)/y), 60 / boardSize);
         }
 }
 
@@ -505,7 +496,6 @@ void show_turn(turns turn){
 }
 
 void show_round(int round){
-    printf("updated\n");
     al_draw_filled_rectangle(994, 40, 1258, 90, al_map_rgb(0X43, 0X28, 0X18));
     al_draw_filled_rectangle(999, 45, 1253, 85, al_map_rgb(0x99, 0x58, 0x2a));
     al_draw_textf(scoreboardFont, al_map_rgb(0x6f, 0x1d, 0x1b), 1015, 52, ALLEGRO_ALIGN_LEFT, "round :");
@@ -903,32 +893,32 @@ enum page move_animation(coordinates avalie,coordinates sanavie,int id)
             
             
             
-            al_draw_filled_rectangle(((int)(x - 10) / length) * length + 10, ((int)(y - 10) / height) * height + 10,(((int)(x - 10) / length) + 1) * length + 10, (((int)(y - 10) / height) + 1) * height + 10, al_map_rgb(204, 191, 123));
-            al_draw_filled_rectangle(sanavie.x*(length)+10,sanavie.y*(height)+10,(sanavie.x + 1)*length+10,(sanavie.y + 1)*(height)+10, al_map_rgb(204, 191, 123));
-            al_draw_rectangle(((int)(x - 10) / length) * length + 10, ((int)(y - 10) / height) * height + 10,(((int)(x - 10) / length) + 1) * length + 10, (((int)(y - 10) / height) + 1) * height + 10, al_map_rgb(158,153,101),60 / boardSize);
-            al_draw_rectangle(sanavie.x*(length)+10,sanavie.y*(height)+10,(sanavie.x + 1)*length+10,(sanavie.y + 1)*(height)+10, al_map_rgb(158,153,101),60 / boardSize);
+            // al_draw_filled_rectangle(((int)(x - 10) / length) * length + 10, ((int)(y - 10) / height) * height + 10,(((int)(x - 10) / length) + 1) * length + 10, (((int)(y - 10) / height) + 1) * height + 10, al_map_rgb(204, 191, 123));
+            // al_draw_filled_rectangle(sanavie.x*(length)+10,sanavie.y*(height)+10,(sanavie.x + 1)*length+10,(sanavie.y + 1)*(height)+10, al_map_rgb(204, 191, 123));
+            // al_draw_rectangle(((int)(x - 10) / length) * length + 10, ((int)(y - 10) / height) * height + 10,(((int)(x - 10) / length) + 1) * length + 10, (((int)(y - 10) / height) + 1) * height + 10, al_map_rgb(158,153,101),60 / boardSize);
+            // al_draw_rectangle(sanavie.x*(length)+10,sanavie.y*(height)+10,(sanavie.x + 1)*length+10,(sanavie.y + 1)*(height)+10, al_map_rgb(158,153,101),60 / boardSize);
             int x1 = avalie.x, y1 = avalie.y;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            x1--;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            x1--;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            x1++;
-            y1--;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            y1 += 2;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            x1++;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            y1 -= 2;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            y1--;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            x1++;
-            y1++;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
-            y1++;
-            show_wall(y1, x1, (x1 + 1) * length, (y1 + 1) * height, (x1) * length, (y1 + 1) * height, (x1 + 1) * height, (y1) * height, boardSize / 60);
+            // show_wall(x1, y1, boardSize / 60);
+            // x1--;
+            // show_wall(x1, y1, boardSize / 60);
+            // x1--;
+            // show_wall(x1, y1, boardSize / 60);
+            // x1++;
+            // y1--;
+            // show_wall(x1, y1, boardSize / 60);
+            // y1 += 2;
+            // show_wall(x1, y1, boardSize / 60);
+            // x1++;
+            // show_wall(x1, y1, boardSize / 60);
+            // y1 -= 2;
+            // show_wall(x1, y1, boardSize / 60);
+            // y1--;
+            // show_wall(x1, y1, boardSize / 60);
+            // x1++;
+            // y1++;
+            // show_wall(x1, y1, boardSize / 60);
+            // y1++;
+            // show_wall(x1, y1, boardSize / 60);
             al_draw_scaled_bitmap(anipic[id],0,0,512,512,x, y,length,height,0);
 
             x += dx / 30;

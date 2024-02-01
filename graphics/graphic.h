@@ -16,7 +16,7 @@ int allegroINIT();
 int allegroDESTROY();
 int put_mouse();
 void show_board();
-void show_wall(int i,int j,int x,int y,int x1,int y1,int x2,int y2, float thickness);
+void show_wall(int x, int y, float thickness);
 void show_walls();
 int show_animal(int id);
 int show_object(int id, int x, int y);
